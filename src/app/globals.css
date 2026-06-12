@@ -37,3 +37,18 @@ body {
     clip-path: none;
   }
 }
+
+/* Custom subtle scrollbar for horizontal containers */
+.scrollbar-thin::-webkit-scrollbar {
+  height: 5px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(10, 82, 214, 0.08);
+  border-radius: 9999px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(10, 82, 214, 0.2);
+}
