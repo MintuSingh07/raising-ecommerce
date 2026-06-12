@@ -39,17 +39,17 @@ export default function Categories() {
           <div className="flex flex-col items-start space-y-4">
             <div className="flex items-center gap-3">
               <span className="w-8 h-[2px] bg-accent rounded-full"></span>
-              <span className="text-xs font-extrabold tracking-widest text-primary uppercase">
+              <span className="text-xs font-semibold tracking-widest text-primary uppercase">
                 Our Product Categories
               </span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-dark-navy tracking-tight leading-tight">
+            <h2 className="text-3xl sm:text-4xl font-semibold text-dark-navy tracking-tight leading-tight">
               Solutions That <span className="text-primary">Light</span> Every Need
             </h2>
           </div>
           <Link
             href="#all-products"
-            className="inline-flex items-center text-sm font-bold text-primary hover:text-primary-navy group transition-colors"
+            className="inline-flex items-center text-sm font-semibold text-primary hover:text-primary-navy group transition-colors"
           >
             View All Products
             <svg
@@ -89,7 +89,7 @@ export default function Categories() {
 
               {/* Card Footer Details */}
               <div className="flex items-center justify-between mt-auto">
-                <span className="text-sm font-extrabold text-dark-navy leading-tight group-hover:text-primary transition-colors pr-2">
+                <span className="text-sm font-semibold text-dark-navy leading-tight group-hover:text-primary transition-colors pr-2">
                   {cat.title}
                 </span>
                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-light transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:border-primary">

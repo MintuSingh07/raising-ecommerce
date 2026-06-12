@@ -53,10 +53,10 @@ export default function StatsBanner() {
                 {stat.icon}
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-[10px] sm:text-sm md:text-lg lg:text-2xl font-black text-dark-navy leading-none tracking-tight">
+                <span className="text-[10px] sm:text-sm md:text-lg lg:text-2xl font-semibold text-dark-navy leading-none tracking-tight">
                   {stat.value}
                 </span>
-                <span className="text-[8px] sm:text-[10px] md:text-xs font-semibold text-slate-light mt-0.5 sm:mt-1 leading-tight">
+                <span className="text-[8px] sm:text-[10px] md:text-xs font-medium text-slate-light mt-0.5 sm:mt-1 leading-tight">
                   {stat.label}
                 </span>
               </div>

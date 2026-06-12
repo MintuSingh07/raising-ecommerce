@@ -14,11 +14,11 @@ export default function CtaBanner() {
             
             {/* Left Column Content */}
             <div className="lg:col-span-7 p-8 sm:p-12 md:p-16 flex flex-col justify-center items-start space-y-6 z-10">
-              <span className="text-xs sm:text-sm font-extrabold uppercase tracking-widest text-accent">
+              <span className="text-xs sm:text-sm font-semibold uppercase tracking-widest text-accent">
                 Looking for Bulk Supply?
               </span>
               
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight leading-tight">
                 Partner With <span className="text-accent">RISING</span>
               </h2>
               
@@ -29,7 +29,7 @@ export default function CtaBanner() {
               <div className="flex flex-wrap gap-4 w-full sm:w-auto pt-4">
                 <Link
                   href="#distributor-form"
-                  className="inline-flex items-center justify-center px-8 py-4 rounded-full text-xs font-black bg-accent text-dark-navy transition-all duration-300 hover:bg-accent-hover hover:-translate-y-0.5 active:translate-y-0 hover:shadow-lg hover:shadow-yellow-500/10"
+                  className="inline-flex items-center justify-center px-8 py-4 rounded-full text-xs font-semibold bg-accent text-dark-navy transition-all duration-300 hover:bg-accent-hover hover:-translate-y-0.5 active:translate-y-0 hover:shadow-lg hover:shadow-yellow-500/10"
                 >
                   Become a Distributor
                   <svg className="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -39,7 +39,7 @@ export default function CtaBanner() {
                 
                 <Link
                   href="#contact-sales"
-                  className="inline-flex items-center justify-center px-8 py-4 rounded-full text-xs font-black bg-transparent text-white border border-white/30 hover:border-white hover:bg-white/10 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"
+                  className="inline-flex items-center justify-center px-8 py-4 rounded-full text-xs font-semibold bg-transparent text-white border border-white/30 hover:border-white hover:bg-white/10 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"
                 >
                   Contact Sales Team
                   <svg className="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

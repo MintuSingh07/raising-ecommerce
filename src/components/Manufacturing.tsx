@@ -49,13 +49,13 @@ export default function Manufacturing() {
             {/* Tagline */}
             <div className="flex items-center gap-3">
               <span className="w-8 h-[2px] bg-accent rounded-full"></span>
-              <span className="text-xs font-extrabold tracking-widest text-primary uppercase">
+              <span className="text-xs font-semibold tracking-widest text-primary uppercase">
                 Built With Precision
               </span>
             </div>
 
             {/* Title */}
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-dark-navy tracking-tight leading-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-dark-navy tracking-tight leading-tight">
               Advanced Manufacturing.<br />
               Engineered for <span className="text-primary">Excellence.</span>
             </h2>
@@ -72,7 +72,7 @@ export default function Manufacturing() {
                   <div className="p-2 rounded-xl bg-white border border-slate-100 text-primary shadow-sm">
                     {pt.icon}
                   </div>
-                  <span className="text-sm font-extrabold text-dark-navy">{pt.title}</span>
+                  <span className="text-sm font-semibold text-dark-navy">{pt.title}</span>
                 </div>
               ))}
             </div>
@@ -81,7 +81,7 @@ export default function Manufacturing() {
             <div className="pt-6">
               <Link
                 href="#manufacturing-details"
-                className="inline-flex items-center justify-center px-8 py-3.5 rounded-full text-xs font-bold text-primary border border-slate-200 bg-white transition-all duration-300 hover:border-primary/30 hover:bg-slate-50 hover:-translate-y-0.5 active:translate-y-0"
+                className="inline-flex items-center justify-center px-8 py-3.5 rounded-full text-xs font-semibold text-primary border border-slate-200 bg-white transition-all duration-300 hover:border-primary/30 hover:bg-slate-50 hover:-translate-y-0.5 active:translate-y-0"
               >
                 Explore Our Manufacturing
                 <svg className="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -66,12 +66,12 @@ export default function WhyChooseUs() {
         <div className="flex flex-col items-center text-center space-y-4 mb-16">
           <div className="flex items-center gap-3 justify-center">
             <span className="w-8 h-[2px] bg-accent rounded-full"></span>
-            <span className="text-xs font-extrabold tracking-widest text-primary uppercase">
+            <span className="text-xs font-semibold tracking-widest text-primary uppercase">
               Why Choose Rising
             </span>
             <span className="w-8 h-[2px] bg-accent rounded-full"></span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-dark-navy tracking-tight leading-tight">
+          <h2 className="text-3xl sm:text-4xl font-semibold text-dark-navy tracking-tight leading-tight">
             Built Different. Built <span className="text-primary">Better.</span>
           </h2>
         </div>
@@ -86,7 +86,7 @@ export default function WhyChooseUs() {
               <div className="w-12 h-12 rounded-2xl bg-blue-50/50 text-primary flex items-center justify-center mb-6 transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:scale-110">
                 {pt.icon}
               </div>
-              <h3 className="text-lg font-extrabold text-dark-navy mb-3 group-hover:text-primary transition-colors">
+              <h3 className="text-lg font-semibold text-dark-navy mb-3 group-hover:text-primary transition-colors">
                 {pt.title}
               </h3>
               <p className="text-sm text-slate-body leading-relaxed">

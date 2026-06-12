@@ -20,9 +20,9 @@ export default function Footer() {
                   <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
-              <span className="text-2xl font-black tracking-wider text-dark-navy flex items-baseline">
+              <span className="text-2xl font-semibold tracking-wider text-dark-navy flex items-baseline">
                 RISING
-                <span className="text-[10px] font-bold text-slate-400 ml-0.5 leading-none">®</span>
+                <span className="text-[10px] font-medium text-slate-400 ml-0.5 leading-none">®</span>
               </span>
             </Link>
             
@@ -63,8 +63,8 @@ export default function Footer() {
 
           {/* Links Column 1: Products */}
           <div className="lg:col-span-2 flex flex-col space-y-4">
-            <h4 className="text-sm font-extrabold text-dark-navy tracking-wider uppercase">Products</h4>
-            <ul className="space-y-2 text-xs font-bold text-slate-light">
+            <h4 className="text-sm font-semibold text-dark-navy tracking-wider uppercase">Products</h4>
+            <ul className="space-y-2 text-xs font-medium text-slate-light">
               <li><Link href="#torches" className="hover:text-primary transition-colors">LED Torches</Link></li>
               <li><Link href="#spotlights" className="hover:text-primary transition-colors">Spotlights</Link></li>
               <li><Link href="#emergency-lights" className="hover:text-primary transition-colors">Emergency Lights</Link></li>
@@ -75,8 +75,8 @@ export default function Footer() {
 
           {/* Links Column 2: Company */}
           <div className="lg:col-span-2 flex flex-col space-y-4">
-            <h4 className="text-sm font-extrabold text-dark-navy tracking-wider uppercase">Company</h4>
-            <ul className="space-y-2 text-xs font-bold text-slate-light">
+            <h4 className="text-sm font-semibold text-dark-navy tracking-wider uppercase">Company</h4>
+            <ul className="space-y-2 text-xs font-medium text-slate-light">
               <li><Link href="#about" className="hover:text-primary transition-colors">About Us</Link></li>
               <li><Link href="#manufacturing" className="hover:text-primary transition-colors">Manufacturing</Link></li>
               <li><Link href="#quality" className="hover:text-primary transition-colors">Quality Assurance</Link></li>
@@ -87,8 +87,8 @@ export default function Footer() {
 
           {/* Links Column 3: Resources */}
           <div className="lg:col-span-2 flex flex-col space-y-4">
-            <h4 className="text-sm font-extrabold text-dark-navy tracking-wider uppercase">Resources</h4>
-            <ul className="space-y-2 text-xs font-bold text-slate-light">
+            <h4 className="text-sm font-semibold text-dark-navy tracking-wider uppercase">Resources</h4>
+            <ul className="space-y-2 text-xs font-medium text-slate-light">
               <li><Link href="#brochure" className="hover:text-primary transition-colors">Brochure</Link></li>
               <li><Link href="#catalog" className="hover:text-primary transition-colors">Catalog</Link></li>
               <li><Link href="#warranty" className="hover:text-primary transition-colors">Warranty</Link></li>
@@ -99,8 +99,8 @@ export default function Footer() {
 
           {/* Links Column 4: Contact info */}
           <div className="lg:col-span-2 flex flex-col space-y-4">
-            <h4 className="text-sm font-extrabold text-dark-navy tracking-wider uppercase">Contact Us</h4>
-            <ul className="space-y-3 text-xs font-bold text-slate-light">
+            <h4 className="text-sm font-semibold text-dark-navy tracking-wider uppercase">Contact Us</h4>
+            <ul className="space-y-3 text-xs font-medium text-slate-light">
               <li className="flex gap-2">
                 <svg className="w-4 h-4 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -126,7 +126,7 @@ export default function Footer() {
         </div>
 
         {/* Footer Bottom copyright */}
-        <div className="flex flex-col sm:flex-row justify-between items-center pt-8 text-xs font-bold text-slate-light gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center pt-8 text-xs font-medium text-slate-light gap-4">
           <span>© 2026 Rising Appliances. All Rights Reserved.</span>
           <div className="flex gap-4">
             <Link href="#privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>

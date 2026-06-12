@@ -135,7 +135,7 @@ export default function Hero() {
 
       {/* Vertical Scroll Down Indicator (Left Side, from reference image) */}
       <div className="absolute left-10 top-1/2 -translate-y-1/2 z-20 hidden md:flex flex-col items-center pointer-events-none select-none">
-        <span className="text-[9px] tracking-[0.5em] text-slate-400 font-bold uppercase rotate-90 origin-center whitespace-nowrap mb-14 translate-x-0.5">
+        <span className="text-[9px] tracking-[0.5em] text-slate-400 font-semibold uppercase rotate-90 origin-center whitespace-nowrap mb-14 translate-x-0.5">
           SCROLL DOWN
         </span>
         <svg className="w-3.5 h-3.5 text-slate-400 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">

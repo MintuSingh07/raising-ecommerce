@@ -25,14 +25,14 @@ export default function Navbar() {
               <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <span className="text-lg sm:text-2xl font-black tracking-wider text-dark-navy flex items-baseline">
+          <span className="text-lg sm:text-2xl font-semibold tracking-wider text-dark-navy flex items-baseline">
             RISING
-            <span className="text-[8px] sm:text-[10px] font-bold text-slate-400 ml-0.5 leading-none">®</span>
+            <span className="text-[8px] sm:text-[10px] font-medium text-slate-400 ml-0.5 leading-none">®</span>
           </span>
         </Link>
 
         {/* Desktop Navigation - Glass Pills */}
-        <nav className="hidden md:flex space-x-1 lg:space-x-3 text-xs lg:text-sm font-bold text-slate-800">
+        <nav className="hidden md:flex space-x-1 lg:space-x-3 text-xs lg:text-sm font-semibold text-slate-800">
           <Link 
             href="/" 
             className="text-primary px-4 py-2 rounded-full bg-white/55 border border-white/50 shadow-[0_2px_8px_rgba(10,82,214,0.05)] transition-all duration-300"
@@ -75,7 +75,7 @@ export default function Navbar() {
         <div className="hidden md:flex items-center relative z-10">
           <Link
             href="#distributor"
-            className="inline-flex items-center justify-center px-6 py-2.5 rounded-full text-xs font-bold bg-primary text-white border border-white/20 shadow-lg shadow-primary/25 transition-all duration-300 hover:bg-primary-navy hover:shadow-primary/35 active:scale-95"
+            className="inline-flex items-center justify-center px-6 py-2.5 rounded-full text-xs font-semibold bg-primary text-white border border-white/20 shadow-lg shadow-primary/25 transition-all duration-300 hover:bg-primary-navy hover:shadow-primary/35 active:scale-95"
           >
             Become a Distributor
           </Link>
@@ -107,30 +107,30 @@ export default function Navbar() {
           <Link
             href="/"
             onClick={() => setIsOpen(false)}
-            className="block px-4 py-2 rounded-xl text-sm font-bold text-primary bg-white/50 border border-white/40"
+            className="block px-4 py-2 rounded-xl text-sm font-semibold text-primary bg-white/50 border border-white/40"
           >
             Home
           </Link>
-          <div className="px-4 py-2 text-sm font-bold text-slate-800 hover:text-primary cursor-pointer hover:bg-white/40 border border-transparent hover:border-white/30 rounded-xl transition-all duration-300">
+          <div className="px-4 py-2 text-sm font-semibold text-slate-800 hover:text-primary cursor-pointer hover:bg-white/40 border border-transparent hover:border-white/30 rounded-xl transition-all duration-300">
             Products
           </div>
-          <div className="px-4 py-2 text-sm font-bold text-slate-800 hover:text-primary cursor-pointer hover:bg-white/40 border border-transparent hover:border-white/30 rounded-xl transition-all duration-300">
+          <div className="px-4 py-2 text-sm font-semibold text-slate-800 hover:text-primary cursor-pointer hover:bg-white/40 border border-transparent hover:border-white/30 rounded-xl transition-all duration-300">
             Solutions
           </div>
           <Link
             href="#about"
             onClick={() => setIsOpen(false)}
-            className="block px-4 py-2 text-sm font-bold text-slate-800 hover:text-primary hover:bg-white/40 border border-transparent hover:border-white/30 rounded-xl transition-all duration-300"
+            className="block px-4 py-2 text-sm font-semibold text-slate-800 hover:text-primary hover:bg-white/40 border border-transparent hover:border-white/30 rounded-xl transition-all duration-300"
           >
             About Us
           </Link>
-          <div className="px-4 py-2 text-sm font-bold text-slate-800 hover:text-primary cursor-pointer hover:bg-white/40 border border-transparent hover:border-white/30 rounded-xl transition-all duration-300">
+          <div className="px-4 py-2 text-sm font-semibold text-slate-800 hover:text-primary cursor-pointer hover:bg-white/40 border border-transparent hover:border-white/30 rounded-xl transition-all duration-300">
             Resources
           </div>
           <Link
             href="#contact"
             onClick={() => setIsOpen(false)}
-            className="block px-4 py-2 text-sm font-bold text-slate-800 hover:text-primary hover:bg-white/40 border border-transparent hover:border-white/30 rounded-xl transition-all duration-300"
+            className="block px-4 py-2 text-sm font-semibold text-slate-800 hover:text-primary hover:bg-white/40 border border-transparent hover:border-white/30 rounded-xl transition-all duration-300"
           >
             Contact Us
           </Link>
@@ -138,7 +138,7 @@ export default function Navbar() {
             <Link
               href="#distributor"
               onClick={() => setIsOpen(false)}
-              className="block w-full text-center px-4 py-2.5 rounded-full text-xs font-bold bg-primary text-white border border-white/20 shadow-lg shadow-primary/20 hover:bg-primary-navy transition-all duration-300"
+              className="block w-full text-center px-4 py-2.5 rounded-full text-xs font-semibold bg-primary text-white border border-white/20 shadow-lg shadow-primary/20 hover:bg-primary-navy transition-all duration-300"
             >
               Become a Distributor
             </Link>
