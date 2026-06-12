@@ -12,42 +12,48 @@ export default function FeaturedProducts() {
       category: "Outdoor Series",
       title: "Phoenix Lantern",
       description: "Ultra-bright portable illumination designed for rugged outdoor environments.",
-      price: "$149"
+      price: "$149",
+      image: "/product_lantern.png"
     },
     {
       id: 2,
       category: "Industrial Series",
       title: "Titan Floodlight",
       description: "Professional high-lumen lighting solution for industrial facilities and yards.",
-      price: "$399"
+      price: "$399",
+      image: "/product_spotlight.png"
     },
     {
       id: 3,
       category: "Tactical Gear",
       title: "Vanguard Headlamp",
       description: "Ergonomic hands-free lighting with dynamic focus and gesture control.",
-      price: "$89"
+      price: "$89",
+      image: "/product_headlamp_clean.png"
     },
     {
       id: 4,
       category: "Emergency Systems",
       title: "Aegis Backup Light",
       description: "Automatic backup power source featuring smart failover technology.",
-      price: "$249"
+      price: "$249",
+      image: "/product_emergency.png"
     },
     {
       id: 5,
       category: "Precision Optics",
       title: "Apex Spotlight",
       description: "Precision long-range beam target searchlight with water resistance.",
-      price: "$179"
+      price: "$179",
+      image: "/product_spotlight.png"
     },
     {
       id: 6,
       category: "Commercial Lighting",
       title: "Omni Highbay",
       description: "High-efficiency suspended luminaire for commercial warehouses.",
-      price: "$329"
+      price: "$329",
+      image: "/product_highbay.png"
     },
   ];
 
@@ -67,7 +73,7 @@ export default function FeaturedProducts() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="flex items-center justify-between mb-16">
+        <div className="flex items-center justify-between mb-10">
           <div className="flex flex-col items-start space-y-4">
             <div className="flex items-center gap-3">
               <span className="w-8 h-[2px] bg-accent rounded-full"></span>
@@ -124,7 +130,16 @@ export default function FeaturedProducts() {
               </div>
 
               {/* Bottom Section: Grey Image Placeholder */}
-              <div className="relative w-full aspect-square rounded-[24px] bg-[#EBEBEB] overflow-hidden flex flex-col justify-end p-5 group-hover:bg-[#E2E2E2] transition-colors duration-300">
+              <div className="relative w-full aspect-square rounded-[24px] bg-[#EBEBEB] overflow-hidden transition-colors duration-300">
+                <Image
+                  src={prod.image}
+                  alt={prod.title}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  sizes="(max-width: 640px) 290px, 320px"
+                  priority={idx < 3}
+                />
+
                 {/* Circular Action Button with Arrow ↗ */}
                 <div className="absolute bottom-5 right-5 w-12 h-12 rounded-full bg-white flex items-center justify-center text-black shadow-md transition-all duration-300 group-hover:scale-105 z-10">
                   <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
