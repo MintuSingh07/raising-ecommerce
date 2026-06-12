@@ -91,7 +91,7 @@ export default function Hero() {
 
   return (
     <section 
-      className={`relative overflow-hidden w-full h-screen min-h-[500px] bg-white select-none ${
+      className={`relative overflow-hidden w-full h-screen h-[100dvh] min-h-[500px] bg-white select-none ${
         isDragging ? "cursor-grabbing" : "cursor-grab"
       }`}
       onTouchStart={handleTouchStart}
@@ -124,7 +124,7 @@ export default function Hero() {
             >
               {/* Aesthetic Large Number in Bottom Left Corner - Bleeding out of screen */}
               <div 
-                className="absolute left-[-3vw] bottom-[-3vw] font-medium font-display text-[28vw] sm:text-[24vw] leading-none text-slate-900/6 tracking-tighter select-none"
+                className="absolute left-[-2vw] bottom-[-2vw] sm:left-[-3vw] sm:bottom-[-3vw] font-medium font-display text-[40vw] sm:text-[32vw] md:text-[28vw] lg:text-[24vw] leading-none text-slate-900/15 tracking-tighter select-none"
               >
                 0{index + 1}
               </div>
