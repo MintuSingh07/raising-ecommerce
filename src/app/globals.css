@@ -1,26 +1,39 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #0A52D6;
+  --color-primary-navy: #0B4294;
+  --color-accent: #FFB800;
+  --color-accent-hover: #E0A200;
+  --color-dark-navy: #0A1931;
+  --color-slate-body: #475569;
+  --color-slate-light: #64748B;
+  --color-border-light: #E2E8F0;
+  --shadow-premium: 0 10px 40px -10px rgba(0, 0, 0, 0.04), 0 2px 20px -2px rgba(10, 82, 214, 0.03);
+  --shadow-card: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
+  --font-sans: var(--font-outfit), sans-serif;
+  --font-display: var(--font-outfit), sans-serif;
+}
+
 :root {
   --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --foreground: #0A1931;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #ffffff;
+  color: #475569;
+  font-family: var(--font-sans), sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom layout helpers */
+.clip-diagonal {
+  clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+@media (max-width: 768px) {
+  .clip-diagonal {
+    clip-path: none;
+  }
 }
