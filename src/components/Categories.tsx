@@ -36,7 +36,7 @@ export default function Categories() {
   ];
 
   return (
-    <section id="products" className="py-24 bg-slate-50/40 border-y border-slate-100/50">
+    <section id="products" className="py-20 bg-slate-50/40 border-y border-slate-100/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}

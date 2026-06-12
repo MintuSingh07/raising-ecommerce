@@ -3,7 +3,8 @@ import Hero from "@/components/Hero";
 import StatsBanner from "@/components/StatsBanner";
 import Categories from "@/components/Categories";
 import Manufacturing from "@/components/Manufacturing";
-import WhyChooseUs from "@/components/WhyChooseUs";
+import VersatileUsage from "@/components/VersatileUsage";
+import AboutUs from "@/components/AboutUs";
 import FeaturedProducts from "@/components/FeaturedProducts";
 import CtaBanner from "@/components/CtaBanner";
 import Footer from "@/components/Footer";
@@ -17,7 +18,8 @@ export default function Home() {
         <StatsBanner />
         <Categories />
         <Manufacturing />
-        <WhyChooseUs />
+        <VersatileUsage />
+        <AboutUs />
         <FeaturedProducts />
         <CtaBanner />
       </main>
