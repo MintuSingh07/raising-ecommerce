@@ -1,3 +1,8 @@
+"use client";
+
+import BlurText from "./BlurText";
+import { motion } from "motion/react";
+
 export default function WhyChooseUs() {
   const points = [
     {
@@ -59,28 +64,32 @@ export default function WhyChooseUs() {
   ];
 
   return (
-    <section className="py-24 bg-white">
+    <section id="why-choose-us" className="py-24 bg-white scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="flex flex-col items-center text-center space-y-4 mb-16">
-          <div className="flex items-center gap-3 justify-center">
-            <span className="w-8 h-[2px] bg-accent rounded-full"></span>
-            <span className="text-xs font-semibold tracking-widest text-primary uppercase">
-              Why Choose Rising
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/[0.04] border border-primary/10 text-xs font-medium uppercase tracking-wider text-primary">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
             </span>
-            <span className="w-8 h-[2px] bg-accent rounded-full"></span>
+            <BlurText text="Why Choose Rising" delay={30} animateBy="words" direction="bottom" />
           </div>
-          <h2 className="text-3xl sm:text-4xl font-semibold text-dark-navy tracking-tight leading-tight">
-            Built Different. Built <span className="text-primary">Better.</span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-dark-navy tracking-tight leading-tight">
+            <BlurText text="Built Different. Built Better." highlightWords={["Better."]} delay={20} animateBy="words" direction="bottom" />
           </h2>
         </div>
 
         {/* Feature Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {points.map((pt, idx) => (
-            <div
+            <motion.div
               key={idx}
+              initial={{ opacity: 0, filter: "blur(8px)", y: 30 }}
+              whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: idx * 0.1, ease: "easeOut" }}
               className="group flex flex-col p-8 bg-white rounded-3xl border border-slate-100 shadow-premium transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-card"
             >
               <div className="w-12 h-12 rounded-2xl bg-blue-50/50 text-primary flex items-center justify-center mb-6 transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:scale-110">
@@ -92,7 +101,7 @@ export default function WhyChooseUs() {
               <p className="text-sm text-slate-body leading-relaxed">
                 {pt.desc}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
 

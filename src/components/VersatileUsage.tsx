@@ -2,6 +2,8 @@
 
 import { useRef } from "react";
 import Link from "next/link";
+import BlurText from "./BlurText";
+import { motion } from "motion/react";
 
 export default function VersatileUsage() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -130,20 +132,19 @@ export default function VersatileUsage() {
         {/* Section Header */}
         <div className="flex items-center justify-between mb-10">
           <div className="flex flex-col items-start space-y-4 max-w-3xl">
-            <div className="flex items-center gap-3">
-              <span className="w-8 h-[2px] bg-accent rounded-full"></span>
-              <span className="text-xs font-semibold tracking-widest text-primary uppercase">
-                Versatile Usage
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/[0.04] border border-primary/10 text-xs font-medium uppercase tracking-wider text-primary">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
               </span>
+              <BlurText text="Versatile Usage" delay={30} animateBy="words" direction="bottom" />
             </div>
-            <h2 className="text-3xl sm:text-4xl font-semibold text-dark-navy tracking-tight leading-tight">
-              Illuminate Every Adventure
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-dark-navy tracking-tight leading-tight">
+              <BlurText text="Illuminate Every Adventure" delay={20} animateBy="words" direction="bottom" />
             </h2>
-            <p className="text-sm sm:text-base text-slate-body leading-relaxed pt-2">
-              Dive into the details and discover how each feature enhances your
-              experience, making your life simpler, smarter, and more
-              extraordinary.
-            </p>
+            <div className="text-sm sm:text-base text-slate-body leading-relaxed pt-2">
+              <BlurText text="Dive into the details and discover how each feature enhances your experience, making your life simpler, smarter, and more extraordinary." delay={10} animateBy="words" direction="bottom" />
+            </div>
           </div>
 
           {/* Navigation Arrows */}
@@ -195,51 +196,59 @@ export default function VersatileUsage() {
           className="group/scroller flex flex-row gap-6 overflow-x-auto pb-8 pt-4 px-2 -mx-4 sm:-mx-6 lg:-mx-8 sm:px-6 lg:px-8 snap-x snap-mandatory scroll-smooth scrollbar-none"
         >
           {categories.map((cat, idx) => (
-            <Link
+            <motion.div
               key={idx}
-              href={cat.href}
-              className="group shrink-0 snap-start w-[290px] sm:w-[340px] md:w-[380px] group-hover/scroller:w-[275px] group-hover/scroller:sm:w-[310px] group-hover/scroller:md:w-[340px] hover:!w-[325px] hover:sm:!w-[400px] hover:md:!w-[460px] bg-white border border-[#F0F0F0] rounded-[28px] p-6 sm:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.02)] hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:border-primary/20 transition-all duration-500 ease-out cursor-pointer flex flex-col justify-between overflow-hidden h-[350px]"
+              initial={{ opacity: 0, filter: "blur(8px)", y: 30 }}
+              whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: idx * 0.1, ease: "easeOut" }}
+              className="flex shrink-0 snap-start"
             >
-              {/* Decorative subtle top glow line */}
-              <div className="absolute top-0 left-0 right-0 h-[3px] bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <Link
+                href={cat.href}
+                className="group w-[290px] sm:w-[340px] md:w-[380px] group-hover/scroller:w-[275px] group-hover/scroller:sm:w-[310px] group-hover/scroller:md:w-[340px] hover:!w-[325px] hover:sm:!w-[400px] hover:md:!w-[460px] bg-white border border-[#F0F0F0] rounded-[28px] p-6 sm:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.02)] hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:border-primary/20 transition-all duration-500 ease-out cursor-pointer flex flex-col justify-between overflow-hidden h-[350px]"
+              >
+                {/* Decorative subtle top glow line */}
+                <div className="absolute top-0 left-0 right-0 h-[3px] bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-              {/* Top Section: Title, Description & Arrow */}
-              <div className="relative z-10 flex items-start justify-between w-full">
-                <div className="flex flex-col items-start pr-4">
-                  <h3 className="text-xl sm:text-2xl font-semibold text-dark-navy group-hover:text-primary transition-colors duration-300 tracking-tight leading-tight">
-                    {cat.title}
-                  </h3>
-                  <p className="mt-3 text-xs sm:text-sm text-slate-body leading-relaxed font-normal max-h-0 opacity-0 overflow-hidden group-hover:max-h-24 group-hover:opacity-100 transition-all duration-500 ease-in-out md:max-w-[85%]">
-                    {cat.desc}
-                  </p>
+                {/* Top Section: Title, Description & Arrow */}
+                <div className="relative z-10 flex items-start justify-between w-full">
+                  <div className="flex flex-col items-start pr-4">
+                    <h3 className="text-xl sm:text-2xl font-semibold text-dark-navy group-hover:text-primary transition-colors duration-300 tracking-tight leading-tight">
+                      {cat.title}
+                    </h3>
+                    <p className="mt-3 text-xs sm:text-sm text-slate-body leading-relaxed font-normal max-h-0 opacity-0 overflow-hidden group-hover:max-h-24 group-hover:opacity-100 transition-all duration-500 ease-in-out md:max-w-[85%]">
+                      {cat.desc}
+                    </p>
+                  </div>
+
+                  {/* Circular Action Button */}
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-slate-50 border border-slate-100 text-slate-500 flex items-center justify-center flex-shrink-0 shadow-sm opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all duration-500">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2.5}
+                        d="M14 5l7 7m0 0l-7 7m7-7H3"
+                      />
+                    </svg>
+                  </div>
                 </div>
 
-                {/* Circular Action Button */}
-                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-slate-50 border border-slate-100 text-slate-500 flex items-center justify-center flex-shrink-0 shadow-sm opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all duration-500">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2.5}
-                      d="M14 5l7 7m0 0l-7 7m7-7H3"
-                    />
-                  </svg>
+                {/* Bottom Section: Category Tag Pill */}
+                <div className="relative z-10 flex items-center mt-6 md:mt-0">
+                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-100/80 text-[10px] sm:text-xs text-slate-600 font-semibold tracking-wide uppercase select-none transition-colors duration-300 group-hover:bg-primary/5 group-hover:text-primary group-hover:border-primary/10">
+                    {cat.icon}
+                    <span>{cat.tag}</span>
+                  </div>
                 </div>
-              </div>
-
-              {/* Bottom Section: Category Tag Pill */}
-              <div className="relative z-10 flex items-center mt-6 md:mt-0">
-                <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-100/80 text-[10px] sm:text-xs text-slate-600 font-semibold tracking-wide uppercase select-none transition-colors duration-300 group-hover:bg-primary/5 group-hover:text-primary group-hover:border-primary/10">
-                  {cat.icon}
-                  <span>{cat.tag}</span>
-                </div>
-              </div>
-            </Link>
+              </Link>
+            </motion.div>
           ))}
         </div>
       </div>

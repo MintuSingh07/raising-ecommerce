@@ -1,5 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import BlurText from "./BlurText";
+import { motion } from "motion/react";
 
 export default function Manufacturing() {
   const points = [
@@ -39,7 +43,7 @@ export default function Manufacturing() {
   ];
 
   return (
-    <section id="about" className="py-14 bg-white overflow-hidden">
+    <section id="manufacturing" className="py-14 bg-white overflow-hidden scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           
@@ -47,33 +51,40 @@ export default function Manufacturing() {
           <div className="lg:col-span-6 flex flex-col items-start space-y-6">
             
             {/* Tagline */}
-            <div className="flex items-center gap-3">
-              <span className="w-8 h-[2px] bg-accent rounded-full"></span>
-              <span className="text-xs font-semibold tracking-widest text-primary uppercase">
-                Built With Precision
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/[0.04] border border-primary/10 text-xs font-medium uppercase tracking-wider text-primary">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
               </span>
+              <BlurText text="Built With Precision" delay={30} animateBy="words" direction="bottom" />
             </div>
 
             {/* Title */}
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-dark-navy tracking-tight leading-tight">
-              Advanced Manufacturing.<br />
-              Engineered for <span className="text-primary">Excellence.</span>
+              <BlurText text="Advanced Manufacturing. Engineered for Excellence." highlightWords={["Excellence."]} delay={20} animateBy="words" direction="bottom" />
             </h2>
 
             {/* Description */}
-            <p className="text-base text-slate-body leading-relaxed max-w-xl">
-              State-of-the-art manufacturing facility with advanced technology and stringent quality control to deliver world-class lighting solutions. We prioritize reliability at every stage of the production line.
-            </p>
+            <div className="text-base text-slate-body leading-relaxed max-w-xl">
+              <BlurText text="State-of-the-art manufacturing facility with advanced technology and stringent quality control to deliver world-class lighting solutions. We prioritize reliability at every stage of the production line." delay={10} animateBy="words" direction="bottom" />
+            </div>
 
             {/* Checklist */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full pt-4">
               {points.map((pt, idx) => (
-                <div key={idx} className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100/50">
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, filter: "blur(6px)", y: 20 }}
+                  whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+                  viewport={{ once: true, margin: "-35px" }}
+                  transition={{ duration: 0.4, delay: idx * 0.08, ease: "easeOut" }}
+                  className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100/50"
+                >
                   <div className="p-2 rounded-xl bg-white border border-slate-100 text-primary shadow-sm">
                     {pt.icon}
                   </div>
                   <span className="text-sm font-semibold text-dark-navy">{pt.title}</span>
-                </div>
+                </motion.div>
               ))}
             </div>
 
@@ -93,21 +104,39 @@ export default function Manufacturing() {
           </div>
 
           {/* Right Image */}
-          <div className="lg:col-span-6 relative w-full h-[320px] sm:h-[400px] lg:h-[480px]">
-            <div className="absolute inset-0 bg-blue-50/50 rounded-3xl -rotate-1 scale-98 pointer-events-none" />
-            <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-premium clip-diagonal">
+          <motion.div
+            initial={{ opacity: 0, filter: "blur(10px)", scale: 0.95, x: 30 }}
+            whileInView={{ opacity: 1, filter: "blur(0px)", scale: 1, x: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="lg:col-span-6 relative w-full h-[320px] sm:h-[400px] lg:h-[480px]"
+          >
+            {/* Custom shaped background drop shadow offset */}
+            <div className="absolute inset-0 bg-primary/[0.04] translate-x-3 translate-y-3 pointer-events-none" style={{ clipPath: "url(#custom-diagonal)" }} />
+            
+            <div className="relative w-full h-full overflow-hidden shadow-premium" style={{ clipPath: "url(#custom-diagonal)" }}>
               <Image
                 src="/about_manufacturing.png"
                 alt="RISING State of the Art Manufacturing Facility"
                 fill
+                loading="lazy"
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 600px"
               />
             </div>
-          </div>
+          </motion.div>
 
         </div>
       </div>
+
+      {/* Responsive custom SVG clip-path definition */}
+      <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+        <defs>
+          <clipPath id="custom-diagonal" clipPathUnits="objectBoundingBox">
+            <path d="M 0.2,0 L 0.95,0 Q 1,0 1,0.05 L 1,0.95 Q 1,1 0.95,1 L 0.05,1 Q 0,1 0,0.95 C 0.02,0.8 0.05,0.5 0.1,0.2 C 0.12,0.1 0.15,0.02 0.2,0 Z" />
+          </clipPath>
+        </defs>
+      </svg>
     </section>
   );
 }

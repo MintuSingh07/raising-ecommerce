@@ -1,7 +1,16 @@
+"use client";
+
+import CountUp from "./CountUp";
+import { motion } from "motion/react";
+
 export default function StatsBanner() {
   const stats = [
     {
-      value: "20+",
+      value: (
+        <span>
+          <CountUp from={0} to={20} duration={2} />+
+        </span>
+      ),
       label: "Years of Experience",
       icon: (
         <svg className="w-4 h-4 sm:w-6 sm:h-6 md:w-8 md:h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -10,7 +19,11 @@ export default function StatsBanner() {
       ),
     },
     {
-      value: "500+",
+      value: (
+        <span>
+          <CountUp from={0} to={500} duration={2} separator="," />+
+        </span>
+      ),
       label: "Dealers Network",
       icon: (
         <svg className="w-4 h-4 sm:w-6 sm:h-6 md:w-8 md:h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -43,8 +56,12 @@ export default function StatsBanner() {
       <div className="bg-white rounded-2xl border border-slate-100 shadow-premium py-2 sm:py-4 md:py-6 px-3 sm:px-6">
         <div className="grid grid-cols-4 gap-1 sm:gap-6 lg:gap-8 divide-x divide-slate-100">
           {stats.map((stat, idx) => (
-            <div
+            <motion.div
               key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: idx * 0.1, ease: "easeOut" }}
               className={`flex flex-col sm:flex-row items-center gap-1 sm:gap-3 lg:gap-4 text-center sm:text-left ${
                 idx > 0 ? "pl-1 sm:pl-4 lg:pl-6" : ""
               }`}
@@ -60,7 +77,7 @@ export default function StatsBanner() {
                   {stat.label}
                 </span>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

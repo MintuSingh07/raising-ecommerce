@@ -2,8 +2,16 @@
 
 import { useRef } from "react";
 import Image from "next/image";
+import BlurText from "./BlurText";
+import { motion } from "motion/react";
+import productData from "../../public/products_structured.json";
+import { type Product } from "./ProductCatalog";
 
-export default function FeaturedProducts() {
+interface FeaturedProductsProps {
+  setSelectedProduct?: (product: Product) => void;
+}
+
+export default function FeaturedProducts({ setSelectedProduct }: FeaturedProductsProps = {}) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const products = [
@@ -68,6 +76,33 @@ export default function FeaturedProducts() {
     }
   };
 
+  const handleProductClick = (mockTitle: string) => {
+    const allProducts = productData.products as Product[];
+    let targetProduct: Product | undefined;
+
+    if (mockTitle === "Vanguard Headlamp") {
+      targetProduct = allProducts.find(p => p.name === "Falcon" || p.categories.some(c => c.toLowerCase().includes("headlamp")));
+    } else if (mockTitle === "Phoenix Lantern") {
+      targetProduct = allProducts.find(p => p.name === "Comet" || p.categories.some(c => c.toLowerCase().includes("lantern")));
+    } else if (mockTitle === "Titan Floodlight") {
+      targetProduct = allProducts.find(p => p.name === "Tri Color Metal Torch" || p.categories.some(c => c.toLowerCase().includes("spotlight")));
+    } else if (mockTitle === "Aegis Backup Light") {
+      targetProduct = allProducts.find(p => p.categories.some(c => c.toLowerCase().includes("solar") || c.toLowerCase().includes("emergency")));
+    } else if (mockTitle === "Apex Spotlight") {
+      targetProduct = allProducts.find(p => p.name === "Omni" || p.categories.some(c => c.toLowerCase().includes("searchlight")));
+    } else if (mockTitle === "Omni Highbay") {
+      targetProduct = allProducts.find(p => p.categories.some(c => c.toLowerCase().includes("industrial")));
+    }
+
+    if (!targetProduct && allProducts.length > 0) {
+      targetProduct = allProducts[0];
+    }
+
+    if (targetProduct) {
+      setSelectedProduct?.(targetProduct);
+    }
+  };
+
   return (
     <section className="py-24 bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -75,14 +110,15 @@ export default function FeaturedProducts() {
         {/* Section Header */}
         <div className="flex items-center justify-between mb-10">
           <div className="flex flex-col items-start space-y-4">
-            <div className="flex items-center gap-3">
-              <span className="w-8 h-[2px] bg-accent rounded-full"></span>
-              <span className="text-xs font-semibold tracking-widest text-primary uppercase">
-                Featured Products
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/[0.04] border border-primary/10 text-xs font-medium uppercase tracking-wider text-primary">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
               </span>
+              <BlurText text="Featured Products" delay={30} animateBy="words" direction="bottom" />
             </div>
-            <h2 className="text-3xl sm:text-4xl font-semibold text-dark-navy tracking-tight leading-tight">
-              Our Bestselling Solutions
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-dark-navy tracking-tight leading-tight">
+              <BlurText text="Our Bestselling Solutions" highlightWords={["Bestselling"]} delay={20} animateBy="words" direction="bottom" />
             </h2>
           </div>
           
@@ -115,8 +151,13 @@ export default function FeaturedProducts() {
           className="flex flex-row gap-6 overflow-x-auto pb-8 pt-4 px-2 -mx-4 sm:-mx-6 lg:-mx-8 sm:px-6 lg:px-8 snap-x snap-mandatory scroll-smooth scrollbar-none"
         >
           {products.map((prod, idx) => (
-            <div
+            <motion.div
               key={idx}
+              initial={{ opacity: 0, filter: "blur(8px)", y: 30 }}
+              whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: idx * 0.1, ease: "easeOut" }}
+              onClick={() => handleProductClick(prod.title)}
               className="group shrink-0 snap-start w-[300px] sm:w-[340px] bg-white rounded-[32px] p-6 border border-[#F0F0F0] shadow-[0_12px_40px_rgba(0,0,0,0.02)] hover:-translate-y-1.5 hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] transition-all duration-300 flex flex-col justify-between cursor-pointer"
             >
               {/* Top Section: Title & Short Description */}
@@ -147,7 +188,7 @@ export default function FeaturedProducts() {
                   </svg>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 

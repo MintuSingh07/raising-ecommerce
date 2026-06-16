@@ -3,6 +3,16 @@
 import { useState } from "react";
 import Link from "next/link";
 
+const navLinks = [
+  { label: "Home", href: "#home" },
+  { label: "Categories", href: "#products" },
+  { label: "Catalog", href: "#catalog" },
+  { label: "Manufacturing", href: "#manufacturing" },
+  { label: "About Us", href: "#about" },
+  { label: "Why Us", href: "#why-choose-us" },
+  { label: "Contact", href: "#contact" },
+];
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -32,43 +42,16 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Navigation - Glass Pills */}
-        <nav className="hidden md:flex space-x-1 lg:space-x-3 text-xs lg:text-sm font-semibold text-slate-800">
-          <Link 
-            href="/" 
-            className="text-primary px-4 py-2 rounded-full bg-white/55 border border-white/50 shadow-[0_2px_8px_rgba(10,82,214,0.05)] transition-all duration-300"
-          >
-            Home
-          </Link>
-          <div className="relative group cursor-pointer text-slate-800 hover:text-primary px-4 py-2 rounded-full hover:bg-white/45 border border-transparent hover:border-white/35 transition-all duration-300 flex items-center gap-1">
-            Products
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-            </svg>
-          </div>
-          <div className="relative group cursor-pointer text-slate-800 hover:text-primary px-4 py-2 rounded-full hover:bg-white/45 border border-transparent hover:border-white/35 transition-all duration-300 flex items-center gap-1">
-            Solutions
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-            </svg>
-          </div>
-          <Link 
-            href="#about" 
-            className="text-slate-800 hover:text-primary px-4 py-2 rounded-full hover:bg-white/45 border border-transparent hover:border-white/35 transition-all duration-300"
-          >
-            About Us
-          </Link>
-          <div className="relative group cursor-pointer text-slate-800 hover:text-primary px-4 py-2 rounded-full hover:bg-white/45 border border-transparent hover:border-white/35 transition-all duration-300 flex items-center gap-1">
-            Resources
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-            </svg>
-          </div>
-          <Link 
-            href="#contact" 
-            className="text-slate-800 hover:text-primary px-4 py-2 rounded-full hover:bg-white/45 border border-transparent hover:border-white/35 transition-all duration-300"
-          >
-            Contact Us
-          </Link>
+        <nav className="hidden md:flex space-x-1 lg:space-x-2 text-xs lg:text-sm font-semibold text-slate-800">
+          {navLinks.map((link) => (
+            <Link 
+              key={link.href}
+              href={link.href} 
+              className="text-slate-800 hover:text-primary px-3.5 py-2 rounded-full hover:bg-white/45 border border-transparent hover:border-white/35 transition-all duration-300"
+            >
+              {link.label}
+            </Link>
+          ))}
         </nav>
 
         {/* Desktop Action Buttons */}
@@ -104,36 +87,16 @@ export default function Navbar() {
       {/* Mobile Menu - Liquid Glass dropdown */}
       {isOpen && (
         <div className="md:hidden mt-2 mx-auto max-w-7xl p-4 bg-white/35 backdrop-blur-xl border border-white/45 rounded-2xl space-y-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.08)] animate-fadeIn pointer-events-auto relative z-40">
-          <Link
-            href="/"
-            onClick={() => setIsOpen(false)}
-            className="block px-4 py-2 rounded-xl text-sm font-semibold text-primary bg-white/50 border border-white/40"
-          >
-            Home
-          </Link>
-          <div className="px-4 py-2 text-sm font-semibold text-slate-800 hover:text-primary cursor-pointer hover:bg-white/40 border border-transparent hover:border-white/30 rounded-xl transition-all duration-300">
-            Products
-          </div>
-          <div className="px-4 py-2 text-sm font-semibold text-slate-800 hover:text-primary cursor-pointer hover:bg-white/40 border border-transparent hover:border-white/30 rounded-xl transition-all duration-300">
-            Solutions
-          </div>
-          <Link
-            href="#about"
-            onClick={() => setIsOpen(false)}
-            className="block px-4 py-2 text-sm font-semibold text-slate-800 hover:text-primary hover:bg-white/40 border border-transparent hover:border-white/30 rounded-xl transition-all duration-300"
-          >
-            About Us
-          </Link>
-          <div className="px-4 py-2 text-sm font-semibold text-slate-800 hover:text-primary cursor-pointer hover:bg-white/40 border border-transparent hover:border-white/30 rounded-xl transition-all duration-300">
-            Resources
-          </div>
-          <Link
-            href="#contact"
-            onClick={() => setIsOpen(false)}
-            className="block px-4 py-2 text-sm font-semibold text-slate-800 hover:text-primary hover:bg-white/40 border border-transparent hover:border-white/30 rounded-xl transition-all duration-300"
-          >
-            Contact Us
-          </Link>
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setIsOpen(false)}
+              className="block px-4 py-2 rounded-xl text-sm font-semibold text-slate-800 hover:text-primary hover:bg-white/40 border border-transparent hover:border-white/30 transition-all duration-300"
+            >
+              {link.label}
+            </Link>
+          ))}
           <div className="pt-2">
             <Link
               href="#distributor"

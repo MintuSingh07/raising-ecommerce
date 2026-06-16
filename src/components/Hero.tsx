@@ -91,7 +91,8 @@ export default function Hero() {
 
   return (
     <section 
-      className={`relative overflow-hidden w-full h-screen h-[100dvh] min-h-[500px] bg-white select-none ${
+      id="home"
+      className={`scroll-mt-20 relative overflow-hidden w-full h-screen h-[100dvh] min-h-[500px] bg-white select-none ${
         isDragging ? "cursor-grabbing" : "cursor-grab"
       }`}
       onTouchStart={handleTouchStart}
