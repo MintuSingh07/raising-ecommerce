@@ -393,17 +393,17 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
                 <>
                   <button
                     onClick={() => setActiveImageIndex(prev => (prev - 1 + allImages.length) % allImages.length)}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center text-white shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer z-10"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white hover:bg-slate-50 border border-slate-200/85 flex items-center justify-center text-slate-800 shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all hover:scale-105 active:scale-95 cursor-pointer z-10"
                     aria-label="Previous image"
                   >
-                    <ChevronLeft className="w-4.5 h-4.5 text-white" />
+                    <ChevronLeft className="w-5 h-5 text-slate-800" strokeWidth={2.5} />
                   </button>
                   <button
                     onClick={() => setActiveImageIndex(prev => (prev + 1) % allImages.length)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center text-white shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer z-10"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white hover:bg-slate-50 border border-slate-200/85 flex items-center justify-center text-slate-800 shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all hover:scale-105 active:scale-95 cursor-pointer z-10"
                     aria-label="Next image"
                   >
-                    <ChevronRight className="w-4.5 h-4.5 text-white" />
+                    <ChevronRight className="w-5 h-5 text-slate-800" strokeWidth={2.5} />
                   </button>
                 </>
               )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 import Image from "next/image";
 import BlurText from "./BlurText";
 import { motion } from "motion/react";
@@ -14,56 +14,67 @@ interface FeaturedProductsProps {
 export default function FeaturedProducts({ setSelectedProduct }: FeaturedProductsProps = {}) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const products = [
-    {
-      id: 1,
-      category: "Outdoor Series",
-      title: "Phoenix Lantern",
-      description: "Ultra-bright portable illumination designed for rugged outdoor environments.",
-      price: "$149",
-      image: "/product_lantern.png"
-    },
-    {
-      id: 2,
-      category: "Industrial Series",
-      title: "Titan Floodlight",
-      description: "Professional high-lumen lighting solution for industrial facilities and yards.",
-      price: "$399",
-      image: "/product_spotlight.png"
-    },
-    {
-      id: 3,
-      category: "Tactical Gear",
-      title: "Vanguard Headlamp",
-      description: "Ergonomic hands-free lighting with dynamic focus and gesture control.",
-      price: "$89",
-      image: "/product_headlamp_clean.png"
-    },
-    {
-      id: 4,
-      category: "Emergency Systems",
-      title: "Aegis Backup Light",
-      description: "Automatic backup power source featuring smart failover technology.",
-      price: "$249",
-      image: "/product_emergency.png"
-    },
-    {
-      id: 5,
-      category: "Precision Optics",
-      title: "Apex Spotlight",
-      description: "Precision long-range beam target searchlight with water resistance.",
-      price: "$179",
-      image: "/product_spotlight.png"
-    },
-    {
-      id: 6,
-      category: "Commercial Lighting",
-      title: "Omni Highbay",
-      description: "High-efficiency suspended luminaire for commercial warehouses.",
-      price: "$329",
-      image: "/product_highbay.png"
-    },
-  ];
+  const bestsellingProducts = useMemo(() => {
+    const allProducts = productData.products as Product[];
+    const items = [
+      {
+        mockTitle: "Phoenix Lantern",
+        defaultCategory: "Outdoor Series",
+        defaultTitle: "Comet",
+        defaultDesc: "Ultra-bright portable illumination designed for rugged outdoor environments.",
+        findFn: (p: Product) => p.name === "Comet" || p.categories.some(c => c.toLowerCase().includes("lantern"))
+      },
+      {
+        mockTitle: "Titan Floodlight",
+        defaultCategory: "Industrial Series",
+        defaultTitle: "Tri Color Metal Torch",
+        defaultDesc: "Professional high-lumen lighting solution for industrial facilities and yards.",
+        findFn: (p: Product) => p.name === "Tri Color Metal Torch" || p.categories.some(c => c.toLowerCase().includes("spotlight"))
+      },
+      {
+        mockTitle: "Vanguard Headlamp",
+        defaultCategory: "Tactical Gear",
+        defaultTitle: "Falcon",
+        defaultDesc: "Ergonomic hands-free lighting with dynamic focus and gesture control.",
+        findFn: (p: Product) => p.name === "Falcon" || p.categories.some(c => c.toLowerCase().includes("headlamp"))
+      },
+      {
+        mockTitle: "Aegis Backup Light",
+        defaultCategory: "Emergency Systems",
+        defaultTitle: "Jyoti",
+        defaultDesc: "Automatic backup power source featuring smart failover technology.",
+        findFn: (p: Product) => p.name === "Jyoti" || p.categories.some(c => c.toLowerCase().includes("solar") || c.toLowerCase().includes("emergency"))
+      },
+      {
+        mockTitle: "Apex Spotlight",
+        defaultCategory: "Precision Optics",
+        defaultTitle: "Omni",
+        defaultDesc: "Precision long-range beam target searchlight with water resistance.",
+        findFn: (p: Product) => p.name === "Omni" || p.categories.some(c => c.toLowerCase().includes("searchlight"))
+      },
+      {
+        mockTitle: "Omni Highbay",
+        defaultCategory: "Commercial Lighting",
+        defaultTitle: "Toofan",
+        defaultDesc: "High-efficiency suspended luminaire for commercial warehouses.",
+        findFn: (p: Product) => p.categories.some(c => c.toLowerCase().includes("industrial"))
+      }
+    ];
+
+    return items.map((item) => {
+      const matched = allProducts.find(item.findFn);
+      const product = matched || allProducts[0];
+      
+      return {
+        id: product ? product.id : Math.random(),
+        category: product ? (product.categories[0] || item.defaultCategory) : item.defaultCategory,
+        title: product ? product.name : item.defaultTitle,
+        description: item.defaultDesc,
+        image: product && product.media?.images?.[0] ? product.media.images[0] : "/product_lantern.png",
+        rawProduct: product
+      };
+    });
+  }, []);
 
   const handleScroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
@@ -73,33 +84,6 @@ export default function FeaturedProducts({ setSelectedProduct }: FeaturedProduct
         left: scrollAmount,
         behavior: "smooth",
       });
-    }
-  };
-
-  const handleProductClick = (mockTitle: string) => {
-    const allProducts = productData.products as Product[];
-    let targetProduct: Product | undefined;
-
-    if (mockTitle === "Vanguard Headlamp") {
-      targetProduct = allProducts.find(p => p.name === "Falcon" || p.categories.some(c => c.toLowerCase().includes("headlamp")));
-    } else if (mockTitle === "Phoenix Lantern") {
-      targetProduct = allProducts.find(p => p.name === "Comet" || p.categories.some(c => c.toLowerCase().includes("lantern")));
-    } else if (mockTitle === "Titan Floodlight") {
-      targetProduct = allProducts.find(p => p.name === "Tri Color Metal Torch" || p.categories.some(c => c.toLowerCase().includes("spotlight")));
-    } else if (mockTitle === "Aegis Backup Light") {
-      targetProduct = allProducts.find(p => p.categories.some(c => c.toLowerCase().includes("solar") || c.toLowerCase().includes("emergency")));
-    } else if (mockTitle === "Apex Spotlight") {
-      targetProduct = allProducts.find(p => p.name === "Omni" || p.categories.some(c => c.toLowerCase().includes("searchlight")));
-    } else if (mockTitle === "Omni Highbay") {
-      targetProduct = allProducts.find(p => p.categories.some(c => c.toLowerCase().includes("industrial")));
-    }
-
-    if (!targetProduct && allProducts.length > 0) {
-      targetProduct = allProducts[0];
-    }
-
-    if (targetProduct) {
-      setSelectedProduct?.(targetProduct);
     }
   };
 
@@ -150,14 +134,18 @@ export default function FeaturedProducts({ setSelectedProduct }: FeaturedProduct
           ref={scrollContainerRef}
           className="flex flex-row gap-6 overflow-x-auto pb-8 pt-4 px-2 -mx-4 sm:-mx-6 lg:-mx-8 sm:px-6 lg:px-8 snap-x snap-mandatory scroll-smooth scrollbar-none"
         >
-          {products.map((prod, idx) => (
+          {bestsellingProducts.map((prod, idx) => (
             <motion.div
               key={idx}
               initial={{ opacity: 0, filter: "blur(8px)", y: 30 }}
               whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: idx * 0.1, ease: "easeOut" }}
-              onClick={() => handleProductClick(prod.title)}
+              onClick={() => {
+                if (prod.rawProduct) {
+                  setSelectedProduct?.(prod.rawProduct);
+                }
+              }}
               className="group shrink-0 snap-start w-[300px] sm:w-[340px] bg-white rounded-[32px] p-6 border border-[#F0F0F0] shadow-[0_12px_40px_rgba(0,0,0,0.02)] hover:-translate-y-1.5 hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] transition-all duration-300 flex flex-col justify-between cursor-pointer"
             >
               {/* Top Section: Title & Short Description */}
