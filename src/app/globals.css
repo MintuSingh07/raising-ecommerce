@@ -84,3 +84,16 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Mask fade edge for banners */
+.mask-fade-edge {
+  mask-image: linear-gradient(to bottom, transparent 0%, black 20%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%);
+}
+
+@media (min-width: 1024px) {
+  .mask-fade-edge {
+    mask-image: linear-gradient(to right, transparent 0%, black 35%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 35%);
+  }
+}

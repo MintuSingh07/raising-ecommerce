@@ -71,7 +71,7 @@ export default function CtaBanner() {
               transition={{ duration: 0.6, ease: "easeOut" }}
               className="lg:col-span-5 relative w-full min-h-[300px] lg:min-h-full overflow-hidden select-none"
             >
-              <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-primary-navy via-transparent to-transparent z-10 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-b lg:bg-gradient-to-r from-primary via-transparent to-transparent z-10 pointer-events-none" />
               <Image
                 src="/b2b_logistics.png"
                 alt="RISING Logistics and Supply Chain"

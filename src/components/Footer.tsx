@@ -65,11 +65,11 @@ export default function Footer() {
           <div className="lg:col-span-2 flex flex-col space-y-4">
             <h4 className="text-sm font-semibold text-dark-navy tracking-wider uppercase">Products</h4>
             <ul className="space-y-2 text-xs font-medium text-slate-light">
-              <li><Link href="#torches" className="hover:text-primary transition-colors">LED Torches</Link></li>
-              <li><Link href="#spotlights" className="hover:text-primary transition-colors">Spotlights</Link></li>
-              <li><Link href="#emergency-lights" className="hover:text-primary transition-colors">Emergency Lights</Link></li>
-              <li><Link href="#rechargeable" className="hover:text-primary transition-colors">Rechargeable Products</Link></li>
-              <li><Link href="#industrial" className="hover:text-primary transition-colors">Industrial Solutions</Link></li>
+              <li><Link href="/collections/torches" className="hover:text-primary transition-colors">LED Torches</Link></li>
+              <li><Link href="/collections/spotlights" className="hover:text-primary transition-colors">Spotlights</Link></li>
+              <li><Link href="/collections/emergency-lights" className="hover:text-primary transition-colors">Emergency Lights</Link></li>
+              <li><Link href="/collections/rechargeable" className="hover:text-primary transition-colors">Rechargeable Products</Link></li>
+              <li><Link href="/collections/industrial" className="hover:text-primary transition-colors">Industrial Solutions</Link></li>
             </ul>
           </div>
 
@@ -77,11 +77,10 @@ export default function Footer() {
           <div className="lg:col-span-2 flex flex-col space-y-4">
             <h4 className="text-sm font-semibold text-dark-navy tracking-wider uppercase">Company</h4>
             <ul className="space-y-2 text-xs font-medium text-slate-light">
-              <li><Link href="#about" className="hover:text-primary transition-colors">About Us</Link></li>
-              <li><Link href="#manufacturing" className="hover:text-primary transition-colors">Manufacturing</Link></li>
+              <li><Link href="/#about" className="hover:text-primary transition-colors">About Us</Link></li>
               <li><Link href="#quality" className="hover:text-primary transition-colors">Quality Assurance</Link></li>
               <li><Link href="#careers" className="hover:text-primary transition-colors">Careers</Link></li>
-              <li><Link href="#contact" className="hover:text-primary transition-colors">Contact Us</Link></li>
+              <li><Link href="/#contact" className="hover:text-primary transition-colors">Contact Us</Link></li>
             </ul>
           </div>
 
@@ -90,7 +89,7 @@ export default function Footer() {
             <h4 className="text-sm font-semibold text-dark-navy tracking-wider uppercase">Resources</h4>
             <ul className="space-y-2 text-xs font-medium text-slate-light">
               <li><Link href="#brochure" className="hover:text-primary transition-colors">Brochure</Link></li>
-              <li><Link href="#catalog" className="hover:text-primary transition-colors">Catalog</Link></li>
+              <li><Link href="/#catalog" className="hover:text-primary transition-colors">Catalog</Link></li>
               <li><Link href="#warranty" className="hover:text-primary transition-colors">Warranty</Link></li>
               <li><Link href="#downloads" className="hover:text-primary transition-colors">Downloads</Link></li>
               <li><Link href="#faq" className="hover:text-primary transition-colors">FAQ</Link></li>

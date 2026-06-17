@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 
 const slides = [
-  { id: 1 },
-  { id: 2 },
-  { id: 3 }
+  { id: 1, image: "/banner-1.png" },
+  { id: 2, image: "/banner-2.png" },
+  { id: 3, image: "/banner-3.png" },
 ];
 
 export default function Hero() {
@@ -41,14 +42,16 @@ export default function Hero() {
   const handleTouchEnd = () => {
     if (!isDragging) return;
     setIsDragging(false);
-    
+
     const threshold = 70;
     if (dragOffset < -threshold) {
       // Swipe Left -> Next Slide
       setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
     } else if (dragOffset > threshold) {
       // Swipe Right -> Prev Slide
-      setCurrentIndex((prevIndex) => (prevIndex - 1 + slides.length) % slides.length);
+      setCurrentIndex(
+        (prevIndex) => (prevIndex - 1 + slides.length) % slides.length,
+      );
     }
     setDragOffset(0);
   };
@@ -71,14 +74,16 @@ export default function Hero() {
   const handleMouseUp = () => {
     if (!isDragging) return;
     setIsDragging(false);
-    
+
     const threshold = 70;
     if (dragOffset < -threshold) {
       // Drag Left -> Next Slide
       setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
     } else if (dragOffset > threshold) {
       // Drag Right -> Prev Slide
-      setCurrentIndex((prevIndex) => (prevIndex - 1 + slides.length) % slides.length);
+      setCurrentIndex(
+        (prevIndex) => (prevIndex - 1 + slides.length) % slides.length,
+      );
     }
     setDragOffset(0);
   };
@@ -90,7 +95,7 @@ export default function Hero() {
   };
 
   return (
-    <section 
+    <section
       id="home"
       className={`scroll-mt-20 relative overflow-hidden w-full h-screen h-[100dvh] min-h-[500px] bg-white select-none ${
         isDragging ? "cursor-grabbing" : "cursor-grab"
@@ -108,13 +113,15 @@ export default function Hero() {
       <div className="absolute bottom-0 left-0 w-[70vw] h-[70vh] bg-[radial-gradient(circle_at_20%_80%,rgba(255,184,0,0.04),transparent_70%)] pointer-events-none z-0" />
 
       {/* Sliding Track Container */}
-      <div 
+      <div
         className="flex h-full w-full relative z-10"
-        style={{ 
-          transform: isDragging 
+        style={{
+          transform: isDragging
             ? `translateX(calc(-${currentIndex * 100}% + ${dragOffset}px))`
             : `translateX(-${currentIndex * 100}%)`,
-          transition: isDragging ? "none" : "transform 700ms cubic-bezier(0.16, 1, 0.3, 1)"
+          transition: isDragging
+            ? "none"
+            : "transform 700ms cubic-bezier(0.16, 1, 0.3, 1)",
         }}
       >
         {slides.map((slide, index) => {
@@ -123,12 +130,17 @@ export default function Hero() {
               key={slide.id}
               className="relative w-full h-full shrink-0 bg-transparent overflow-hidden"
             >
-              {/* Aesthetic Large Number in Bottom Left Corner - Bleeding out of screen */}
-              <div 
-                className="absolute left-[-2vw] bottom-[-2vw] sm:left-[-3vw] sm:bottom-[-3vw] font-medium font-display text-[40vw] sm:text-[32vw] md:text-[28vw] lg:text-[24vw] leading-none text-slate-900/15 tracking-tighter select-none"
-              >
-                0{index + 1}
-              </div>
+              {slide.image && (
+                <Image
+                  src={slide.image}
+                  alt={`RISING Banner ${index + 1}`}
+                  fill
+                  className={`object-cover ${index === 1 ? "object-[center_60%]" : "object-center"} pointer-events-none select-none`}
+                  sizes="100vw"
+                  priority={index === 0}
+                  draggable={false}
+                />
+              )}
             </div>
           );
         })}
@@ -139,8 +151,18 @@ export default function Hero() {
         <span className="text-[9px] tracking-[0.5em] text-slate-400 font-semibold uppercase rotate-90 origin-center whitespace-nowrap mb-14 translate-x-0.5">
           SCROLL DOWN
         </span>
-        <svg className="w-3.5 h-3.5 text-slate-400 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 14l-7 7m0 0l-7-7" />
+        <svg
+          className="w-3.5 h-3.5 text-slate-400 animate-bounce"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2.5}
+            d="M19 14l-7 7m0 0l-7-7"
+          />
         </svg>
       </div>
 
@@ -151,8 +173,8 @@ export default function Hero() {
             key={index}
             onClick={() => setCurrentIndex(index)}
             className={`h-1.5 transition-all duration-300 cursor-pointer ${
-              currentIndex === index 
-                ? "w-12 bg-primary" 
+              currentIndex === index
+                ? "w-12 bg-primary"
                 : "w-6 bg-slate-350 hover:bg-slate-400"
             }`}
             aria-label={`Go to slide ${index + 1}`}

@@ -192,6 +192,15 @@ export default function ProductCatalog({ setSelectedProduct }: ProductCatalogPro
       }
     });
 
+    // Sort each group so best sellers are always first
+    Object.keys(groups).forEach(key => {
+      groups[key].sort((a, b) => {
+        const aVal = (a.featured === 1 || a.tags.includes("top-product")) ? 1 : 0;
+        const bVal = (b.featured === 1 || b.tags.includes("top-product")) ? 1 : 0;
+        return bVal - aVal;
+      });
+    });
+
     return groups;
   }, []);
 
@@ -240,13 +249,13 @@ export default function ProductCatalog({ setSelectedProduct }: ProductCatalogPro
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
             </span>
-            <BlurText text="Product Catalog" delay={30} animateBy="words" direction="bottom" />
+            <BlurText className="justify-center" text="Product Catalog" delay={30} animateBy="words" direction="bottom" />
           </div>
           <h2 className="text-3xl sm:text-5xl font-semibold text-dark-navy tracking-tight leading-tight">
-            <BlurText text="Explore Our Full Range of Lighting Products" highlightWords={["Full", "Range"]} delay={20} animateBy="words" direction="bottom" />
+            <BlurText className="justify-center" text="Explore Our Full Range of Lighting Products" highlightWords={["Full", "Range"]} delay={20} animateBy="words" direction="bottom" />
           </h2>
           <div className="text-slate-body font-medium text-sm sm:text-base">
-            <BlurText text="Find the perfect high-power backup, searchlight, or eco-friendly lamp. Filter and inspect the official RISING line-up." delay={10} animateBy="words" direction="bottom" />
+            <BlurText className="justify-center" text="Find the perfect high-power backup, searchlight, or eco-friendly lamp. Filter and inspect the official RISING line-up." delay={10} animateBy="words" direction="bottom" />
           </div>
 
           {/* Search Box */}

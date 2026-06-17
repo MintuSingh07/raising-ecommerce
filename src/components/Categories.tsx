@@ -11,36 +11,36 @@ export default function Categories() {
       title: "LED Torches",
       subtitle: "High-power portable beams",
       image: "/product_torch.png",
-      href: "#torches",
+      href: "/collections/torches",
     },
     {
       title: "Spotlights",
       subtitle: "Precision long-range lighting",
       image: "/product_spotlight.png",
-      href: "#spotlights",
+      href: "/collections/spotlights",
     },
     {
       title: "Emergency Lights",
       subtitle: "Automatic backup illumination",
       image: "/product_emergency.png",
-      href: "#emergency-lights",
+      href: "/collections/emergency-lights",
     },
     {
       title: "Rechargeable Products",
       subtitle: "Eco-friendly energy solutions",
       image: "/product_lantern.png",
-      href: "#rechargeable",
+      href: "/collections/rechargeable",
     },
     {
       title: "Industrial Solutions",
       subtitle: "Heavy-duty commercial systems",
       image: "/product_highbay.png",
-      href: "#industrial",
+      href: "/collections/industrial",
     },
   ];
 
   return (
-    <section id="products" className="py-20 bg-slate-50/40 border-y border-slate-100/50 scroll-mt-20">
+    <section id="collections" className="py-20 bg-slate-50/40 border-y border-slate-100/50 scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
@@ -51,7 +51,7 @@ export default function Categories() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
               </span>
-              <BlurText text="Our Product Categories" delay={30} animateBy="words" direction="bottom" />
+              <BlurText text="Our Product Collections" delay={30} animateBy="words" direction="bottom" />
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-dark-navy tracking-tight leading-tight">
               <BlurText text="Solutions That Light Every Need" highlightWords={["Light"]} delay={20} animateBy="words" direction="bottom" />
@@ -61,7 +61,7 @@ export default function Categories() {
             href="#catalog"
             className="inline-flex items-center text-sm font-semibold text-primary hover:text-primary-navy group transition-colors"
           >
-            View All Products
+            View Collection
             <svg
               className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1.5"
               fill="none"
@@ -109,7 +109,7 @@ export default function Categories() {
                     {cat.subtitle}
                   </p>
                   <div className="flex items-center gap-1 mt-4 text-xs font-semibold text-primary">
-                    <span>Explore Collection</span>
+                    <span>Explore</span>
                     <svg className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
