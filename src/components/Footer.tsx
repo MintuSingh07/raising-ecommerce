@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -9,21 +10,15 @@ export default function Footer() {
           
           {/* Brand Column */}
           <div className="lg:col-span-4 flex flex-col items-start space-y-6">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="relative w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-sm transition-transform duration-300 group-hover:scale-105">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-5 h-5 text-accent fill-accent"
-                >
-                  <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+            <Link href="/" className="flex items-center group">
+              <div className="relative h-[50px] w-[109px] transition-transform duration-300 group-hover:scale-105">
+                <Image
+                  src="/logo.png"
+                  alt="RISING Logo"
+                  fill
+                  className="object-contain object-left"
+                />
               </div>
-              <span className="text-2xl font-semibold tracking-wider text-dark-navy flex items-baseline">
-                RISING
-                <span className="text-[10px] font-medium text-slate-400 ml-0.5 leading-none">®</span>
-              </span>
             </Link>
             
             <p className="text-sm text-slate-body leading-relaxed max-w-sm">

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const navLinks = [
   { label: "Home", href: "/#home" },
@@ -22,21 +23,16 @@ export default function Navbar() {
         <div className="absolute top-0 inset-x-12 h-[1px] bg-gradient-to-r from-transparent via-white/60 to-transparent pointer-events-none" />
 
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-1.5 sm:gap-2 group relative z-10">
-          <div className="relative w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-primary/95 flex items-center justify-center shadow-md shadow-primary/10 border border-white/25 transition-transform duration-300 group-hover:scale-105">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-accent fill-accent"
-            >
-              <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+        <Link href="/" className="flex items-center group relative z-10">
+          <div className="relative h-[38px] w-[83px] sm:h-[48px] sm:w-[105px] transition-transform duration-300 group-hover:scale-105">
+            <Image
+              src="/logo.png"
+              alt="RISING Logo"
+              fill
+              priority
+              className="object-contain object-left"
+            />
           </div>
-          <span className="text-lg sm:text-2xl font-semibold tracking-wider text-dark-navy flex items-baseline">
-            RISING
-            <span className="text-[8px] sm:text-[10px] font-medium text-slate-400 ml-0.5 leading-none">®</span>
-          </span>
         </Link>
 
         {/* Desktop Navigation - Glass Pills */}
