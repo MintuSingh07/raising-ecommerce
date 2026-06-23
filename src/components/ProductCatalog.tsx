@@ -326,29 +326,44 @@ export default function ProductCatalog({
             />
           </div>
 
-          {/* Search Box */}
-          <div className="relative w-full max-w-lg mt-8 group">
-            <div className="absolute inset-0 bg-primary/10 rounded-full blur group-hover:bg-primary/15 transition-colors duration-300" />
-            <input
-              type="text"
-              placeholder="Search products by name, specs (e.g. 10W, mAh)..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="relative w-full px-6 py-4 rounded-full border border-slate-200 bg-white/95 text-dark-navy font-medium text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 shadow-sm transition-all duration-300"
-            />
-            <svg
-              className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-hover:text-primary transition-colors duration-300"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          {/* Search & Action Buttons Container */}
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full max-w-2xl mt-8 justify-center">
+            {/* Search Box */}
+            <div className="relative w-full max-w-md group">
+              <div className="absolute inset-0 bg-primary/10 rounded-full blur group-hover:bg-primary/15 transition-colors duration-300" />
+              <input
+                type="text"
+                placeholder="Search products by name, specs (e.g. 10W, mAh)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="relative w-full px-6 py-4 rounded-full border border-slate-200 bg-white/95 text-dark-navy font-medium text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 shadow-sm transition-all duration-300"
               />
-            </svg>
+              <svg
+                className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-hover:text-primary transition-colors duration-300"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+
+            {/* Download Catalog Button */}
+            <a
+              href="/catalog.pdf"
+              download
+              className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-full text-xs font-semibold bg-primary text-white border border-white/20 shadow-lg shadow-primary/15 transition-all duration-300 hover:bg-primary-navy hover:shadow-primary/25 active:scale-95 whitespace-nowrap w-full sm:w-auto cursor-pointer"
+            >
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Download Catalog
+            </a>
           </div>
         </div>
 
