@@ -58,7 +58,7 @@ export default function Categories() {
             </h2>
           </div>
           <Link
-            href="#catalog"
+            href="#product"
             className="inline-flex items-center text-sm font-semibold text-primary hover:text-primary-navy group transition-colors"
           >
             View Collection

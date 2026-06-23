@@ -37,21 +37,34 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       if (!anchor) return;
       
       const href = anchor.getAttribute("href");
-      if (href && href.startsWith("#")) {
-        // Find if target element exists
-        const elementId = href.substring(1);
-        const element = document.getElementById(elementId);
+      if (!href) return;
+      
+      try {
+        // Resolve URL relative to current location
+        const url = new URL(href, window.location.href);
         
-        if (element) {
-          e.preventDefault();
-          lenis.scrollTo(element, {
-            offset: -80, // Offset for fixed navbar
-            duration: 1.2,
-          });
+        // If the path and hostname match the current page, and there is a hash
+        if (
+          url.origin === window.location.origin &&
+          url.pathname === window.location.pathname &&
+          url.hash
+        ) {
+          const elementId = url.hash.substring(1);
+          const element = document.getElementById(elementId);
           
-          // Update browser history hash without jumping
-          window.history.pushState(null, "", href);
+          if (element) {
+            e.preventDefault();
+            lenis.scrollTo(element, {
+              offset: -80, // Offset for fixed navbar
+              duration: 1.2,
+            });
+            
+            // Update browser history hash without jumping
+            window.history.pushState(null, "", url.hash);
+          }
         }
+      } catch (err) {
+        // Fallback for invalid URLs or absolute external links
       }
     };
 

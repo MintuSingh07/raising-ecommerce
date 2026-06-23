@@ -84,7 +84,7 @@ export default function Footer() {
             <h4 className="text-sm font-semibold text-dark-navy tracking-wider uppercase">Resources</h4>
             <ul className="space-y-2 text-xs font-medium text-slate-light">
               <li><Link href="#brochure" className="hover:text-primary transition-colors">Brochure</Link></li>
-              <li><Link href="/#catalog" className="hover:text-primary transition-colors">Catalog</Link></li>
+              <li><Link href="/#product" className="hover:text-primary transition-colors">Products</Link></li>
               <li><Link href="#warranty" className="hover:text-primary transition-colors">Warranty</Link></li>
               <li><Link href="#downloads" className="hover:text-primary transition-colors">Downloads</Link></li>
               <li><Link href="#faq" className="hover:text-primary transition-colors">FAQ</Link></li>
