@@ -173,6 +173,45 @@ function getColorBubbleStyle(colorName: string): { bg: string; border: string; v
 export default function ProductDetails({ product, onClose }: ProductDetailsProps) {
   const { features, specs } = useMemo(() => parseHtmlDescription(product.descriptions.short), [product]);
   
+  const filteredSpecs = useMemo(() => {
+    const skipLabels = ["brand", "model name", "model name/number", "model number", "model"];
+    
+    return specs.filter((spec) => {
+      const labelLower = spec.label.trim().toLowerCase();
+      if (skipLabels.includes(labelLower)) {
+        return false;
+      }
+      
+      const valClean = spec.value.trim().toLowerCase().replace(/\s+/g, "");
+      if (!valClean) return false;
+      
+      if (valClean === "yes" || valClean === "no") {
+        if (labelLower === "rechargeable") {
+          return !features.some(feat => feat.toLowerCase().includes("recharge"));
+        }
+        return true;
+      }
+
+      // Check if this spec value is mentioned in any of the feature items
+      const isMentioned = features.some((feat) => {
+        const featLower = feat.toLowerCase().replace(/\s+/g, "");
+        if (featLower.includes(valClean)) {
+          return true;
+        }
+        
+        // Check if value parts (for lists like "Farming, Mining") are in features
+        if (labelLower.includes("usage") || labelLower.includes("application")) {
+          const parts = spec.value.split(/[,/]/);
+          return parts.some(part => featLower.includes(part.trim().toLowerCase().replace(/\s+/g, "")));
+        }
+
+        return false;
+      });
+
+      return !isMentioned;
+    });
+  }, [specs, features]);
+
   const [selectedColor, setSelectedColor] = useState("");
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
@@ -610,98 +649,93 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
         {/* Main Grid: Specifications, Highlights, and Box Content */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 mb-16">
           
-          {/* Column 1: Product Highlights (Left) - Matching border card with drop shadow */}
-          <div className="lg:col-span-4 bg-white border border-slate-100 rounded-[24px] p-6 sm:p-7.5 shadow-[0_8px_30px_rgba(0,0,0,0.015)] flex flex-col justify-start">
-            <h3 className="text-base font-bold text-dark-navy flex items-center gap-2 mb-6 pb-4 border-b border-slate-100 select-none">
-              <span className="w-1.5 h-4 bg-primary rounded-full" />
-              Product Highlights
-            </h3>
-            {features.length > 0 ? (
-              <ul className="space-y-5">
-                {features.map((feat, idx) => {
-                  const { title, desc } = getFormattedHighlight(feat);
-                  if (!title) return null;
-                  
-                  // Keyword mapping for Lucide icons
-                  const isLED = title.toLowerCase().includes("led") || title.toLowerCase().includes("smd") || title.toLowerCase().includes("light") || title.toLowerCase().includes("bulb");
-                  const isRange = title.toLowerCase().includes("beam") || title.toLowerCase().includes("range") || title.toLowerCase().includes("spot") || title.toLowerCase().includes("reflector");
-                  const isBattery = title.toLowerCase().includes("battery") || title.toLowerCase().includes("mah") || title.toLowerCase().includes("recharge");
-                  const isModes = title.toLowerCase().includes("mode") || title.toLowerCase().includes("strobe") || title.toLowerCase().includes("operate");
-                  const isBody = title.toLowerCase().includes("body") || title.toLowerCase().includes("abs") || title.toLowerCase().includes("durable") || title.toLowerCase().includes("rugged") || title.toLowerCase().includes("material") || title.toLowerCase().includes("metal") || title.toLowerCase().includes("aluminium");
-                  const isProtect = title.toLowerCase().includes("protect") || title.toLowerCase().includes("safety") || title.toLowerCase().includes("overcharge");
+          {/* Combined Column 1 & 2: Specifications & Highlights details wrapper */}
+          <div className="lg:col-span-9 bg-white border border-slate-100 rounded-[24px] p-6 sm:p-7.5 shadow-[0_8px_30px_rgba(0,0,0,0.015)]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Features List */}
+              <div>
+                {features.length > 0 ? (
+                  <ul className="space-y-5">
+                    {features.map((feat, idx) => {
+                      const { title, desc } = getFormattedHighlight(feat);
+                      if (!title) return null;
+                      
+                      // Keyword mapping for Lucide icons
+                      const isLED = title.toLowerCase().includes("led") || title.toLowerCase().includes("smd") || title.toLowerCase().includes("light") || title.toLowerCase().includes("bulb");
+                      const isRange = title.toLowerCase().includes("beam") || title.toLowerCase().includes("range") || title.toLowerCase().includes("spot") || title.toLowerCase().includes("reflector");
+                      const isBattery = title.toLowerCase().includes("battery") || title.toLowerCase().includes("mah") || title.toLowerCase().includes("recharge");
+                      const isModes = title.toLowerCase().includes("mode") || title.toLowerCase().includes("strobe") || title.toLowerCase().includes("operate");
+                      const isBody = title.toLowerCase().includes("body") || title.toLowerCase().includes("abs") || title.toLowerCase().includes("durable") || title.toLowerCase().includes("rugged") || title.toLowerCase().includes("material") || title.toLowerCase().includes("metal") || title.toLowerCase().includes("aluminium");
+                      const isProtect = title.toLowerCase().includes("protect") || title.toLowerCase().includes("safety") || title.toLowerCase().includes("overcharge");
 
-                  return (
-                    <li key={idx} className="flex gap-4">
-                      <div className="w-8 h-8 rounded-lg bg-blue-50/50 flex-shrink-0 flex items-center justify-center">
-                        {isLED && <Lightbulb className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
-                        {isRange && <Navigation className="w-4.5 h-4.5 text-primary rotate-45" strokeWidth={2} />}
-                        {isBattery && <Battery className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
-                        {isModes && <Sliders className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
-                        {isBody && <Shield className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
-                        {isProtect && <ShieldCheck className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
-                        {!isLED && !isRange && !isBattery && !isModes && !isBody && !isProtect && (
-                          <ShieldCheck className="w-4.5 h-4.5 text-primary" strokeWidth={2.5} />
-                        )}
-                      </div>
-                      <div className="space-y-0.5">
-                        <span className="text-sm font-bold text-dark-navy block leading-tight">{title}</span>
-                        {desc && <span className="text-xs text-slate-body font-medium block leading-relaxed">{desc}</span>}
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : (
-              <p className="text-xs text-slate-body font-medium">No highlights available for this model.</p>
-            )}
-          </div>
-
-          {/* Column 2: Technical Specifications (Center) - Matching border card with drop shadow */}
-          <div className="lg:col-span-5 bg-white border border-slate-100 rounded-[24px] p-6 sm:p-7.5 shadow-[0_8px_30px_rgba(0,0,0,0.015)]">
-            <h3 className="text-base font-bold text-dark-navy flex items-center gap-2 mb-6 pb-4 border-b border-slate-100 select-none">
-              <span className="w-1.5 h-4 bg-primary rounded-full" />
-              Technical Specifications
-            </h3>
-            {specs.length > 0 ? (
-              <div className="overflow-hidden rounded-xl border border-slate-100/50">
-                <table className="w-full border-collapse text-xs">
-                  <tbody>
-                    {specs.map((spec, idx) => (
-                      <tr
-                        key={idx}
-                        className={`border-b border-slate-100/50 last:border-0 ${
-                          idx % 2 === 0 ? "bg-slate-50/20" : "bg-white"
-                        }`}
-                      >
-                        <td className="px-4 py-2 font-bold text-dark-navy w-1/3">
-                          {spec.label}
-                        </td>
-                        <td className="px-4 py-2 text-slate-body font-medium leading-normal">
-                          {spec.label.toLowerCase().includes("color") && colorsList.length > 0 ? (
-                            <div className="flex gap-1.5 items-center">
-                              {colorsList.map((color: string) => {
-                                const style = getColorBubbleStyle(color);
-                                return (
-                                  <span 
-                                    key={color} 
-                                    className={`w-3.5 h-3.5 rounded-full border ${style.bg} ${style.border}`} 
-                                    title={color}
-                                  />
-                                );
-                              })}
-                            </div>
-                          ) : (
-                            spec.value
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                      return (
+                        <li key={idx} className="flex gap-4">
+                          <div className="w-8 h-8 rounded-lg bg-blue-50/50 flex-shrink-0 flex items-center justify-center">
+                            {isLED && <Lightbulb className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
+                            {isRange && <Navigation className="w-4.5 h-4.5 text-primary rotate-45" strokeWidth={2} />}
+                            {isBattery && <Battery className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
+                            {isModes && <Sliders className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
+                            {isBody && <Shield className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
+                            {isProtect && <ShieldCheck className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
+                            {!isLED && !isRange && !isBattery && !isModes && !isBody && !isProtect && (
+                              <ShieldCheck className="w-4.5 h-4.5 text-primary" strokeWidth={2.5} />
+                            )}
+                          </div>
+                          <div className="space-y-0.5">
+                            <span className="text-sm font-bold text-dark-navy block leading-tight">{title}</span>
+                            {desc && <span className="text-xs text-slate-body font-medium block leading-relaxed">{desc}</span>}
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <p className="text-xs text-slate-body font-medium">No details available for this model.</p>
+                )}
               </div>
-            ) : (
-              <p className="text-xs text-slate-body font-medium">No technical specifications table available.</p>
-            )}
+
+              {/* Technical Specifications */}
+              <div>
+                {filteredSpecs.length > 0 && (
+                  <div className="overflow-hidden rounded-xl border border-slate-100/50">
+                    <table className="w-full border-collapse text-xs">
+                      <tbody>
+                        {filteredSpecs.map((spec, idx) => (
+                          <tr
+                            key={idx}
+                            className={`border-b border-slate-100/50 last:border-0 ${
+                              idx % 2 === 0 ? "bg-slate-50/20" : "bg-white"
+                            }`}
+                          >
+                            <td className="px-4 py-2 font-bold text-dark-navy w-1/3">
+                              {spec.label}
+                            </td>
+                            <td className="px-4 py-2 text-slate-body font-medium leading-normal">
+                              {spec.label.toLowerCase().includes("color") && colorsList.length > 0 ? (
+                                <div className="flex gap-1.5 items-center">
+                                  {colorsList.map((color: string) => {
+                                    const style = getColorBubbleStyle(color);
+                                    return (
+                                      <span 
+                                        key={color} 
+                                        className={`w-3.5 h-3.5 rounded-full border ${style.bg} ${style.border}`} 
+                                        title={color}
+                                      />
+                                    );
+                                  })}
+                                </div>
+                              ) : (
+                                spec.value
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Column 3: Stacked Cards (Right) - Matching border card with drop shadow */}

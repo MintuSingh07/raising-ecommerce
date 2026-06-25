@@ -42,7 +42,7 @@ export default function CtaBanner() {
               
               <div className="flex flex-wrap gap-4 w-full sm:w-auto pt-4">
                 <Link
-                  href="#distributor-form"
+                  href="/distributor"
                   className="inline-flex items-center justify-center px-8 py-4 rounded-full text-xs font-semibold bg-accent text-dark-navy transition-all duration-300 hover:bg-accent-hover hover:-translate-y-0.5 active:translate-y-0 hover:shadow-lg hover:shadow-yellow-500/10"
                 >
                   Become a Distributor

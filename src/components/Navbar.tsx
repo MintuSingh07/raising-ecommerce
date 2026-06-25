@@ -52,7 +52,7 @@ export default function Navbar() {
         {/* Desktop Action Buttons */}
         <div className="hidden md:flex items-center relative z-10">
           <Link
-            href="#distributor"
+            href="/distributor"
             className="inline-flex items-center justify-center px-6 py-2.5 rounded-full text-xs font-semibold bg-primary text-white border border-white/20 shadow-lg shadow-primary/25 transition-all duration-300 hover:bg-primary-navy hover:shadow-primary/35 active:scale-95"
           >
             Become a Distributor
@@ -94,7 +94,7 @@ export default function Navbar() {
           ))}
           <div className="pt-2">
             <Link
-              href="#distributor"
+              href="/distributor"
               onClick={() => setIsOpen(false)}
               className="block w-full text-center px-4 py-2.5 rounded-full text-xs font-semibold bg-primary text-white border border-white/20 shadow-lg shadow-primary/20 hover:bg-primary-navy transition-all duration-300"
             >
