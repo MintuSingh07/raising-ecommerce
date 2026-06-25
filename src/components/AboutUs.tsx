@@ -97,7 +97,7 @@ export default function AboutUs() {
             {/* Read More link */}
             <div className="pt-2">
               <Link
-                href="#about-details"
+                href="/about"
                 className="inline-flex items-center text-xs font-semibold text-primary hover:text-primary-navy group transition-colors cursor-pointer"
               >
                 <span>Read More</span>

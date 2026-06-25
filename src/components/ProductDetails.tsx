@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import BlurText from "./BlurText";
@@ -534,8 +535,8 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
 
             {/* Actions CTA Buttons with Lucide Icons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-4 select-none">
-              <a
-                href="#contact"
+              <Link
+                href="/contact"
                 className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start px-6 py-3.5 rounded-lg text-xs font-bold bg-primary text-white border border-primary hover:bg-primary-navy shadow-md shadow-primary/10 transition-all duration-300 active:scale-[0.98]"
               >
                 <div className="flex items-center">
@@ -545,7 +546,7 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
                 <div className="w-5 h-5 ml-4 rounded bg-white/10 flex items-center justify-center">
                   <ChevronRight className="w-3.5 h-3.5 text-white" strokeWidth={3} />
                 </div>
-              </a>
+              </Link>
               <button
                 onClick={() => alert("Datasheet download started successfully.")}
                 className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start px-6 py-3.5 rounded-lg text-xs font-bold bg-white text-slate-800 border border-slate-200 hover:border-slate-350 hover:bg-slate-50 transition-all duration-300 active:scale-[0.98]"

@@ -52,7 +52,7 @@ export default function CtaBanner() {
                 </Link>
                 
                 <Link
-                  href="#contact-sales"
+                  href="/contact"
                   className="inline-flex items-center justify-center px-8 py-4 rounded-full text-xs font-semibold bg-transparent text-white border border-white/30 hover:border-white hover:bg-white/10 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"
                 >
                   Contact Sales Team

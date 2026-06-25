@@ -75,7 +75,7 @@ export default function Footer() {
               <li><Link href="/#about" className="hover:text-primary transition-colors">About Us</Link></li>
               <li><Link href="#quality" className="hover:text-primary transition-colors">Quality Assurance</Link></li>
               <li><Link href="#careers" className="hover:text-primary transition-colors">Careers</Link></li>
-              <li><Link href="/#contact" className="hover:text-primary transition-colors">Contact Us</Link></li>
+              <li><Link href="/contact" className="hover:text-primary transition-colors">Contact Us</Link></li>
             </ul>
           </div>
 
@@ -84,7 +84,7 @@ export default function Footer() {
             <h4 className="text-sm font-semibold text-dark-navy tracking-wider uppercase">Resources</h4>
             <ul className="space-y-2 text-xs font-medium text-slate-light">
               <li><Link href="#brochure" className="hover:text-primary transition-colors">Brochure</Link></li>
-              <li><Link href="/#product" className="hover:text-primary transition-colors">Products</Link></li>
+              <li><Link href="/products" className="hover:text-primary transition-colors">Products</Link></li>
               <li><Link href="#warranty" className="hover:text-primary transition-colors">Warranty</Link></li>
               <li><Link href="#downloads" className="hover:text-primary transition-colors">Downloads</Link></li>
               <li><Link href="#faq" className="hover:text-primary transition-colors">FAQ</Link></li>
@@ -100,19 +100,19 @@ export default function Footer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span>F-30, Industrial Area, Narela, Delhi - 110040, India</span>
+                <span>Wonder Appliances Private Limited E 330A, MIA, Basni Phase II Jodhpur - 342005, Rajasthan, India</span>
               </li>
               <li className="flex gap-2 items-center">
                 <svg className="w-4 h-4 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
-                <span>+91 11 4707 2571</span>
+                <a href="tel:+919468650719" className="hover:text-primary transition-colors">+91- 9468650719</a>
               </li>
               <li className="flex gap-2 items-center">
                 <svg className="w-4 h-4 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L22 8m-2 11H4a2 2 0 01-2-2V7a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2z" />
                 </svg>
-                <span>info@risingappliances.com</span>
+                <a href="mailto:info@wonderappliances.com" className="hover:text-primary transition-colors">info@wonderappliances.com</a>
               </li>
             </ul>
           </div>

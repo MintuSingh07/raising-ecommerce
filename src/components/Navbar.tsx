@@ -8,9 +8,9 @@ const navLinks = [
   { label: "Home", href: "/#home" },
   { label: "Collections", href: "/#collections" },
   { label: "About Us", href: "/#about" },
-  { label: "Products", href: "/#product" },
+  { label: "Products", href: "/products" },
   { label: "Best Selling", href: "/#bestselling" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export default function Navbar() {

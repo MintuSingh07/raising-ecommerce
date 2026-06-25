@@ -54,13 +54,11 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
           
           if (element) {
             e.preventDefault();
+            // Scroll to target element
             lenis.scrollTo(element, {
               offset: -80, // Offset for fixed navbar
               duration: 1.2,
             });
-            
-            // Update browser history hash without jumping
-            window.history.pushState(null, "", url.hash);
           }
         }
       } catch (err) {

@@ -1,86 +1,35 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import StatsBanner from "@/components/StatsBanner";
 import Categories from "@/components/Categories";
 import VersatileUsage from "@/components/VersatileUsage";
 import AboutUs from "@/components/AboutUs";
-import ProductCatalog, { type Product } from "@/components/ProductCatalog";
 import FeaturedProducts from "@/components/FeaturedProducts";
 import CtaBanner from "@/components/CtaBanner";
 import Footer from "@/components/Footer";
-import ProductDetails from "@/components/ProductDetails";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import productData from "../../public/products_structured.json";
-
-
+import { useRouter } from "next/navigation";
+import { type Product } from "@/components/ProductCatalog";
 
 export default function Home() {
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const router = useRouter();
 
-
-
-  // Read product ID from URL query parameters on mount to persist product detail view on reload
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const prodIdStr = params.get("product");
-      if (prodIdStr) {
-        const prodId = parseInt(prodIdStr, 10);
-        const products = productData.products as Product[];
-        const match = products.find((p) => p.id === prodId);
-        if (match) {
-          setSelectedProduct(match);
-        }
-      }
-    }
-  }, []);
-
-  // Update URL search parameters when selectedProduct changes
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const url = new URL(window.location.href);
-      if (selectedProduct) {
-        url.searchParams.set("product", selectedProduct.id.toString());
-      } else {
-        url.searchParams.delete("product");
-      }
-      window.history.pushState({}, "", url.toString());
-    }
-  }, [selectedProduct]);
-
-  // Scroll to top when product is selected
-  useEffect(() => {
-    if (selectedProduct) {
-      window.scrollTo({ top: 0, behavior: "instant" });
-      if (typeof window !== "undefined" && (window as any).lenis) {
-        (window as any).lenis.scrollTo(0, { immediate: true });
-      }
-    }
-  }, [selectedProduct]);
+  const handleSelectProduct = (product: Product) => {
+    router.push(`/products?product=${product.id}`);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50/20 font-sans">
       <Navbar />
       <main className="flex-grow">
-        {selectedProduct ? (
-          <ProductDetails 
-            product={selectedProduct} 
-            onClose={() => setSelectedProduct(null)} 
-          />
-        ) : (
-          <>
-            <Hero />
-            <StatsBanner />
-            <Categories />
-            <VersatileUsage />
-            <AboutUs />
-            <ProductCatalog setSelectedProduct={setSelectedProduct} />
-            <FeaturedProducts setSelectedProduct={setSelectedProduct} />
-          </>
-        )}
+        <Hero />
+        <StatsBanner />
+        <Categories />
+        <VersatileUsage />
+        <AboutUs />
+        <FeaturedProducts setSelectedProduct={handleSelectProduct} />
         <CtaBanner />
       </main>
       <Footer />
