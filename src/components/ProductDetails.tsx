@@ -339,6 +339,82 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
     return list;
   }, [specs, features]);
 
+  const taglineTitles = useMemo(() => {
+    const list: string[] = [];
+    if (features[0]) {
+      const title = getFormattedHighlight(features[0]).title.replace(/,$/, "").trim().toLowerCase();
+      if (title) list.push(title);
+    }
+    if (features[1]) {
+      const title = getFormattedHighlight(features[1]).title.replace(/,$/, "").trim().toLowerCase();
+      if (title) list.push(title);
+    }
+    return list;
+  }, [features]);
+
+  const filteredFeatures = useMemo(() => {
+    return features.filter((feat) => {
+      const featLower = feat.toLowerCase();
+      const featTitle = getFormattedHighlight(feat).title.replace(/,$/, "").trim().toLowerCase();
+
+      // 1. If it's featured in the tagline (top area tagline)
+      if (taglineTitles.includes(featTitle)) {
+        return false;
+      }
+
+      // 2. Exact or near-exact match in quickSpecs values
+      const quickSpecsValues = quickSpecs.map(q => q.value.toLowerCase());
+      if (quickSpecsValues.some(val => val === featLower || featLower.includes(val) || val.includes(featLower))) {
+        return false;
+      }
+
+      // 3. Category/keyword check against quickSpecs keys
+      const activeKeys = new Set(quickSpecs.map(q => q.key));
+
+      // - Wattage / LED check (brightness key)
+      if (activeKeys.has("brightness")) {
+        const wattMatch = featLower.match(/\b(\d+)\s*w\b/i);
+        if (wattMatch) {
+          const wattVal = wattMatch[1];
+          const hasWattInQuick = quickSpecs.some(q => {
+            const qLower = q.value.toLowerCase();
+            return q.key === "brightness" && (qLower.includes(`${wattVal}w`) || qLower.includes(`${wattVal} w`));
+          });
+          if (hasWattInQuick) return false;
+        }
+      }
+
+      // - Battery Capacity check (battery key)
+      if (activeKeys.has("battery")) {
+        const capMatch = featLower.match(/\b(\d+)\s*mah\b/i);
+        if (capMatch) {
+          const capVal = capMatch[1];
+          const hasCapInQuick = quickSpecs.some(q => {
+            const qLower = q.value.toLowerCase();
+            return q.key === "battery" && (qLower.includes(`${capVal}mah`) || qLower.includes(`${capVal} mah`));
+          });
+          if (hasCapInQuick) return false;
+        }
+      }
+
+      // - Overcharging / protection check (protection key)
+      if (activeKeys.has("protection")) {
+        if (featLower.includes("protection") || featLower.includes("protect") || featLower.includes("overcharge") || featLower.includes("over-charge") || featLower.includes("over discharge") || featLower.includes("over-discharge")) {
+          return false;
+        }
+      }
+
+      // - Backup check (backup key)
+      if (activeKeys.has("backup")) {
+        if (featLower.includes("backup")) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [features, quickSpecs, taglineTitles]);
+
   // Parse Applications list strictly from the Usage/Application spec in JSON
   const applications = useMemo(() => {
     const appSpec = specs.find(s => s.label.toLowerCase().includes("usage") || s.label.toLowerCase().includes("application"));
@@ -690,91 +766,89 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
           
           {/* Combined Column 1 & 2: Specifications & Highlights details wrapper */}
           <div className="lg:col-span-9 bg-white border border-slate-100 rounded-[24px] p-6 sm:p-7.5 shadow-[0_8px_30px_rgba(0,0,0,0.015)]">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Features List */}
-              <div>
-                {features.length > 0 ? (
-                  <ul className="space-y-5">
-                    {features.map((feat, idx) => {
-                      const { title, desc } = getFormattedHighlight(feat);
-                      if (!title) return null;
-                      
-                      // Keyword mapping for Lucide icons
-                      const isLED = title.toLowerCase().includes("led") || title.toLowerCase().includes("smd") || title.toLowerCase().includes("light") || title.toLowerCase().includes("bulb");
-                      const isRange = title.toLowerCase().includes("beam") || title.toLowerCase().includes("range") || title.toLowerCase().includes("spot") || title.toLowerCase().includes("reflector");
-                      const isBattery = title.toLowerCase().includes("battery") || title.toLowerCase().includes("mah") || title.toLowerCase().includes("recharge");
-                      const isModes = title.toLowerCase().includes("mode") || title.toLowerCase().includes("strobe") || title.toLowerCase().includes("operate");
-                      const isBody = title.toLowerCase().includes("body") || title.toLowerCase().includes("abs") || title.toLowerCase().includes("durable") || title.toLowerCase().includes("rugged") || title.toLowerCase().includes("material") || title.toLowerCase().includes("metal") || title.toLowerCase().includes("aluminium");
-                      const isProtect = title.toLowerCase().includes("protect") || title.toLowerCase().includes("safety") || title.toLowerCase().includes("overcharge");
+            {(filteredFeatures.length > 0 || filteredSpecs.length > 0) ? (
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5">
+                {/* Features */}
+                {filteredFeatures.map((feat, idx) => {
+                  const { title, desc } = getFormattedHighlight(feat);
+                  if (!title) return null;
+                  
+                  // Keyword mapping for Lucide icons
+                  const isLED = title.toLowerCase().includes("led") || title.toLowerCase().includes("smd") || title.toLowerCase().includes("light") || title.toLowerCase().includes("bulb");
+                  const isRange = title.toLowerCase().includes("beam") || title.toLowerCase().includes("range") || title.toLowerCase().includes("spot") || title.toLowerCase().includes("reflector");
+                  const isBattery = title.toLowerCase().includes("battery") || title.toLowerCase().includes("mah") || title.toLowerCase().includes("recharge");
+                  const isModes = title.toLowerCase().includes("mode") || title.toLowerCase().includes("strobe") || title.toLowerCase().includes("operate");
+                  const isBody = title.toLowerCase().includes("body") || title.toLowerCase().includes("abs") || title.toLowerCase().includes("durable") || title.toLowerCase().includes("rugged") || title.toLowerCase().includes("material") || title.toLowerCase().includes("metal") || title.toLowerCase().includes("aluminium");
+                  const isProtect = title.toLowerCase().includes("protect") || title.toLowerCase().includes("safety") || title.toLowerCase().includes("overcharge");
 
-                      return (
-                        <li key={idx} className="flex gap-4">
-                          <div className="w-8 h-8 rounded-lg bg-blue-50/50 flex-shrink-0 flex items-center justify-center">
-                            {isLED && <Lightbulb className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
-                            {isRange && <Navigation className="w-4.5 h-4.5 text-primary rotate-45" strokeWidth={2} />}
-                            {isBattery && <Battery className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
-                            {isModes && <Sliders className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
-                            {isBody && <Shield className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
-                            {isProtect && <ShieldCheck className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
-                            {!isLED && !isRange && !isBattery && !isModes && !isBody && !isProtect && (
-                              <ShieldCheck className="w-4.5 h-4.5 text-primary" strokeWidth={2.5} />
-                            )}
-                          </div>
-                          <div className="space-y-0.5">
-                            <span className="text-sm font-bold text-dark-navy block leading-tight">{title}</span>
-                            {desc && <span className="text-xs text-slate-body font-medium block leading-relaxed">{desc}</span>}
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                ) : (
-                  <p className="text-xs text-slate-body font-medium">No details available for this model.</p>
-                )}
-              </div>
+                  return (
+                    <li key={`feat-${idx}`} className="flex gap-4">
+                      <div className="w-8 h-8 rounded-lg bg-blue-50/50 flex-shrink-0 flex items-center justify-center">
+                        {isLED && <Lightbulb className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
+                        {isRange && <Navigation className="w-4.5 h-4.5 text-primary rotate-45" strokeWidth={2} />}
+                        {isBattery && <Battery className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
+                        {isModes && <Sliders className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
+                        {isBody && <Shield className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
+                        {isProtect && <ShieldCheck className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
+                        {!isLED && !isRange && !isBattery && !isModes && !isBody && !isProtect && (
+                          <ShieldCheck className="w-4.5 h-4.5 text-primary" strokeWidth={2.5} />
+                        )}
+                      </div>
+                      <div className="space-y-0.5">
+                        <span className="text-sm font-bold text-dark-navy block leading-tight">{title}</span>
+                        {desc && <span className="text-xs text-slate-body font-medium block leading-relaxed">{desc}</span>}
+                      </div>
+                    </li>
+                  );
+                })}
 
-              {/* Technical Specifications */}
-              <div>
-                {filteredSpecs.length > 0 && (
-                  <div className="overflow-hidden rounded-xl border border-slate-100/50">
-                    <table className="w-full border-collapse text-xs">
-                      <tbody>
-                        {filteredSpecs.map((spec, idx) => (
-                          <tr
-                            key={idx}
-                            className={`border-b border-slate-100/50 last:border-0 ${
-                              idx % 2 === 0 ? "bg-slate-50/20" : "bg-white"
-                            }`}
-                          >
-                            <td className="px-4 py-2 font-bold text-dark-navy w-1/3">
-                              {spec.label}
-                            </td>
-                            <td className="px-4 py-2 text-slate-body font-medium leading-normal">
-                              {spec.label.toLowerCase().includes("color") && colorsList.length > 0 ? (
-                                <div className="flex gap-1.5 items-center">
-                                  {colorsList.map((color: string) => {
-                                    const style = getColorBubbleStyle(color);
-                                    return (
-                                      <span 
-                                        key={color} 
-                                        className={`w-3.5 h-3.5 rounded-full border ${style.bg} ${style.border}`} 
-                                        title={color}
-                                      />
-                                    );
-                                  })}
-                                </div>
-                              ) : (
-                                spec.value
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-            </div>
+                {/* Specs */}
+                {filteredSpecs.map((spec, idx) => {
+                  const labelLower = spec.label.toLowerCase();
+                  const isLED = labelLower.includes("lighting") || labelLower.includes("led") || labelLower.includes("type") || labelLower.includes("watt") || labelLower.includes("lumen") || labelLower.includes("bulb");
+                  const isBattery = labelLower.includes("battery") || labelLower.includes("capacity") || labelLower.includes("charge");
+                  const isBrand = labelLower.includes("brand") || labelLower.includes("make");
+                  const isUsage = labelLower.includes("usage") || labelLower.includes("application");
+
+                  return (
+                    <li key={`spec-${idx}`} className="flex gap-4">
+                      <div className="w-8 h-8 rounded-lg bg-blue-50/50 flex-shrink-0 flex items-center justify-center">
+                        {isLED && <Lightbulb className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
+                        {isBattery && <Battery className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
+                        {isBrand && <Award className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
+                        {isUsage && <Sliders className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
+                        {!isLED && !isBattery && !isBrand && !isUsage && (
+                          <ShieldCheck className="w-4.5 h-4.5 text-primary" strokeWidth={2.5} />
+                        )}
+                      </div>
+                      <div className="space-y-0.5">
+                        <span className="text-sm font-bold text-dark-navy block leading-tight">{spec.label}</span>
+                        <span className="text-xs text-slate-body font-medium block leading-relaxed">
+                          {spec.label.toLowerCase().includes("color") && colorsList.length > 0 ? (
+                            <div className="flex gap-1.5 items-center mt-1">
+                              {colorsList.map((color: string) => {
+                                const style = getColorBubbleStyle(color);
+                                return (
+                                  <span 
+                                    key={color} 
+                                    className={`w-3.5 h-3.5 rounded-full border ${style.bg} ${style.border}`} 
+                                    title={color}
+                                  />
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            spec.value
+                          )}
+                        </span>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="text-xs text-slate-body font-medium">No details available for this model.</p>
+            )}
           </div>
 
           {/* Column 3: Stacked Cards (Right) - Matching border card with drop shadow */}
