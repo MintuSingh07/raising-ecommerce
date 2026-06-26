@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 import BlurText from "./BlurText";
 import { motion } from "motion/react";
@@ -214,6 +214,7 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
 
   const [selectedColor, setSelectedColor] = useState("");
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const thumbRef = useRef<HTMLDivElement>(null);
 
   const allImages = useMemo<string[]>(() => {
     const baseImages = product.media.images || [];
@@ -451,38 +452,76 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
 
             {/* Thumbnails strip with object-cover and soft shadows (no borders) */}
             {allImages.length > 1 && (
-              <div className="flex flex-wrap gap-2.5 select-none">
-                {allImages.map((img: string, idx: number) => {
-                  const isActive = activeImageIndex === idx;
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveImageIndex(idx)}
-                      className={`relative w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] rounded-xl bg-slate-50 overflow-hidden transition-all shrink-0 cursor-pointer ${
-                        isActive
-                          ? "ring-2 ring-primary ring-offset-2 scale-102 shadow-md"
-                          : "shadow-sm hover:scale-102"
-                      }`}
-                    >
-                      <Image
-                        src={img}
-                        alt={`${product.name} thumbnail ${idx + 1}`}
-                        fill
-                        loading="lazy"
-                        className="object-cover"
-                        sizes="80px"
-                      />
-                      
-                      {idx === 0 && product.video && (
-                        <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
-                          <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-primary shadow-sm">
-                            <ChevronRight className="w-3.5 h-3.5 text-primary ml-0.5 fill-primary" />
+              <div className="relative flex items-center w-full px-8 mt-4 select-none">
+                {/* Left scroll arrow */}
+                <button
+                  onClick={() => {
+                    if (thumbRef.current) {
+                      thumbRef.current.scrollBy({ left: -120, behavior: "smooth" });
+                    }
+                  }}
+                  className="absolute left-0 w-8 h-8 rounded-full bg-white hover:bg-slate-50 border border-slate-200 shadow-sm flex items-center justify-center text-slate-800 transition-all hover:scale-105 active:scale-95 cursor-pointer z-20"
+                  aria-label="Scroll thumbnails left"
+                >
+                  <ChevronLeft className="w-4.5 h-4.5 text-slate-800" strokeWidth={2.5} />
+                </button>
+
+                {/* Left edge fade out overlay */}
+                <div className="absolute left-8 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10" />
+
+                {/* Thumbnails list */}
+                <div
+                  ref={thumbRef}
+                  className="flex flex-row flex-nowrap overflow-x-auto scrollbar-none gap-2.5 w-full scroll-smooth py-1"
+                >
+                  {allImages.map((img: string, idx: number) => {
+                    const isActive = activeImageIndex === idx;
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => setActiveImageIndex(idx)}
+                        className={`relative w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] rounded-xl bg-slate-50 overflow-hidden transition-all shrink-0 cursor-pointer ${
+                          isActive
+                            ? "ring-2 ring-primary ring-offset-2 scale-102 shadow-md"
+                            : "shadow-sm hover:scale-102"
+                        }`}
+                      >
+                        <Image
+                          src={img}
+                          alt={`${product.name} thumbnail ${idx + 1}`}
+                          fill
+                          loading="lazy"
+                          className="object-cover"
+                          sizes="80px"
+                        />
+                        
+                        {idx === 0 && product.video && (
+                          <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
+                            <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-primary shadow-sm">
+                              <ChevronRight className="w-3.5 h-3.5 text-primary ml-0.5 fill-primary" />
+                            </div>
                           </div>
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Right edge fade out overlay */}
+                <div className="absolute right-8 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10" />
+
+                {/* Right scroll arrow */}
+                <button
+                  onClick={() => {
+                    if (thumbRef.current) {
+                      thumbRef.current.scrollBy({ left: 120, behavior: "smooth" });
+                    }
+                  }}
+                  className="absolute right-0 w-8 h-8 rounded-full bg-white hover:bg-slate-50 border border-slate-200 shadow-sm flex items-center justify-center text-slate-800 transition-all hover:scale-105 active:scale-95 cursor-pointer z-20"
+                  aria-label="Scroll thumbnails right"
+                >
+                  <ChevronRight className="w-4.5 h-4.5 text-slate-800" strokeWidth={2.5} />
+                </button>
               </div>
             )}
           </div>
