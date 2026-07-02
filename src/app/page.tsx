@@ -7,6 +7,7 @@ import Categories from "@/components/Categories";
 import VersatileUsage from "@/components/VersatileUsage";
 import AboutUs from "@/components/AboutUs";
 import FeaturedProducts from "@/components/FeaturedProducts";
+import Testimonials from "@/components/Testimonials";
 import CtaBanner from "@/components/CtaBanner";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -30,6 +31,7 @@ export default function Home() {
         <VersatileUsage />
         <AboutUs />
         <FeaturedProducts setSelectedProduct={handleSelectProduct} />
+        <Testimonials />
         <CtaBanner />
       </main>
       <Footer />
