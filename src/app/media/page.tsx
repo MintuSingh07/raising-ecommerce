@@ -158,8 +158,9 @@ export default function MediaPage() {
           {/* Blog cards grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
             {blogs.map((blog, idx) => (
-              <div
+              <Link
                 key={idx}
+                href={`/media/blog/${blog.slug}`}
                 className="group flex flex-col rounded-[28px] overflow-hidden bg-white border border-slate-100/80 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_48px_rgba(0,0,0,0.10)] hover:-translate-y-1.5 transition-all duration-350 cursor-pointer"
               >
                 {/* Full-bleed image with gradient scrim */}
@@ -205,7 +206,7 @@ export default function MediaPage() {
                     </span>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
 

@@ -54,6 +54,43 @@ export default function Footer() {
                 </svg>
               </Link>
             </div>
+
+            {/* Also Available On Section */}
+            <div className="flex flex-col gap-2 pt-4 border-t border-slate-100 w-full select-none">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Also Available On</span>
+              <div className="flex items-center gap-5 mt-1.5">
+                {/* Amazon */}
+                <a
+                  href="https://www.amazon.in"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Available on Amazon"
+                  className="opacity-75 hover:opacity-100 transition-opacity duration-250 flex-shrink-0"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/amazon_full.svg"
+                    alt="Amazon"
+                    className="h-5.5 w-auto object-contain"
+                  />
+                </a>
+                {/* Flipkart */}
+                <a
+                  href="https://www.flipkart.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Available on Flipkart"
+                  className="opacity-75 hover:opacity-100 transition-opacity duration-250 flex-shrink-0"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/flipkart_full.svg"
+                    alt="Flipkart"
+                    className="h-5.5 w-auto object-contain"
+                  />
+                </a>
+              </div>
+            </div>
           </div>
 
           {/* Links Column 1: Products */}
