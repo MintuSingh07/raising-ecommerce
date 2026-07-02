@@ -12,62 +12,42 @@ import productData from "../../../../public/products_structured.json";
 import { type Product } from "@/components/ProductCatalog";
 import { Package, ChevronRight, Home, ArrowLeft } from "lucide-react";
 
-// Website categories mapping
-const WEBSITE_CATEGORIES = [
+// Website usage categories mapping
+const USAGE_CATEGORIES = [
   {
-    id: "rechargeable-led-flashlight",
-    label: "Rechargeable LED Flash Light",
-    desc: "High-efficiency rechargeable beam flashlights engineered for long runtime.",
+    id: "village-remote",
+    label: "Village & Remote Areas",
+    desc: "Reliable off-grid lighting and long-lasting backup solutions for rural homesteads and remote communities.",
+    jsonCategory: "remote areas/village",
   },
   {
-    id: "kisan-torch",
-    label: "Kisan Torch",
-    desc: "Heavy-duty agricultural torches tailored for nighttime farming and outdoor field conditions.",
+    id: "corporate-gifting",
+    label: "Corporate Gifting",
+    desc: "Premium, sophisticated rechargeable lighting products custom-tailored for corporate tokens and events.",
+    jsonCategory: "corporate gifting",
   },
   {
-    id: "metal-flashlights",
-    label: "Metal Flash Lights",
-    desc: "Rugged and durable metal-body searchlights and tactical security lights.",
+    id: "defense-security",
+    label: "Defense & Security",
+    desc: "Rugged, high-lumen tactical systems and surveillance flashlights engineered for security personnel.",
+    jsonCategory: "defence/security",
   },
   {
-    id: "led-headlamp",
-    label: "LED Headlamp",
-    desc: "Hands-free, adjustable high-power headlamps for trekking, mining, and repairs.",
+    id: "farming-fields",
+    label: "Farming & Fields",
+    desc: "Weatherproof Kisan torches and high-beam agriculture searchlights built for field utility.",
+    jsonCategory: "farming",
   },
   {
-    id: "led-table-lamp",
-    label: "LED Table Lamp",
-    desc: "Flexible reading desk lamps and smart energy-saving study lights.",
-  },
-  {
-    id: "solar-lantern-searchlight",
-    label: "Solar Lantern and Search Light",
-    desc: "Dual-charging solar emergency lanterns and long-distance spotlights.",
-  },
-  {
-    id: "led-lantern",
-    label: "LED Lantern",
-    desc: "Premium backup emergency lights and high-lumen room lanterns.",
-  },
-  {
-    id: "led-usb-lamp",
-    label: "LED USB Lamp",
-    desc: "Compact USB plug-and-play bulbs for portable power-bank and laptop hookups.",
-  },
-  {
-    id: "solar-energy-kit",
-    label: "Solar Energy Kit",
-    desc: "All-in-one solar panel home system with multiple bulbs and multi-device charging.",
-  },
-  {
-    id: "power-extension-board",
-    label: "Power Extension Board",
-    desc: "Multi-socket surge-protected power extension boards for safety and convenience.",
+    id: "industrial-yards",
+    label: "Industrial Yards",
+    desc: "Heavy-duty workspace lights, magnetic emergency wands, and high-spec industrial backups.",
+    jsonCategory: "industrial",
   },
 ];
 
 interface PageProps {
-  params: Promise<{ category: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 // Helper to clean HTML text and extract list features and specs
@@ -77,7 +57,7 @@ function parseHtmlDescription(html: string) {
   const features: string[] = [];
   const liMatches = html.match(/<li>(.*?)<\/li>/g);
   if (liMatches) {
-    liMatches.forEach(match => {
+    liMatches.forEach((match) => {
       const clean = match
         .replace(/<\/?li>/g, "")
         .replace(/&amp;/g, "&")
@@ -89,11 +69,18 @@ function parseHtmlDescription(html: string) {
   }
 
   const specs: { label: string; value: string }[] = [];
-  const specDivRegex = /<div>\s*<span class="label">(.*?)<\/span>\s*(.*?)\s*<\/div>/g;
+  const specDivRegex =
+    /<div>\s*<span class="label">(.*?)<\/span>\s*(.*?)\s*<\/div>/g;
   const matches = html.matchAll(specDivRegex);
   for (const m of matches) {
-    const label = m[1].replace(/&amp;/g, "&").replace(/&nbsp;/g, " ").trim();
-    const value = m[2].replace(/&amp;/g, "&").replace(/&nbsp;/g, " ").trim();
+    const label = m[1]
+      .replace(/&amp;/g, "&")
+      .replace(/&nbsp;/g, " ")
+      .trim();
+    const value = m[2]
+      .replace(/&amp;/g, "&")
+      .replace(/&nbsp;/g, " ")
+      .trim();
     if (label) {
       specs.push({ label, value });
     }
@@ -103,13 +90,16 @@ function parseHtmlDescription(html: string) {
 }
 
 // Extract quick specs for badges
-function getQuickSpecs(specs: { label: string; value: string }[], features: string[]) {
+function getQuickSpecs(
+  specs: { label: string; value: string }[],
+  features: string[],
+) {
   let wattage = "";
   let capacity = "";
   let batteryType = "";
   let charging = "";
 
-  specs.forEach(s => {
+  specs.forEach((s) => {
     const label = s.label.toLowerCase();
     const val = s.value;
     if (label.includes("wattage") || label.includes("watt")) wattage = val;
@@ -119,14 +109,14 @@ function getQuickSpecs(specs: { label: string; value: string }[], features: stri
   });
 
   if (!wattage) {
-    const wattFeature = features.find(f => /\b\d+\s*W\b/i.test(f));
+    const wattFeature = features.find((f) => /\b\d+\s*W\b/i.test(f));
     if (wattFeature) {
       const match = wattFeature.match(/\b(\d+\s*W)\b/i);
       if (match) wattage = match[1];
     }
   }
   if (!capacity) {
-    const capFeature = features.find(f => /\b\d+\s*mAh\b/i.test(f));
+    const capFeature = features.find((f) => /\b\d+\s*mAh\b/i.test(f));
     if (capFeature) {
       const match = capFeature.match(/\b(\d+\s*mAh)\b/i);
       if (match) capacity = match[1];
@@ -136,84 +126,72 @@ function getQuickSpecs(specs: { label: string; value: string }[], features: stri
   return { wattage, capacity, batteryType, charging };
 }
 
-export default function CategoryPage({ params }: PageProps) {
+export default function UsagePage({ params }: PageProps) {
   const resolvedParams = use(params);
-  const categoryId = resolvedParams.category;
+  const slug = resolvedParams.slug;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  // Scroll to top on mount and category change
+  // Scroll to top on category change
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
     if (typeof window !== "undefined" && (window as any).lenis) {
       (window as any).lenis.scrollTo(0, { immediate: true });
     }
-  }, [categoryId]);
+  }, [slug]);
 
-  // Find the category info
-  const categoryInfo = useMemo(() => {
-    return WEBSITE_CATEGORIES.find(c => c.id === categoryId);
-  }, [categoryId]);
+  // Find usage category info
+  const usageInfo = useMemo(() => {
+    return USAGE_CATEGORIES.find((u) => u.id === slug);
+  }, [slug]);
 
-  // Group all products to filter the ones belonging to the active category
+  // Group all products belonging to the active usage category
   const products = useMemo(() => {
+    if (!usageInfo) return [];
+
     const allProducts = productData.products as Product[];
-    const filtered = allProducts.filter(p => {
-      const cats = p.categories.map(c => c.toLowerCase());
-      
-      if (categoryId === "led-headlamp") {
-        return cats.includes("led headlamp");
-      } else if (categoryId === "led-lantern") {
-        return cats.includes("led lantern");
-      } else if (categoryId === "led-table-lamp") {
-        return cats.includes("led table lamp") || cats.includes("corporate gifting");
-      } else if (categoryId === "led-usb-lamp") {
-        return cats.includes("led usb lamp");
-      } else if (categoryId === "metal-flashlights") {
-        return cats.includes("metal flashlights") || cats.includes("defence/security") || cats.includes("industrial");
-      } else if (categoryId === "rechargeable-led-flashlight") {
-        return cats.includes("rechargeable led flashlight");
-      } else if (categoryId === "kisan-torch") {
-        return cats.includes("kisan torch") || cats.includes("farming") || cats.includes("remote areas/village");
-      } else if (categoryId === "solar-energy-kit") {
-        return cats.includes("solar energy kit");
-      } else if (categoryId === "solar-lantern-searchlight") {
-        return cats.includes("solar lantern & searchlight");
-      } else if (categoryId === "power-extension-board") {
-        return cats.includes("power extension board");
-      }
-      return false;
+    const filtered = allProducts.filter((p) => {
+      const cats = p.categories.map((c) => c.toLowerCase());
+      return cats.includes(usageInfo.jsonCategory);
     });
 
     // Sort: best sellers first
     return filtered.sort((a, b) => {
-      const aVal = (a.featured === 1 || a.tags.includes("top-product")) ? 1 : 0;
-      const bVal = (b.featured === 1 || b.tags.includes("top-product")) ? 1 : 0;
+      const aVal = a.featured === 1 || a.tags.includes("top-product") ? 1 : 0;
+      const bVal = b.featured === 1 || b.tags.includes("top-product") ? 1 : 0;
       return bVal - aVal;
     });
-  }, [categoryId]);
+  }, [usageInfo]);
 
-  // Apply search query within this category
+  // Filter products by search query
   const filteredProducts = useMemo(() => {
     if (!searchQuery) return products;
 
     const query = searchQuery.toLowerCase();
-    return products.filter(p => {
+    return products.filter((p) => {
       const nameMatch = p.name.toLowerCase().includes(query);
-      const tagMatch = p.tags.some(t => t.toLowerCase().includes(query));
-      const catMatch = p.categories.some(c => c.toLowerCase().includes(query));
-      
+      const tagMatch = p.tags.some((t) => t.toLowerCase().includes(query));
+      const catMatch = p.categories.some((c) =>
+        c.toLowerCase().includes(query),
+      );
+
       const { features, specs } = parseHtmlDescription(p.descriptions.short);
-      const featuresMatch = features.some(f => f.toLowerCase().includes(query));
-      const specsMatch = specs.some(s => s.label.toLowerCase().includes(query) || s.value.toLowerCase().includes(query));
+      const featuresMatch = features.some((f) =>
+        f.toLowerCase().includes(query),
+      );
+      const specsMatch = specs.some(
+        (s) =>
+          s.label.toLowerCase().includes(query) ||
+          s.value.toLowerCase().includes(query),
+      );
 
       return nameMatch || tagMatch || catMatch || featuresMatch || specsMatch;
     });
   }, [products, searchQuery]);
 
-  // Handle Invalid Category
-  if (!categoryInfo) {
+  // Invalid Slug fallback
+  if (!usageInfo) {
     return (
       <div className="flex flex-col min-h-screen bg-slate-50/20 font-sans">
         <Navbar />
@@ -222,10 +200,10 @@ export default function CategoryPage({ params }: PageProps) {
             <Package className="w-8 h-8" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-dark-navy tracking-tight mb-2">
-            Collection Not Found
+            Usage Category Not Found
           </h1>
           <p className="text-sm text-slate-body max-w-md mb-8">
-            The collection you are trying to view does not exist. Please explore our other product ranges.
+            The usage category you are trying to view does not exist.
           </p>
           <Link
             href="/"
@@ -247,41 +225,59 @@ export default function CategoryPage({ params }: PageProps) {
 
       <main className="flex-grow">
         {selectedProduct ? (
-          <ProductDetails 
-            product={selectedProduct} 
-            onClose={() => setSelectedProduct(null)} 
+          <ProductDetails
+            product={selectedProduct}
+            onClose={() => setSelectedProduct(null)}
           />
         ) : (
           <div className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
             {/* Breadcrumbs */}
             <nav className="flex items-center space-x-2 text-[11px] sm:text-xs font-semibold text-slate-light mb-8 select-none tracking-wide">
-              <Link href="/" className="hover:text-primary transition-colors uppercase flex items-center gap-1">
+              <Link
+                href="/"
+                className="hover:text-primary transition-colors uppercase flex items-center gap-1"
+              >
                 <Home className="w-3.5 h-3.5" />
                 Home
               </Link>
               <ChevronRight className="w-3.5 h-3.5 text-slate-350" />
-              <Link href="/#collections" className="hover:text-primary transition-colors uppercase">
-                Collections
+              <Link
+                href="/#usage"
+                className="hover:text-primary transition-colors uppercase"
+              >
+                Applications
               </Link>
               <ChevronRight className="w-3.5 h-3.5 text-slate-350" />
-              <span className="text-primary uppercase font-bold">{categoryInfo.label}</span>
+              <span className="text-primary uppercase font-bold">
+                {usageInfo.label}
+              </span>
             </nav>
 
             {/* Category Header Card */}
             <div className="relative overflow-hidden rounded-[36px] bg-gradient-to-br from-slate-900 via-dark-navy to-slate-950 text-white p-8 sm:p-12 mb-12 shadow-premium border border-white/5">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(10,82,214,0.18)_0%,transparent_70%)] pointer-events-none" />
-              
+
               <div className="max-w-3xl space-y-4 relative z-10">
                 <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-widest text-accent bg-accent/10 border border-accent/20 px-3 py-1 rounded-full inline-block">
-                  Product Collection
+                  Application Category
                 </span>
-                
+
                 <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight text-white leading-tight">
-                  <BlurText text={categoryInfo.label} delay={20} animateBy="words" direction="bottom" />
+                  <BlurText
+                    text={usageInfo.label}
+                    delay={20}
+                    animateBy="words"
+                    direction="bottom"
+                  />
                 </h1>
-                
+
                 <p className="text-sm sm:text-base text-blue-50/80 leading-relaxed font-medium">
-                  <BlurText text={categoryInfo.desc} delay={10} animateBy="words" direction="bottom" />
+                  <BlurText
+                    text={usageInfo.desc}
+                    delay={10}
+                    animateBy="words"
+                    direction="bottom"
+                  />
                 </p>
               </div>
             </div>
@@ -289,7 +285,9 @@ export default function CategoryPage({ params }: PageProps) {
             {/* Search and Toolbar */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 bg-white rounded-3xl p-6 border border-slate-100/80 shadow-[0_8px_30px_rgba(0,0,0,0.01)]">
               <div className="text-xs font-bold text-dark-navy uppercase tracking-wider">
-                Showing {filteredProducts.length} {filteredProducts.length === 1 ? "Product" : "Products"} in {categoryInfo.label}
+                Showing {filteredProducts.length}{" "}
+                {filteredProducts.length === 1 ? "Product" : "Products"} in{" "}
+                {usageInfo.label}
               </div>
 
               {/* Search Box */}
@@ -297,7 +295,7 @@ export default function CategoryPage({ params }: PageProps) {
                 <div className="absolute inset-0 bg-primary/10 rounded-full blur group-hover:bg-primary/15 transition-colors duration-300" />
                 <input
                   type="text"
-                  placeholder={`Search within ${categoryInfo.label}...`}
+                  placeholder={`Search within ${usageInfo.label}...`}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="relative w-full px-5 py-3 rounded-full border border-slate-200 bg-white/95 text-dark-navy font-semibold text-xs focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 shadow-sm transition-all duration-300"
@@ -308,7 +306,12 @@ export default function CategoryPage({ params }: PageProps) {
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
               </div>
             </div>
@@ -316,14 +319,19 @@ export default function CategoryPage({ params }: PageProps) {
             {/* Products Grid */}
             {filteredProducts.length === 0 ? (
               <div className="text-center py-24 bg-white border border-slate-100 rounded-[32px] text-slate-body font-semibold text-sm shadow-[0_8px_30px_rgba(0,0,0,0.01)]">
-                No products match your search. Try resetting the query.
+                No products match your search.
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {filteredProducts.map((p) => {
-                  const { features, specs } = parseHtmlDescription(p.descriptions.short);
-                  const { wattage, capacity, batteryType } = getQuickSpecs(specs, features);
-                  
+                  const { features, specs } = parseHtmlDescription(
+                    p.descriptions.short,
+                  );
+                  const { wattage, capacity, batteryType } = getQuickSpecs(
+                    specs,
+                    features,
+                  );
+
                   return (
                     <div
                       key={p.id}
@@ -331,7 +339,7 @@ export default function CategoryPage({ params }: PageProps) {
                       className="group bg-white rounded-[24px] p-4 border border-slate-100 shadow-sm hover:shadow-premium hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between cursor-pointer"
                     >
                       <div className="space-y-4">
-                        {/* Image box with grey fallback */}
+                        {/* Image box */}
                         <div className="relative w-full aspect-square rounded-[18px] bg-slate-50 overflow-hidden border border-slate-100 flex items-center justify-center">
                           {p.media.images && p.media.images[0] ? (
                             <Image
@@ -344,10 +352,22 @@ export default function CategoryPage({ params }: PageProps) {
                             />
                           ) : (
                             <div className="flex flex-col items-center justify-center text-slate-350">
-                              <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              <svg
+                                className="w-12 h-12"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={1}
+                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
                               </svg>
-                              <span className="text-[10px] uppercase font-bold tracking-wider mt-2">No Image</span>
+                              <span className="text-[10px] uppercase font-bold tracking-wider mt-2">
+                                No Image
+                              </span>
                             </div>
                           )}
 
@@ -367,7 +387,9 @@ export default function CategoryPage({ params }: PageProps) {
                           <div className="flex flex-wrap gap-1 text-[10px] text-slate-body font-medium">
                             {p.brand && <span>{p.brand}</span>}
                             {p.brand && p.categories[0] && <span>•</span>}
-                            {p.categories[0] && <span>{p.categories[0]}</span>}
+                            {p.categories[0] && (
+                              <span>{p.categories[0]}</span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -386,7 +408,10 @@ export default function CategoryPage({ params }: PageProps) {
                             </span>
                           )}
                           {batteryType && (
-                            <span className="bg-slate-50 text-slate-body text-[10px] font-semibold px-2 py-0.5 rounded border border-slate-200 max-w-[120px] truncate" title={batteryType}>
+                            <span
+                              className="bg-slate-50 text-slate-body text-[10px] font-semibold px-2 py-0.5 rounded border border-slate-200 max-w-[120px] truncate"
+                              title={batteryType}
+                            >
                               {batteryType}
                             </span>
                           )}
@@ -394,8 +419,18 @@ export default function CategoryPage({ params }: PageProps) {
 
                         <div className="flex items-center justify-between text-xs font-bold text-primary group-hover:text-primary-navy">
                           <span>Inspect Specs</span>
-                          <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                          <svg
+                            className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2.5}
+                              d="M14 5l7 7m0 0l-7 7m7-7H3"
+                            />
                           </svg>
                         </div>
                       </div>

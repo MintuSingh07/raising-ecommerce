@@ -60,11 +60,16 @@ export default function Footer() {
           <div className="lg:col-span-2 flex flex-col space-y-4">
             <h4 className="text-sm font-semibold text-dark-navy tracking-wider uppercase">Products</h4>
             <ul className="space-y-2 text-xs font-medium text-slate-light">
-              <li><Link href="/collections/torches" className="hover:text-primary transition-colors">LED Torches</Link></li>
-              <li><Link href="/collections/spotlights" className="hover:text-primary transition-colors">Spotlights</Link></li>
-              <li><Link href="/collections/emergency-lights" className="hover:text-primary transition-colors">Emergency Lights</Link></li>
-              <li><Link href="/collections/rechargeable" className="hover:text-primary transition-colors">Rechargeable Products</Link></li>
-              <li><Link href="/collections/industrial" className="hover:text-primary transition-colors">Industrial Solutions</Link></li>
+              <li><Link href="/collections/rechargeable-led-flashlight" className="hover:text-primary transition-colors">Rechargeable LED Flash Light</Link></li>
+              <li><Link href="/collections/kisan-torch" className="hover:text-primary transition-colors">Kisan Torch</Link></li>
+              <li><Link href="/collections/metal-flashlights" className="hover:text-primary transition-colors">Metal Flash Lights</Link></li>
+              <li><Link href="/collections/led-headlamp" className="hover:text-primary transition-colors">LED Headlamp</Link></li>
+              <li><Link href="/collections/led-table-lamp" className="hover:text-primary transition-colors">LED Table Lamp</Link></li>
+              <li><Link href="/collections/solar-lantern-searchlight" className="hover:text-primary transition-colors">Solar Lantern and Search Light</Link></li>
+              <li><Link href="/collections/led-lantern" className="hover:text-primary transition-colors">LED Lantern</Link></li>
+              <li><Link href="/collections/led-usb-lamp" className="hover:text-primary transition-colors">LED USB Lamp</Link></li>
+              <li><Link href="/collections/solar-energy-kit" className="hover:text-primary transition-colors">Solar Energy Kit</Link></li>
+              <li><Link href="/collections/power-extension-board" className="hover:text-primary transition-colors">Power Extension Board</Link></li>
             </ul>
           </div>
 

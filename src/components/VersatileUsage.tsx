@@ -28,7 +28,7 @@ export default function VersatileUsage() {
         </svg>
       ),
       tag: "Off-Grid",
-      href: "#usage-remote",
+      href: "/usage/village-remote",
     },
     {
       title: "Corporate Gifting",
@@ -48,7 +48,7 @@ export default function VersatileUsage() {
         </svg>
       ),
       tag: "Corporate",
-      href: "#usage-gifting",
+      href: "/usage/corporate-gifting",
     },
     {
       title: "Defense & Security",
@@ -69,7 +69,7 @@ export default function VersatileUsage() {
         </svg>
       ),
       tag: "Tactical",
-      href: "#usage-security",
+      href: "/usage/defense-security",
     },
     {
       title: "Farming & Fields",
@@ -90,7 +90,7 @@ export default function VersatileUsage() {
         </svg>
       ),
       tag: "Farming",
-      href: "#usage-farming",
+      href: "/usage/farming-fields",
     },
     {
       title: "Industrial Yards",
@@ -111,7 +111,7 @@ export default function VersatileUsage() {
         </svg>
       ),
       tag: "Industrial",
-      href: "#usage-industrial",
+      href: "/usage/industrial-yards",
     },
   ];
 

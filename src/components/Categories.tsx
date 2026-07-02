@@ -16,7 +16,7 @@ export default function Categories() {
 
   const categories = [
     {
-      title: "Rechargeable LED Flashlight",
+      title: "Rechargeable LED Flash Light",
       subtitle: "High-efficiency beam flashlights",
       image: "/product_torch.png",
       href: "/collections/rechargeable-led-flashlight",
@@ -28,7 +28,7 @@ export default function Categories() {
       href: "/collections/kisan-torch",
     },
     {
-      title: "Metal Flashlights",
+      title: "Metal Flash Lights",
       subtitle: "Rugged metal-body searchlights",
       image: "/product_torch.png",
       href: "/collections/metal-flashlights",
@@ -40,13 +40,13 @@ export default function Categories() {
       href: "/collections/led-headlamp",
     },
     {
-      title: "LED Table lamp",
+      title: "LED Table Lamp",
       subtitle: "Flexible desk and reading lamps",
       image: "/product_lantern.png",
       href: "/collections/led-table-lamp",
     },
     {
-      title: "Solar Lantern & Searchlight",
+      title: "Solar Lantern and Search Light",
       subtitle: "Dual-purpose solar rechargeable lights",
       image: "/product_spotlight.png",
       href: "/collections/solar-lantern-searchlight",

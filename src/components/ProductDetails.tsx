@@ -5,32 +5,32 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 import BlurText from "./BlurText";
 import { motion } from "motion/react";
-import { 
-  Package, 
-  Tag, 
-  Truck, 
-  Award, 
-  Sun, 
-  Navigation, 
-  Battery, 
-  Clock, 
-  Shield, 
-  ShieldCheck, 
-  Lightbulb, 
-  Sliders, 
-  Factory, 
-  Car, 
-  Tent, 
-  Home, 
-  Usb, 
-  Bookmark, 
-  BookOpen, 
-  FileText, 
+import {
+  Package,
+  Tag,
+  Truck,
+  Award,
+  Sun,
+  Navigation,
+  Battery,
+  Clock,
+  Shield,
+  ShieldCheck,
+  Lightbulb,
+  Sliders,
+  Factory,
+  Car,
+  Tent,
+  Home,
+  Usb,
+  Bookmark,
+  BookOpen,
+  FileText,
   Download,
   ChevronLeft,
   ChevronRight,
   Check,
-  MessageCircle
+  MessageCircle,
 } from "lucide-react";
 
 interface ProductDetailsProps {
@@ -89,7 +89,7 @@ function parseHtmlDescription(html: string) {
   const features: string[] = [];
   const liMatches = html.match(/<li>(.*?)<\/li>/g);
   if (liMatches) {
-    liMatches.forEach(match => {
+    liMatches.forEach((match) => {
       const clean = match
         .replace(/<\/?li>/g, "")
         .replace(/&amp;/g, "&")
@@ -101,11 +101,18 @@ function parseHtmlDescription(html: string) {
   }
 
   const specs: { label: string; value: string }[] = [];
-  const specDivRegex = /<div>\s*<span class="label">(.*?)<\/span>\s*(.*?)\s*<\/div>/g;
+  const specDivRegex =
+    /<div>\s*<span class="label">(.*?)<\/span>\s*(.*?)\s*<\/div>/g;
   const matches = html.matchAll(specDivRegex);
   for (const m of matches) {
-    const label = m[1].replace(/&amp;/g, "&").replace(/&nbsp;/g, " ").trim();
-    const value = m[2].replace(/&amp;/g, "&").replace(/&nbsp;/g, " ").trim();
+    const label = m[1]
+      .replace(/&amp;/g, "&")
+      .replace(/&nbsp;/g, " ")
+      .trim();
+    const value = m[2]
+      .replace(/&amp;/g, "&")
+      .replace(/&nbsp;/g, " ")
+      .trim();
     if (label) {
       specs.push({ label, value });
     }
@@ -116,8 +123,14 @@ function parseHtmlDescription(html: string) {
     const labelSpanRegex = /<span class="label">(.*?)<\/span>\s*([^<]*)/g;
     const matches2 = html.matchAll(labelSpanRegex);
     for (const m of matches2) {
-      const label = m[1].replace(/&amp;/g, "&").replace(/&nbsp;/g, " ").trim();
-      const value = m[2].replace(/&amp;/g, "&").replace(/&nbsp;/g, " ").trim();
+      const label = m[1]
+        .replace(/&amp;/g, "&")
+        .replace(/&nbsp;/g, " ")
+        .trim();
+      const value = m[2]
+        .replace(/&amp;/g, "&")
+        .replace(/&nbsp;/g, " ")
+        .trim();
       if (label && value) {
         specs.push({ label, value });
       }
@@ -129,13 +142,16 @@ function parseHtmlDescription(html: string) {
 
 // Helper to format highlights dynamically
 function getFormattedHighlight(feat: string) {
-  const cleanFeat = feat.replace(/&amp;/g, "&").replace(/&nbsp;/g, " ").trim();
-  
+  const cleanFeat = feat
+    .replace(/&amp;/g, "&")
+    .replace(/&nbsp;/g, " ")
+    .trim();
+
   if (cleanFeat.includes(":")) {
     const [title, ...rest] = cleanFeat.split(":");
     return { title: title.trim(), desc: rest.join(":").trim() };
   }
-  
+
   const withRegex = /\bwith\b/i;
   if (withRegex.test(cleanFeat)) {
     const match = cleanFeat.split(withRegex);
@@ -159,36 +175,77 @@ function getFormattedHighlight(feat: string) {
 }
 
 // Helper to map color strings to Tailwind CSS color classes
-function getColorBubbleStyle(colorName: string): { bg: string; border: string; value: string } {
+function getColorBubbleStyle(colorName: string): {
+  bg: string;
+  border: string;
+  value: string;
+} {
   const name = colorName.trim().toLowerCase();
-  if (name.includes("red")) return { bg: "bg-red-600", border: "border-red-800", value: "Red" };
-  if (name.includes("blue")) return { bg: "bg-blue-600", border: "border-blue-800", value: "Blue" };
-  if (name.includes("yellow")) return { bg: "bg-yellow-500", border: "border-yellow-600", value: "Yellow" };
-  if (name.includes("orange")) return { bg: "bg-orange-500", border: "border-orange-600", value: "Orange" };
-  if (name.includes("green")) return { bg: "bg-emerald-600", border: "border-emerald-800", value: "Green" };
-  if (name.includes("black")) return { bg: "bg-slate-900", border: "border-black", value: "Black" };
-  if (name.includes("white")) return { bg: "bg-slate-100", border: "border-slate-350", value: "White" };
-  return { bg: "bg-primary-navy", border: "border-primary-navy", value: colorName };
+  if (name.includes("red"))
+    return { bg: "bg-red-600", border: "border-red-800", value: "Red" };
+  if (name.includes("blue"))
+    return { bg: "bg-blue-600", border: "border-blue-800", value: "Blue" };
+  if (name.includes("yellow"))
+    return {
+      bg: "bg-yellow-500",
+      border: "border-yellow-600",
+      value: "Yellow",
+    };
+  if (name.includes("orange"))
+    return {
+      bg: "bg-orange-500",
+      border: "border-orange-600",
+      value: "Orange",
+    };
+  if (name.includes("green"))
+    return {
+      bg: "bg-emerald-600",
+      border: "border-emerald-800",
+      value: "Green",
+    };
+  if (name.includes("black"))
+    return { bg: "bg-slate-900", border: "border-black", value: "Black" };
+  if (name.includes("white"))
+    return { bg: "bg-slate-100", border: "border-slate-350", value: "White" };
+  return {
+    bg: "bg-primary-navy",
+    border: "border-primary-navy",
+    value: colorName,
+  };
 }
 
-export default function ProductDetails({ product, onClose }: ProductDetailsProps) {
-  const { features, specs } = useMemo(() => parseHtmlDescription(product.descriptions.short), [product]);
-  
+export default function ProductDetails({
+  product,
+  onClose,
+}: ProductDetailsProps) {
+  const { features, specs } = useMemo(
+    () => parseHtmlDescription(product.descriptions.short),
+    [product],
+  );
+
   const filteredSpecs = useMemo(() => {
-    const skipLabels = ["brand", "model name", "model name/number", "model number", "model"];
-    
+    const skipLabels = [
+      "brand",
+      "model name",
+      "model name/number",
+      "model number",
+      "model",
+    ];
+
     return specs.filter((spec) => {
       const labelLower = spec.label.trim().toLowerCase();
       if (skipLabels.includes(labelLower)) {
         return false;
       }
-      
+
       const valClean = spec.value.trim().toLowerCase().replace(/\s+/g, "");
       if (!valClean) return false;
-      
+
       if (valClean === "yes" || valClean === "no") {
         if (labelLower === "rechargeable") {
-          return !features.some(feat => feat.toLowerCase().includes("recharge"));
+          return !features.some((feat) =>
+            feat.toLowerCase().includes("recharge"),
+          );
         }
         return true;
       }
@@ -199,11 +256,16 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
         if (featLower.includes(valClean)) {
           return true;
         }
-        
+
         // Check if value parts (for lists like "Farming, Mining") are in features
-        if (labelLower.includes("usage") || labelLower.includes("application")) {
+        if (
+          labelLower.includes("usage") ||
+          labelLower.includes("application")
+        ) {
           const parts = spec.value.split(/[,/]/);
-          return parts.some(part => featLower.includes(part.trim().toLowerCase().replace(/\s+/g, "")));
+          return parts.some((part) =>
+            featLower.includes(part.trim().toLowerCase().replace(/\s+/g, "")),
+          );
         }
 
         return false;
@@ -224,14 +286,15 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
         (v: any) =>
           (v.attributes?.Colors || v.attributes?.colors || "")
             .trim()
-            .toLowerCase() === selectedColor.trim().toLowerCase()
+            .toLowerCase() === selectedColor.trim().toLowerCase(),
       );
 
       const otherVarImages = new Set<string>();
       product.variations.forEach((v: any) => {
-        const isSelected = (v.attributes?.Colors || v.attributes?.colors || "")
-          .trim()
-          .toLowerCase() === selectedColor.trim().toLowerCase();
+        const isSelected =
+          (v.attributes?.Colors || v.attributes?.colors || "")
+            .trim()
+            .toLowerCase() === selectedColor.trim().toLowerCase();
         if (!isSelected && v.images) {
           v.images.forEach((img: string) => {
             if (img) otherVarImages.add(img);
@@ -248,18 +311,21 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
     }
     return baseImages;
   }, [product, selectedColor]);
-  
+
   // Parse color options from attributes
   const colorsList = useMemo(() => {
     const rawColors = product.attributes.Colors || "";
     if (!rawColors) return [];
-    return rawColors.split(",").map((c: string) => c.trim()).filter(Boolean);
+    return rawColors
+      .split(",")
+      .map((c: string) => c.trim())
+      .filter(Boolean);
   }, [product]);
 
   // Set default states on mount/product change
   useEffect(() => {
     setActiveImageIndex(0);
-    
+
     if (colorsList.length > 0) {
       setSelectedColor(colorsList[0]);
     } else {
@@ -276,65 +342,143 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
   // Find quick features from specs for the main info panel (Strictly parsed from JSON)
   const quickSpecs = useMemo(() => {
     const list: { value: string; key: string }[] = [];
-    
+
     // 1. Lumens / Brightness
-    const lumen = specs.find(s => s.label.toLowerCase().includes("lumen") || s.value.toLowerCase().includes("lumen"));
-    const watt = specs.find(s => s.label.toLowerCase().includes("watt") || s.label.toLowerCase().includes("power"));
+    const lumen = specs.find(
+      (s) =>
+        s.label.toLowerCase().includes("lumen") ||
+        s.value.toLowerCase().includes("lumen"),
+    );
+    const watt = specs.find(
+      (s) =>
+        s.label.toLowerCase().includes("watt") ||
+        s.label.toLowerCase().includes("power"),
+    );
     if (lumen) {
-      list.push({ value: lumen.value.includes("Lumen") ? lumen.value : `${lumen.value} High Brightness`, key: "brightness" });
+      list.push({
+        value: lumen.value.includes("Lumen")
+          ? lumen.value
+          : `${lumen.value} High Brightness`,
+        key: "brightness",
+      });
     } else if (watt) {
       list.push({ value: `${watt.value} High Power LED`, key: "brightness" });
     } else {
-      const wattFeat = features.find(f => /\b\d+\s*W\b/i.test(f) || /\b\d+\s*Lumen\b/i.test(f));
+      const wattFeat = features.find(
+        (f) => /\b\d+\s*W\b/i.test(f) || /\b\d+\s*Lumen\b/i.test(f),
+      );
       if (wattFeat) list.push({ value: wattFeat, key: "brightness" });
     }
 
     // 2. Beam Range
-    const range = specs.find(s => s.label.toLowerCase().includes("range") || s.label.toLowerCase().includes("beam") || s.label.toLowerCase().includes("distance"));
+    const range = specs.find(
+      (s) =>
+        s.label.toLowerCase().includes("range") ||
+        s.label.toLowerCase().includes("beam") ||
+        s.label.toLowerCase().includes("distance"),
+    );
     if (range) {
-      list.push({ value: range.value.includes("Beam") || range.value.includes("Range") ? range.value : `${range.value} Beam Range`, key: "range" });
+      list.push({
+        value:
+          range.value.includes("Beam") || range.value.includes("Range")
+            ? range.value
+            : `${range.value} Beam Range`,
+        key: "range",
+      });
     } else {
-      const rangeFeat = features.find(f => f.toLowerCase().includes("beam") || f.toLowerCase().includes("range") || f.toLowerCase().includes("meters"));
+      const rangeFeat = features.find(
+        (f) =>
+          f.toLowerCase().includes("beam") ||
+          f.toLowerCase().includes("range") ||
+          f.toLowerCase().includes("meters"),
+      );
       if (rangeFeat) list.push({ value: rangeFeat, key: "range" });
     }
 
     // 3. Rechargeable Battery
-    const cap = specs.find(s => s.label.toLowerCase().includes("capacity"));
-    const batType = specs.find(s => s.label.toLowerCase().includes("battery"));
+    const cap = specs.find((s) => s.label.toLowerCase().includes("capacity"));
+    const batType = specs.find((s) =>
+      s.label.toLowerCase().includes("battery"),
+    );
     if (cap) {
       list.push({ value: `${cap.value} Rechargeable Battery`, key: "battery" });
     } else if (batType) {
       list.push({ value: `${batType.value} Battery`, key: "battery" });
     } else {
-      const batFeat = features.find(f => f.toLowerCase().includes("battery") || f.toLowerCase().includes("mah"));
+      const batFeat = features.find(
+        (f) =>
+          f.toLowerCase().includes("battery") ||
+          f.toLowerCase().includes("mah"),
+      );
       if (batFeat) list.push({ value: batFeat, key: "battery" });
     }
 
     // 4. Backup Time
-    const backup = specs.find(s => s.label.toLowerCase().includes("backup") || s.label.toLowerCase().includes("duration") || s.label.toLowerCase().includes("time"));
+    const backup = specs.find(
+      (s) =>
+        s.label.toLowerCase().includes("backup") ||
+        s.label.toLowerCase().includes("duration") ||
+        s.label.toLowerCase().includes("time"),
+    );
     if (backup) {
-      list.push({ value: backup.value.toLowerCase().includes("backup") || backup.value.toLowerCase().includes("hours") ? backup.value : `Up to ${backup.value} Backup`, key: "backup" });
+      list.push({
+        value:
+          backup.value.toLowerCase().includes("backup") ||
+          backup.value.toLowerCase().includes("hours")
+            ? backup.value
+            : `Up to ${backup.value} Backup`,
+        key: "backup",
+      });
     } else {
-      const backupFeat = features.find(f => f.toLowerCase().includes("backup") || f.toLowerCase().includes("duration") || f.toLowerCase().includes("hours"));
+      const backupFeat = features.find(
+        (f) =>
+          f.toLowerCase().includes("backup") ||
+          f.toLowerCase().includes("duration") ||
+          f.toLowerCase().includes("hours"),
+      );
       if (backupFeat) list.push({ value: backupFeat, key: "backup" });
     }
 
     // 5. Body Material
-    const material = specs.find(s => s.label.toLowerCase().includes("material") || s.label.toLowerCase().includes("body"));
+    const material = specs.find(
+      (s) =>
+        s.label.toLowerCase().includes("material") ||
+        s.label.toLowerCase().includes("body"),
+    );
     if (material) {
       list.push({ value: `${material.value} Body`, key: "body" });
     } else {
-      const materialFeat = features.find(f => f.toLowerCase().includes("material") || f.toLowerCase().includes("body") || f.toLowerCase().includes("abs") || f.toLowerCase().includes("aluminum"));
+      const materialFeat = features.find(
+        (f) =>
+          f.toLowerCase().includes("material") ||
+          f.toLowerCase().includes("body") ||
+          f.toLowerCase().includes("abs") ||
+          f.toLowerCase().includes("aluminum"),
+      );
       if (materialFeat) list.push({ value: materialFeat, key: "body" });
     }
 
     // 6. Protection
-    const protectFeat = features.find(f => f.toLowerCase().includes("protection") || f.toLowerCase().includes("protect") || f.toLowerCase().includes("safety") || f.toLowerCase().includes("overcharg"));
+    const protectFeat = features.find(
+      (f) =>
+        f.toLowerCase().includes("protection") ||
+        f.toLowerCase().includes("protect") ||
+        f.toLowerCase().includes("safety") ||
+        f.toLowerCase().includes("overcharg"),
+    );
     if (protectFeat) {
       list.push({ value: protectFeat, key: "protection" });
     } else {
-      const protectSpec = specs.find(s => s.label.toLowerCase().includes("protection") || s.label.toLowerCase().includes("safety"));
-      if (protectSpec) list.push({ value: `${protectSpec.label}: ${protectSpec.value}`, key: "protection" });
+      const protectSpec = specs.find(
+        (s) =>
+          s.label.toLowerCase().includes("protection") ||
+          s.label.toLowerCase().includes("safety"),
+      );
+      if (protectSpec)
+        list.push({
+          value: `${protectSpec.label}: ${protectSpec.value}`,
+          key: "protection",
+        });
     }
 
     return list;
@@ -343,11 +487,17 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
   const taglineTitles = useMemo(() => {
     const list: string[] = [];
     if (features[0]) {
-      const title = getFormattedHighlight(features[0]).title.replace(/,$/, "").trim().toLowerCase();
+      const title = getFormattedHighlight(features[0])
+        .title.replace(/,$/, "")
+        .trim()
+        .toLowerCase();
       if (title) list.push(title);
     }
     if (features[1]) {
-      const title = getFormattedHighlight(features[1]).title.replace(/,$/, "").trim().toLowerCase();
+      const title = getFormattedHighlight(features[1])
+        .title.replace(/,$/, "")
+        .trim()
+        .toLowerCase();
       if (title) list.push(title);
     }
     return list;
@@ -356,7 +506,10 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
   const filteredFeatures = useMemo(() => {
     return features.filter((feat) => {
       const featLower = feat.toLowerCase();
-      const featTitle = getFormattedHighlight(feat).title.replace(/,$/, "").trim().toLowerCase();
+      const featTitle = getFormattedHighlight(feat)
+        .title.replace(/,$/, "")
+        .trim()
+        .toLowerCase();
 
       // 1. If it's featured in the tagline (top area tagline)
       if (taglineTitles.includes(featTitle)) {
@@ -364,22 +517,33 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
       }
 
       // 2. Exact or near-exact match in quickSpecs values
-      const quickSpecsValues = quickSpecs.map(q => q.value.toLowerCase());
-      if (quickSpecsValues.some(val => val === featLower || featLower.includes(val) || val.includes(featLower))) {
+      const quickSpecsValues = quickSpecs.map((q) => q.value.toLowerCase());
+      if (
+        quickSpecsValues.some(
+          (val) =>
+            val === featLower ||
+            featLower.includes(val) ||
+            val.includes(featLower),
+        )
+      ) {
         return false;
       }
 
       // 3. Category/keyword check against quickSpecs keys
-      const activeKeys = new Set(quickSpecs.map(q => q.key));
+      const activeKeys = new Set(quickSpecs.map((q) => q.key));
 
       // - Wattage / LED check (brightness key)
       if (activeKeys.has("brightness")) {
         const wattMatch = featLower.match(/\b(\d+)\s*w\b/i);
         if (wattMatch) {
           const wattVal = wattMatch[1];
-          const hasWattInQuick = quickSpecs.some(q => {
+          const hasWattInQuick = quickSpecs.some((q) => {
             const qLower = q.value.toLowerCase();
-            return q.key === "brightness" && (qLower.includes(`${wattVal}w`) || qLower.includes(`${wattVal} w`));
+            return (
+              q.key === "brightness" &&
+              (qLower.includes(`${wattVal}w`) ||
+                qLower.includes(`${wattVal} w`))
+            );
           });
           if (hasWattInQuick) return false;
         }
@@ -390,9 +554,13 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
         const capMatch = featLower.match(/\b(\d+)\s*mah\b/i);
         if (capMatch) {
           const capVal = capMatch[1];
-          const hasCapInQuick = quickSpecs.some(q => {
+          const hasCapInQuick = quickSpecs.some((q) => {
             const qLower = q.value.toLowerCase();
-            return q.key === "battery" && (qLower.includes(`${capVal}mah`) || qLower.includes(`${capVal} mah`));
+            return (
+              q.key === "battery" &&
+              (qLower.includes(`${capVal}mah`) ||
+                qLower.includes(`${capVal} mah`))
+            );
           });
           if (hasCapInQuick) return false;
         }
@@ -400,7 +568,14 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
 
       // - Overcharging / protection check (protection key)
       if (activeKeys.has("protection")) {
-        if (featLower.includes("protection") || featLower.includes("protect") || featLower.includes("overcharge") || featLower.includes("over-charge") || featLower.includes("over discharge") || featLower.includes("over-discharge")) {
+        if (
+          featLower.includes("protection") ||
+          featLower.includes("protect") ||
+          featLower.includes("overcharge") ||
+          featLower.includes("over-charge") ||
+          featLower.includes("over discharge") ||
+          featLower.includes("over-discharge")
+        ) {
           return false;
         }
       }
@@ -418,35 +593,56 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
 
   // Parse Applications list strictly from the Usage/Application spec in JSON
   const applications = useMemo(() => {
-    const appSpec = specs.find(s => s.label.toLowerCase().includes("usage") || s.label.toLowerCase().includes("application"));
+    const appSpec = specs.find(
+      (s) =>
+        s.label.toLowerCase().includes("usage") ||
+        s.label.toLowerCase().includes("application"),
+    );
     if (!appSpec) return [];
-    
+
     return appSpec.value
       .split(/,|;|and/i)
-      .map(item => item.trim())
+      .map((item) => item.trim())
       .filter(Boolean);
   }, [specs]);
 
   // Parse What's in the Box strictly from the JSON model name & features keywords
   const whatsInTheBox = useMemo(() => {
     const list: string[] = [`1x RISING ${product.name}`];
-    
-    features.forEach(feat => {
+
+    features.forEach((feat) => {
       const lower = feat.toLowerCase();
-      if (lower.includes("belt") || lower.includes("strap") || lower.includes("lanyard")) {
+      if (
+        lower.includes("belt") ||
+        lower.includes("strap") ||
+        lower.includes("lanyard")
+      ) {
         if (lower.includes("belt")) list.push("1x Nylon Belt");
         else if (lower.includes("strap")) list.push("1x Shoulder Strap");
         else if (lower.includes("lanyard")) list.push("1x Lanyard");
       }
-      if (lower.includes("adapter") || lower.includes("charger") || lower.includes("smps")) {
+      if (
+        lower.includes("adapter") ||
+        lower.includes("charger") ||
+        lower.includes("smps")
+      ) {
         if (lower.includes("adapter")) list.push("1x SMPS Adapter");
         else if (lower.includes("charger")) list.push("1x Charger");
         else list.push("1x Power Adapter");
       }
-      if (lower.includes("cable") || lower.includes("usb") || lower.includes("type-c")) {
+      if (
+        lower.includes("cable") ||
+        lower.includes("usb") ||
+        lower.includes("type-c")
+      ) {
         list.push("1x USB Charging Cable");
       }
-      if (lower.includes("battery") && (lower.includes("dry") || lower.includes("aa") || lower.includes("provided"))) {
+      if (
+        lower.includes("battery") &&
+        (lower.includes("dry") ||
+          lower.includes("aa") ||
+          lower.includes("provided"))
+      ) {
         list.push("Dry Cell Batteries");
       }
     });
@@ -457,28 +653,35 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
   return (
     <section className="py-20 bg-white scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 sm:mt-10">
-        
         {/* Breadcrumb Navigation */}
         <nav className="flex items-center space-x-2 text-[11px] sm:text-xs font-semibold text-slate-light mb-8 select-none tracking-wide">
-          <button onClick={onClose} className="hover:text-primary cursor-pointer transition-colors uppercase">
+          <button
+            onClick={onClose}
+            className="hover:text-primary cursor-pointer transition-colors uppercase"
+          >
             Home
           </button>
           <ChevronRight className="w-3.5 h-3.5 text-slate-350" />
-          <button onClick={onClose} className="hover:text-primary cursor-pointer transition-colors uppercase">
+          <button
+            onClick={onClose}
+            className="hover:text-primary cursor-pointer transition-colors uppercase"
+          >
             Products
           </button>
           <ChevronRight className="w-3.5 h-3.5 text-slate-350" />
-          <span className="text-primary uppercase">{product.categories[0] || "Lighting"}</span>
+          <span className="text-primary uppercase">
+            {product.categories[0] || "Lighting"}
+          </span>
           <ChevronRight className="w-3.5 h-3.5 text-slate-350" />
-          <span className="text-slate-400 font-medium truncate max-w-[180px] sm:max-w-none">{product.name}</span>
+          <span className="text-slate-400 font-medium truncate max-w-[180px] sm:max-w-none">
+            {product.name}
+          </span>
         </nav>
 
         {/* Top Split Block: Gallery and Info */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start mb-16">
-          
           {/* Left Side: Product Gallery */}
           <div className="lg:col-span-6 space-y-5">
-            
             {/* Main Image View - Dark Cinematic Backdrop with object-cover */}
             <div className="relative w-full aspect-square bg-gradient-to-b from-[#1E293B] via-[#0F172A] to-[#020617] rounded-[28px] flex items-center justify-center overflow-hidden shadow-premium group">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(10,82,214,0.15)_0%,transparent_65%)] pointer-events-none" />
@@ -494,13 +697,19 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center text-slate-650">
-                  <Package className="w-16 h-16 text-slate-500" strokeWidth={1} />
-                  <span className="text-xs uppercase font-extrabold tracking-wider mt-2">No Image Available</span>
+                  <Package
+                    className="w-16 h-16 text-slate-500"
+                    strokeWidth={1}
+                  />
+                  <span className="text-xs uppercase font-extrabold tracking-wider mt-2">
+                    No Image Available
+                  </span>
                 </div>
               )}
 
               {/* Best Seller Badge */}
-              {(product.featured === 1 || product.tags.includes("top-product")) && (
+              {(product.featured === 1 ||
+                product.tags.includes("top-product")) && (
                 <span className="absolute top-5 left-5 bg-accent text-dark-navy text-[10px] font-extrabold uppercase px-3.5 py-1.5 rounded-md shadow-sm select-none tracking-wider">
                   Best Seller
                 </span>
@@ -510,18 +719,33 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
               {allImages.length > 1 && (
                 <>
                   <button
-                    onClick={() => setActiveImageIndex(prev => (prev - 1 + allImages.length) % allImages.length)}
+                    onClick={() =>
+                      setActiveImageIndex(
+                        (prev) =>
+                          (prev - 1 + allImages.length) % allImages.length,
+                      )
+                    }
                     className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white hover:bg-slate-50 border border-slate-200/85 flex items-center justify-center text-slate-800 shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all hover:scale-105 active:scale-95 cursor-pointer z-10"
                     aria-label="Previous image"
                   >
-                    <ChevronLeft className="w-5 h-5 text-slate-800" strokeWidth={2.5} />
+                    <ChevronLeft
+                      className="w-5 h-5 text-slate-800"
+                      strokeWidth={2.5}
+                    />
                   </button>
                   <button
-                    onClick={() => setActiveImageIndex(prev => (prev + 1) % allImages.length)}
+                    onClick={() =>
+                      setActiveImageIndex(
+                        (prev) => (prev + 1) % allImages.length,
+                      )
+                    }
                     className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white hover:bg-slate-50 border border-slate-200/85 flex items-center justify-center text-slate-800 shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all hover:scale-105 active:scale-95 cursor-pointer z-10"
                     aria-label="Next image"
                   >
-                    <ChevronRight className="w-5 h-5 text-slate-800" strokeWidth={2.5} />
+                    <ChevronRight
+                      className="w-5 h-5 text-slate-800"
+                      strokeWidth={2.5}
+                    />
                   </button>
                 </>
               )}
@@ -534,13 +758,19 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
                 <button
                   onClick={() => {
                     if (thumbRef.current) {
-                      thumbRef.current.scrollBy({ left: -120, behavior: "smooth" });
+                      thumbRef.current.scrollBy({
+                        left: -120,
+                        behavior: "smooth",
+                      });
                     }
                   }}
                   className="absolute left-0 w-8 h-8 rounded-full bg-white hover:bg-slate-50 border border-slate-200 shadow-sm flex items-center justify-center text-slate-800 transition-all hover:scale-105 active:scale-95 cursor-pointer z-20"
                   aria-label="Scroll thumbnails left"
                 >
-                  <ChevronLeft className="w-4.5 h-4.5 text-slate-800" strokeWidth={2.5} />
+                  <ChevronLeft
+                    className="w-4.5 h-4.5 text-slate-800"
+                    strokeWidth={2.5}
+                  />
                 </button>
 
                 {/* Left edge fade out overlay */}
@@ -571,7 +801,7 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
                           className="object-cover"
                           sizes="80px"
                         />
-                        
+
                         {idx === 0 && product.video && (
                           <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
                             <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-primary shadow-sm">
@@ -591,13 +821,19 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
                 <button
                   onClick={() => {
                     if (thumbRef.current) {
-                      thumbRef.current.scrollBy({ left: 120, behavior: "smooth" });
+                      thumbRef.current.scrollBy({
+                        left: 120,
+                        behavior: "smooth",
+                      });
                     }
                   }}
                   className="absolute right-0 w-8 h-8 rounded-full bg-white hover:bg-slate-50 border border-slate-200 shadow-sm flex items-center justify-center text-slate-800 transition-all hover:scale-105 active:scale-95 cursor-pointer z-20"
                   aria-label="Scroll thumbnails right"
                 >
-                  <ChevronRight className="w-4.5 h-4.5 text-slate-800" strokeWidth={2.5} />
+                  <ChevronRight
+                    className="w-4.5 h-4.5 text-slate-800"
+                    strokeWidth={2.5}
+                  />
                 </button>
               </div>
             )}
@@ -605,7 +841,6 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
 
           {/* Right Side: Product Info */}
           <div className="lg:col-span-6 space-y-6">
-            
             {/* Category tag */}
             <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-primary block">
               {product.categories[0] || "Industrial Series"}
@@ -618,7 +853,10 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
               </h1>
               {features.length > 0 && (
                 <p className="text-sm sm:text-base text-slate-body font-medium leading-relaxed max-w-xl">
-                  {getFormattedHighlight(features[0]).title}. {features[1] ? getFormattedHighlight(features[1]).title : "High performance illumination. Built for every challenge."}
+                  {getFormattedHighlight(features[0]).title}.{" "}
+                  {features[1]
+                    ? getFormattedHighlight(features[1]).title
+                    : "High performance illumination. Built for every challenge."}
                 </p>
               )}
             </div>
@@ -627,12 +865,18 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-light select-none">
               <div className="flex items-center text-amber-400">
                 {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
+                  <svg
+                    key={i}
+                    className="w-3.5 h-3.5 fill-current"
+                    viewBox="0 0 20 20"
+                  >
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
                 ))}
               </div>
-              <span className="font-bold text-dark-navy">4.8 (132 Reviews)</span>
+              <span className="font-bold text-dark-navy">
+                4.8 (132 Reviews)
+              </span>
               <span className="text-slate-200">|</span>
               <span>SKU: {product.sku || `RT-${product.id}`}</span>
             </div>
@@ -643,13 +887,45 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
                 <ul className="space-y-3.5 text-xs sm:text-sm font-semibold text-dark-navy">
                   {quickSpecs.map((item, idx) => (
                     <li key={idx} className="flex items-center gap-3">
-                      {item.key === "brightness" && <Sun className="w-5 h-5 text-amber-500 flex-shrink-0" strokeWidth={2} />}
-                      {item.key === "range" && <Navigation className="w-5 h-5 text-slate-700 flex-shrink-0 rotate-45" strokeWidth={2} />}
-                      {item.key === "battery" && <Battery className="w-5 h-5 text-slate-700 flex-shrink-0" strokeWidth={2} />}
-                      {item.key === "backup" && <Clock className="w-5 h-5 text-slate-700 flex-shrink-0" strokeWidth={2} />}
-                      {item.key === "body" && <Shield className="w-5 h-5 text-slate-700 flex-shrink-0" strokeWidth={2} />}
-                      {item.key === "protection" && <ShieldCheck className="w-5 h-5 text-slate-750 flex-shrink-0" strokeWidth={2} />}
-                      <span className="text-slate-850 leading-tight font-medium">{item.value}</span>
+                      {item.key === "brightness" && (
+                        <Sun
+                          className="w-5 h-5 text-amber-500 flex-shrink-0"
+                          strokeWidth={2}
+                        />
+                      )}
+                      {item.key === "range" && (
+                        <Navigation
+                          className="w-5 h-5 text-slate-700 flex-shrink-0 rotate-45"
+                          strokeWidth={2}
+                        />
+                      )}
+                      {item.key === "battery" && (
+                        <Battery
+                          className="w-5 h-5 text-slate-700 flex-shrink-0"
+                          strokeWidth={2}
+                        />
+                      )}
+                      {item.key === "backup" && (
+                        <Clock
+                          className="w-5 h-5 text-slate-700 flex-shrink-0"
+                          strokeWidth={2}
+                        />
+                      )}
+                      {item.key === "body" && (
+                        <Shield
+                          className="w-5 h-5 text-slate-700 flex-shrink-0"
+                          strokeWidth={2}
+                        />
+                      )}
+                      {item.key === "protection" && (
+                        <ShieldCheck
+                          className="w-5 h-5 text-slate-750 flex-shrink-0"
+                          strokeWidth={2}
+                        />
+                      )}
+                      <span className="text-slate-850 leading-tight font-medium">
+                        {item.value}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -660,7 +936,10 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
             {colorsList.length > 0 && (
               <div className="space-y-3 pt-2 select-none">
                 <span className="text-xs font-bold text-dark-navy uppercase tracking-wider block">
-                  Color: <span className="font-semibold text-slate-body capitalize">{selectedColor}</span>
+                  Color:{" "}
+                  <span className="font-semibold text-slate-body capitalize">
+                    {selectedColor}
+                  </span>
                 </span>
                 <div className="flex gap-2.5">
                   {colorsList.map((color: string) => {
@@ -680,7 +959,12 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
                         }`}
                         title={color}
                       >
-                        {isActive && <Check className="w-4 h-4 text-white drop-shadow-sm" strokeWidth={3.5} />}
+                        {isActive && (
+                          <Check
+                            className="w-4 h-4 text-white drop-shadow-sm"
+                            strokeWidth={3.5}
+                          />
+                        )}
                       </button>
                     );
                   })}
@@ -701,18 +985,25 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
                   <span>Know more</span>
                 </div>
                 <div className="w-5 h-5 ml-4 rounded bg-white/20 flex items-center justify-center">
-                  <ChevronRight className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                  <ChevronRight
+                    className="w-3.5 h-3.5 text-white"
+                    strokeWidth={3}
+                  />
                 </div>
               </a>
               <button
-                onClick={() => alert("Datasheet download started successfully.")}
+                onClick={() =>
+                  alert("Datasheet download started successfully.")
+                }
                 className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start px-6 py-3.5 rounded-lg text-xs font-bold bg-white text-slate-800 border border-slate-200 hover:border-slate-350 hover:bg-slate-50 transition-all duration-300 active:scale-[0.98]"
               >
                 <span>Download Datasheet</span>
-                <Download className="w-4.5 h-4.5 ml-6 text-slate-650" strokeWidth={2.5} />
+                <Download
+                  className="w-4.5 h-4.5 ml-6 text-slate-650"
+                  strokeWidth={2.5}
+                />
               </button>
             </div>
-            
           </div>
         </div>
 
@@ -734,7 +1025,9 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
               <Tag className="w-5 h-5 text-primary" strokeWidth={1.75} />
             </div>
             <div className="space-y-0.5">
-              <h4 className="text-sm font-bold text-dark-navy">OEM & Branding</h4>
+              <h4 className="text-sm font-bold text-dark-navy">
+                OEM & Branding
+              </h4>
               <p className="text-[11px] sm:text-xs text-slate-body font-medium leading-relaxed">
                 Custom branding & packaging available
               </p>
@@ -745,7 +1038,9 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
               <Truck className="w-5 h-5 text-primary" strokeWidth={1.75} />
             </div>
             <div className="space-y-0.5">
-              <h4 className="text-sm font-bold text-dark-navy">Fast Delivery</h4>
+              <h4 className="text-sm font-bold text-dark-navy">
+                Fast Delivery
+              </h4>
               <p className="text-[11px] sm:text-xs text-slate-body font-medium leading-relaxed">
                 Pan India delivery with secure packaging
               </p>
@@ -756,7 +1051,9 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
               <Award className="w-5 h-5 text-primary" strokeWidth={1.75} />
             </div>
             <div className="space-y-0.5">
-              <h4 className="text-sm font-bold text-dark-navy">Trusted Quality</h4>
+              <h4 className="text-sm font-bold text-dark-navy">
+                Trusted Quality
+              </h4>
               <p className="text-[11px] sm:text-xs text-slate-body font-medium leading-relaxed">
                 20+ years of excellence in lighting solutions
               </p>
@@ -766,45 +1063,114 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
 
         {/* Main Grid: Specifications, Highlights, and Box Content */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 mb-16">
-          
           {/* Combined Column 1 & 2: Specifications & Highlights details wrapper */}
           <div className="lg:col-span-9 bg-white border border-slate-100 rounded-[24px] p-6 sm:p-7.5 shadow-[0_8px_30px_rgba(0,0,0,0.015)]">
             {/* Box heading */}
             <div className="flex items-center gap-3 mb-6 pb-5 border-b border-slate-100">
-              <h3 className="text-sm font-bold text-dark-navy tracking-tight uppercase">Product Features</h3>
+              <h3 className="text-sm font-bold text-dark-navy tracking-tight uppercase">
+                Product Features
+              </h3>
             </div>
 
-            {(filteredFeatures.length > 0 || filteredSpecs.length > 0) ? (
+            {filteredFeatures.length > 0 || filteredSpecs.length > 0 ? (
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5">
                 {/* Features */}
                 {filteredFeatures.map((feat, idx) => {
                   const { title, desc } = getFormattedHighlight(feat);
                   if (!title) return null;
-                  
+
                   // Keyword mapping for Lucide icons
-                  const isLED = title.toLowerCase().includes("led") || title.toLowerCase().includes("smd") || title.toLowerCase().includes("light") || title.toLowerCase().includes("bulb");
-                  const isRange = title.toLowerCase().includes("beam") || title.toLowerCase().includes("range") || title.toLowerCase().includes("spot") || title.toLowerCase().includes("reflector");
-                  const isBattery = title.toLowerCase().includes("battery") || title.toLowerCase().includes("mah") || title.toLowerCase().includes("recharge");
-                  const isModes = title.toLowerCase().includes("mode") || title.toLowerCase().includes("strobe") || title.toLowerCase().includes("operate");
-                  const isBody = title.toLowerCase().includes("body") || title.toLowerCase().includes("abs") || title.toLowerCase().includes("durable") || title.toLowerCase().includes("rugged") || title.toLowerCase().includes("material") || title.toLowerCase().includes("metal") || title.toLowerCase().includes("aluminium");
-                  const isProtect = title.toLowerCase().includes("protect") || title.toLowerCase().includes("safety") || title.toLowerCase().includes("overcharge");
+                  const isLED =
+                    title.toLowerCase().includes("led") ||
+                    title.toLowerCase().includes("smd") ||
+                    title.toLowerCase().includes("light") ||
+                    title.toLowerCase().includes("bulb");
+                  const isRange =
+                    title.toLowerCase().includes("beam") ||
+                    title.toLowerCase().includes("range") ||
+                    title.toLowerCase().includes("spot") ||
+                    title.toLowerCase().includes("reflector");
+                  const isBattery =
+                    title.toLowerCase().includes("battery") ||
+                    title.toLowerCase().includes("mah") ||
+                    title.toLowerCase().includes("recharge");
+                  const isModes =
+                    title.toLowerCase().includes("mode") ||
+                    title.toLowerCase().includes("strobe") ||
+                    title.toLowerCase().includes("operate");
+                  const isBody =
+                    title.toLowerCase().includes("body") ||
+                    title.toLowerCase().includes("abs") ||
+                    title.toLowerCase().includes("durable") ||
+                    title.toLowerCase().includes("rugged") ||
+                    title.toLowerCase().includes("material") ||
+                    title.toLowerCase().includes("metal") ||
+                    title.toLowerCase().includes("aluminium");
+                  const isProtect =
+                    title.toLowerCase().includes("protect") ||
+                    title.toLowerCase().includes("safety") ||
+                    title.toLowerCase().includes("overcharge");
 
                   return (
                     <li key={`feat-${idx}`} className="flex gap-4">
                       <div className="w-8 h-8 rounded-lg bg-blue-50/50 flex-shrink-0 flex items-center justify-center">
-                        {isLED && <Lightbulb className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
-                        {isRange && <Navigation className="w-4.5 h-4.5 text-primary rotate-45" strokeWidth={2} />}
-                        {isBattery && <Battery className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
-                        {isModes && <Sliders className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
-                        {isBody && <Shield className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
-                        {isProtect && <ShieldCheck className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
-                        {!isLED && !isRange && !isBattery && !isModes && !isBody && !isProtect && (
-                          <ShieldCheck className="w-4.5 h-4.5 text-primary" strokeWidth={2.5} />
+                        {isLED && (
+                          <Lightbulb
+                            className="w-4.5 h-4.5 text-primary"
+                            strokeWidth={2}
+                          />
                         )}
+                        {isRange && (
+                          <Navigation
+                            className="w-4.5 h-4.5 text-primary rotate-45"
+                            strokeWidth={2}
+                          />
+                        )}
+                        {isBattery && (
+                          <Battery
+                            className="w-4.5 h-4.5 text-primary"
+                            strokeWidth={2}
+                          />
+                        )}
+                        {isModes && (
+                          <Sliders
+                            className="w-4.5 h-4.5 text-primary"
+                            strokeWidth={2}
+                          />
+                        )}
+                        {isBody && (
+                          <Shield
+                            className="w-4.5 h-4.5 text-primary"
+                            strokeWidth={2}
+                          />
+                        )}
+                        {isProtect && (
+                          <ShieldCheck
+                            className="w-4.5 h-4.5 text-primary"
+                            strokeWidth={2}
+                          />
+                        )}
+                        {!isLED &&
+                          !isRange &&
+                          !isBattery &&
+                          !isModes &&
+                          !isBody &&
+                          !isProtect && (
+                            <ShieldCheck
+                              className="w-4.5 h-4.5 text-primary"
+                              strokeWidth={2.5}
+                            />
+                          )}
                       </div>
                       <div className="space-y-0.5">
-                        <span className="text-sm font-bold text-dark-navy block leading-tight">{title}</span>
-                        {desc && <span className="text-xs text-slate-body font-medium block leading-relaxed">{desc}</span>}
+                        <span className="text-sm font-bold text-dark-navy block leading-tight">
+                          {title}
+                        </span>
+                        {desc && (
+                          <span className="text-xs text-slate-body font-medium block leading-relaxed">
+                            {desc}
+                          </span>
+                        )}
                       </div>
                     </li>
                   );
@@ -813,33 +1179,71 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
                 {/* Specs */}
                 {filteredSpecs.map((spec, idx) => {
                   const labelLower = spec.label.toLowerCase();
-                  const isLED = labelLower.includes("lighting") || labelLower.includes("led") || labelLower.includes("type") || labelLower.includes("watt") || labelLower.includes("lumen") || labelLower.includes("bulb");
-                  const isBattery = labelLower.includes("battery") || labelLower.includes("capacity") || labelLower.includes("charge");
-                  const isBrand = labelLower.includes("brand") || labelLower.includes("make");
-                  const isUsage = labelLower.includes("usage") || labelLower.includes("application");
+                  const isLED =
+                    labelLower.includes("lighting") ||
+                    labelLower.includes("led") ||
+                    labelLower.includes("type") ||
+                    labelLower.includes("watt") ||
+                    labelLower.includes("lumen") ||
+                    labelLower.includes("bulb");
+                  const isBattery =
+                    labelLower.includes("battery") ||
+                    labelLower.includes("capacity") ||
+                    labelLower.includes("charge");
+                  const isBrand =
+                    labelLower.includes("brand") || labelLower.includes("make");
+                  const isUsage =
+                    labelLower.includes("usage") ||
+                    labelLower.includes("application");
 
                   return (
                     <li key={`spec-${idx}`} className="flex gap-4">
                       <div className="w-8 h-8 rounded-lg bg-blue-50/50 flex-shrink-0 flex items-center justify-center">
-                        {isLED && <Lightbulb className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
-                        {isBattery && <Battery className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
-                        {isBrand && <Award className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
-                        {isUsage && <Sliders className="w-4.5 h-4.5 text-primary" strokeWidth={2} />}
+                        {isLED && (
+                          <Lightbulb
+                            className="w-4.5 h-4.5 text-primary"
+                            strokeWidth={2}
+                          />
+                        )}
+                        {isBattery && (
+                          <Battery
+                            className="w-4.5 h-4.5 text-primary"
+                            strokeWidth={2}
+                          />
+                        )}
+                        {isBrand && (
+                          <Award
+                            className="w-4.5 h-4.5 text-primary"
+                            strokeWidth={2}
+                          />
+                        )}
+                        {isUsage && (
+                          <Sliders
+                            className="w-4.5 h-4.5 text-primary"
+                            strokeWidth={2}
+                          />
+                        )}
                         {!isLED && !isBattery && !isBrand && !isUsage && (
-                          <ShieldCheck className="w-4.5 h-4.5 text-primary" strokeWidth={2.5} />
+                          <ShieldCheck
+                            className="w-4.5 h-4.5 text-primary"
+                            strokeWidth={2.5}
+                          />
                         )}
                       </div>
                       <div className="space-y-0.5">
-                        <span className="text-sm font-bold text-dark-navy block leading-tight">{spec.label}</span>
+                        <span className="text-sm font-bold text-dark-navy block leading-tight">
+                          {spec.label}
+                        </span>
                         <span className="text-xs text-slate-body font-medium block leading-relaxed">
-                          {spec.label.toLowerCase().includes("color") && colorsList.length > 0 ? (
+                          {spec.label.toLowerCase().includes("color") &&
+                          colorsList.length > 0 ? (
                             <div className="flex gap-1.5 items-center mt-1">
                               {colorsList.map((color: string) => {
                                 const style = getColorBubbleStyle(color);
                                 return (
-                                  <span 
-                                    key={color} 
-                                    className={`w-3.5 h-3.5 rounded-full border ${style.bg} ${style.border}`} 
+                                  <span
+                                    key={color}
+                                    className={`w-3.5 h-3.5 rounded-full border ${style.bg} ${style.border}`}
                                     title={color}
                                   />
                                 );
@@ -855,13 +1259,14 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
                 })}
               </ul>
             ) : (
-              <p className="text-xs text-slate-body font-medium">No details available for this model.</p>
+              <p className="text-xs text-slate-body font-medium">
+                No details available for this model.
+              </p>
             )}
           </div>
 
           {/* Column 3: Stacked Cards (Right) - Matching border card with drop shadow */}
           <div className="lg:col-span-3 space-y-6">
-            
             {/* Card 1: Applications (Only render if parsed from JSON) */}
             {applications.length > 0 && (
               <div className="bg-white border border-slate-100 rounded-[24px] p-5.5 shadow-[0_8px_30px_rgba(0,0,0,0.015)]">
@@ -871,23 +1276,71 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
                 <ul className="space-y-3.5 text-xs text-slate-body font-semibold">
                   {applications.map((app, idx) => {
                     const lower = app.toLowerCase();
-                    const isIndustrial = lower.includes("industrial") || lower.includes("factory") || lower.includes("mining") || lower.includes("farming") || lower.includes("agriculture");
-                    const isSecurity = lower.includes("security") || lower.includes("patrol") || lower.includes("signal") || lower.includes("railway");
-                    const isAutomotive = lower.includes("auto") || lower.includes("car");
-                    const isOutdoor = lower.includes("outdoor") || lower.includes("camp") || lower.includes("trek");
-                    const isHome = lower.includes("home") || lower.includes("emergen") || lower.includes("house");
+                    const isIndustrial =
+                      lower.includes("industrial") ||
+                      lower.includes("factory") ||
+                      lower.includes("mining") ||
+                      lower.includes("farming") ||
+                      lower.includes("agriculture");
+                    const isSecurity =
+                      lower.includes("security") ||
+                      lower.includes("patrol") ||
+                      lower.includes("signal") ||
+                      lower.includes("railway");
+                    const isAutomotive =
+                      lower.includes("auto") || lower.includes("car");
+                    const isOutdoor =
+                      lower.includes("outdoor") ||
+                      lower.includes("camp") ||
+                      lower.includes("trek");
+                    const isHome =
+                      lower.includes("home") ||
+                      lower.includes("emergen") ||
+                      lower.includes("house");
 
                     return (
                       <li key={idx} className="flex items-center gap-3">
                         <div className="w-5.5 h-5.5 rounded bg-blue-50/50 flex items-center justify-center flex-shrink-0">
-                          {isIndustrial && <Factory className="w-3.5 h-3.5 text-primary" strokeWidth={2} />}
-                          {isSecurity && <Shield className="w-3.5 h-3.5 text-primary" strokeWidth={2} />}
-                          {isAutomotive && <Car className="w-3.5 h-3.5 text-primary" strokeWidth={2} />}
-                          {isOutdoor && <Tent className="w-3.5 h-3.5 text-primary" strokeWidth={2} />}
-                          {isHome && <Home className="w-3.5 h-3.5 text-primary" strokeWidth={2} />}
-                          {!isIndustrial && !isSecurity && !isAutomotive && !isOutdoor && !isHome && (
-                            <Shield className="w-3.5 h-3.5 text-primary" strokeWidth={2} />
+                          {isIndustrial && (
+                            <Factory
+                              className="w-3.5 h-3.5 text-primary"
+                              strokeWidth={2}
+                            />
                           )}
+                          {isSecurity && (
+                            <Shield
+                              className="w-3.5 h-3.5 text-primary"
+                              strokeWidth={2}
+                            />
+                          )}
+                          {isAutomotive && (
+                            <Car
+                              className="w-3.5 h-3.5 text-primary"
+                              strokeWidth={2}
+                            />
+                          )}
+                          {isOutdoor && (
+                            <Tent
+                              className="w-3.5 h-3.5 text-primary"
+                              strokeWidth={2}
+                            />
+                          )}
+                          {isHome && (
+                            <Home
+                              className="w-3.5 h-3.5 text-primary"
+                              strokeWidth={2}
+                            />
+                          )}
+                          {!isIndustrial &&
+                            !isSecurity &&
+                            !isAutomotive &&
+                            !isOutdoor &&
+                            !isHome && (
+                              <Shield
+                                className="w-3.5 h-3.5 text-primary"
+                                strokeWidth={2}
+                              />
+                            )}
                         </div>
                         <span className="capitalize">{app}</span>
                       </li>
@@ -906,20 +1359,54 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
                 <ul className="space-y-3.5 text-xs text-slate-body font-semibold">
                   {whatsInTheBox.map((boxItem, idx) => {
                     const lower = boxItem.toLowerCase();
-                    const isTorch = lower.includes("rising") || lower.includes("torch") || lower.includes("lantern") || lower.includes("headlamp") || lower.includes("lamp");
-                    const isCable = lower.includes("cable") || lower.includes("usb") || lower.includes("wire");
-                    const isStrap = lower.includes("strap") || lower.includes("belt") || lower.includes("lanyard");
+                    const isTorch =
+                      lower.includes("rising") ||
+                      lower.includes("torch") ||
+                      lower.includes("lantern") ||
+                      lower.includes("headlamp") ||
+                      lower.includes("lamp");
+                    const isCable =
+                      lower.includes("cable") ||
+                      lower.includes("usb") ||
+                      lower.includes("wire");
+                    const isStrap =
+                      lower.includes("strap") ||
+                      lower.includes("belt") ||
+                      lower.includes("lanyard");
                     const isBattery = lower.includes("battery");
 
                     return (
                       <li key={idx} className="flex items-center gap-3">
                         <div className="w-5.5 h-5.5 rounded bg-amber-50/50 flex items-center justify-center flex-shrink-0">
-                          {isTorch && <Package className="w-3.5 h-3.5 text-accent" strokeWidth={2} />}
-                          {isCable && <Usb className="w-3.5 h-3.5 text-accent" strokeWidth={2} />}
-                          {isStrap && <Bookmark className="w-3.5 h-3.5 text-accent" strokeWidth={2} />}
-                          {isBattery && <Battery className="w-3.5 h-3.5 text-accent" strokeWidth={2} />}
+                          {isTorch && (
+                            <Package
+                              className="w-3.5 h-3.5 text-accent"
+                              strokeWidth={2}
+                            />
+                          )}
+                          {isCable && (
+                            <Usb
+                              className="w-3.5 h-3.5 text-accent"
+                              strokeWidth={2}
+                            />
+                          )}
+                          {isStrap && (
+                            <Bookmark
+                              className="w-3.5 h-3.5 text-accent"
+                              strokeWidth={2}
+                            />
+                          )}
+                          {isBattery && (
+                            <Battery
+                              className="w-3.5 h-3.5 text-accent"
+                              strokeWidth={2}
+                            />
+                          )}
                           {!isTorch && !isCable && !isStrap && !isBattery && (
-                            <Package className="w-3.5 h-3.5 text-accent" strokeWidth={2} />
+                            <Package
+                              className="w-3.5 h-3.5 text-accent"
+                              strokeWidth={2}
+                            />
                           )}
                         </div>
                         <span>{boxItem}</span>
@@ -929,10 +1416,8 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
                 </ul>
               </div>
             )}
-
           </div>
         </div>
-
       </div>
     </section>
   );

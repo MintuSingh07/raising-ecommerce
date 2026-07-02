@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Image from "next/image";
 import productData from "../../public/products_structured.json";
 import BlurText from "./BlurText";
@@ -66,32 +66,57 @@ export interface Product {
   variations?: any[];
 }
 
-// Map of the 5 website categories
+// Map of the 10 website categories
 const WEBSITE_CATEGORIES = [
   {
-    id: "torches",
-    label: "LED Torches",
-    desc: "Heavy-duty portable flashlights and Kisan torches designed for maximum reach and durability.",
+    id: "rechargeable-led-flashlight",
+    label: "Rechargeable LED Flash Light",
+    desc: "High-efficiency rechargeable beam flashlights engineered for long runtime.",
   },
   {
-    id: "spotlights",
-    label: "Spotlights",
-    desc: "Long-range precision headlights and adjustable focus searchlights.",
+    id: "kisan-torch",
+    label: "Kisan Torch",
+    desc: "Heavy-duty agricultural torches tailored for nighttime farming and outdoor field conditions.",
   },
   {
-    id: "emergency-lights",
-    label: "Emergency Lights",
-    desc: "Multi-functional backup lanterns and solar power home illumination kits.",
+    id: "metal-flashlights",
+    label: "Metal Flash Lights",
+    desc: "Rugged and durable metal-body searchlights and tactical security lights.",
   },
   {
-    id: "rechargeable",
-    label: "Rechargeable Products",
-    desc: "Eco-friendly, energy-efficient desk lamps, reading lamps, and USB bulbs.",
+    id: "led-headlamp",
+    label: "LED Headlamp",
+    desc: "Hands-free, adjustable high-power headlamps for trekking, mining, and repairs.",
   },
   {
-    id: "industrial",
-    label: "Industrial Solutions",
-    desc: "High-spec tactical military gears, security, and industrial application flashlights.",
+    id: "led-table-lamp",
+    label: "LED Table Lamp",
+    desc: "Flexible reading desk lamps and smart energy-saving study lights.",
+  },
+  {
+    id: "solar-lantern-searchlight",
+    label: "Solar Lantern and Search Light",
+    desc: "Dual-charging solar emergency lanterns and long-distance spotlights.",
+  },
+  {
+    id: "led-lantern",
+    label: "LED Lantern",
+    desc: "Premium backup emergency lights and high-lumen room lanterns.",
+  },
+  {
+    id: "led-usb-lamp",
+    label: "LED USB Lamp",
+    desc: "Compact USB plug-and-play bulbs for portable power-bank and laptop hookups.",
+  },
+  {
+    id: "solar-energy-kit",
+    label: "Solar Energy Kit",
+    desc: "All-in-one solar panel home system with multiple bulbs and multi-device charging.",
+  },
+  {
+    id: "power-extension-board",
+    label: "Power Extension Board",
+    desc: "Multi-socket surge-protected power extension boards for safety and convenience.",
   },
 ];
 
@@ -179,60 +204,88 @@ export default function ProductCatalog({
   setSelectedProduct,
 }: ProductCatalogProps = {}) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState("torches");
+  const [activeCategory, setActiveCategory] = useState("rechargeable-led-flashlight");
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (dir: "left" | "right") => {
+    if (!scrollRef.current) return;
+    scrollRef.current.scrollBy({ left: dir === "left" ? -400 : 400, behavior: "smooth" });
+  };
 
   // Expanded state for each category section
   const [expandedCategories, setExpandedCategories] = useState<{
     [key: string]: boolean;
   }>({
-    torches: false,
-    spotlights: false,
-    "emergency-lights": false,
-    rechargeable: false,
-    industrial: false,
+    "rechargeable-led-flashlight": false,
+    "kisan-torch": false,
+    "metal-flashlights": false,
+    "led-headlamp": false,
+    "led-table-lamp": false,
+    "solar-lantern-searchlight": false,
+    "led-lantern": false,
+    "led-usb-lamp": false,
+    "solar-energy-kit": false,
+    "power-extension-board": false,
   });
 
   const currentWebCat = useMemo(() => {
     return WEBSITE_CATEGORIES.find((c) => c.id === activeCategory);
   }, [activeCategory]);
 
-  // Group products into our 5 website categories
+  // Group products into our 10 website categories
   const categorizedProducts = useMemo(() => {
     const products = productData.products as Product[];
 
     const groups: { [key: string]: Product[] } = {
-      torches: [],
-      spotlights: [],
-      "emergency-lights": [],
-      rechargeable: [],
-      industrial: [],
+      "rechargeable-led-flashlight": [],
+      "kisan-torch": [],
+      "metal-flashlights": [],
+      "led-headlamp": [],
+      "led-table-lamp": [],
+      "solar-lantern-searchlight": [],
+      "led-lantern": [],
+      "led-usb-lamp": [],
+      "solar-energy-kit": [],
+      "power-extension-board": [],
     };
 
     products.forEach((p) => {
       const cats = p.categories.map((c) => c.toLowerCase());
 
-      // Determine which category it maps to
-      if (cats.includes("industrial") || cats.includes("defence/security")) {
-        groups["industrial"].push(p);
+      // Group precisely based on category tags
+      if (cats.includes("led headlamp")) {
+        groups["led-headlamp"].push(p);
+      } else if (cats.includes("led lantern")) {
+        groups["led-lantern"].push(p);
+      } else if (cats.includes("led table lamp")) {
+        groups["led-table-lamp"].push(p);
+      } else if (cats.includes("led usb lamp")) {
+        groups["led-usb-lamp"].push(p);
       } else if (
-        cats.includes("led table lamp") ||
-        cats.includes("led usb lamp") ||
-        cats.includes("corporate gifting")
+        cats.includes("metal flashlights") ||
+        cats.includes("defence/security") ||
+        cats.includes("industrial")
       ) {
-        groups["rechargeable"].push(p);
+        groups["metal-flashlights"].push(p);
+      } else if (cats.includes("rechargeable led flashlight")) {
+        groups["rechargeable-led-flashlight"].push(p);
       } else if (
-        cats.includes("led lantern") ||
-        cats.includes("solar energy kit")
+        cats.includes("kisan torch") ||
+        cats.includes("farming") ||
+        cats.includes("remote areas/village")
       ) {
-        groups["emergency-lights"].push(p);
-      } else if (
-        cats.includes("led headlamp") ||
-        cats.includes("solar lantern & searchlight")
-      ) {
-        groups["spotlights"].push(p);
+        groups["kisan-torch"].push(p);
+      } else if (cats.includes("solar energy kit")) {
+        groups["solar-energy-kit"].push(p);
+      } else if (cats.includes("solar lantern & searchlight")) {
+        groups["solar-lantern-searchlight"].push(p);
+      } else if (cats.includes("power extension board")) {
+        groups["power-extension-board"].push(p);
+      } else if (cats.includes("corporate gifting")) {
+        groups["led-table-lamp"].push(p);
       } else {
-        // Fallback or explicit torches category
-        groups["torches"].push(p);
+        // Default fallback
+        groups["rechargeable-led-flashlight"].push(p);
       }
     });
 
@@ -367,36 +420,68 @@ export default function ProductCatalog({
           </div>
         </div>
 
-        {/* Category Capsules */}
-        <div className="flex flex-row flex-nowrap overflow-x-auto justify-start md:justify-center gap-2.5 mt-8 mb-12 w-full max-w-5xl mx-auto scrollbar-none pb-2 md:pb-0 px-4">
-          {WEBSITE_CATEGORIES.map((webCat) => {
-            const isActive = activeCategory === webCat.id;
-            const count = filteredCategorizedProducts[webCat.id]?.length || 0;
-            return (
-              <button
-                key={webCat.id}
-                onClick={() => {
-                  setActiveCategory(webCat.id);
-                }}
-                className={`px-5 py-2.5 rounded-full text-xs font-bold border transition-all duration-300 active:scale-95 cursor-pointer flex items-center gap-2 shrink-0 ${
-                  isActive
-                    ? "bg-primary text-white border-primary shadow-md shadow-primary/15"
-                    : "bg-white text-slate-600 border-slate-250 hover:border-slate-350 hover:bg-slate-50"
-                }`}
-              >
-                {webCat.label}
-                <span
-                  className={`text-[9px] px-1.5 py-0.5 rounded-full font-extrabold ${
+        {/* Category Capsules Wrapper with arrows & fade effect */}
+        <div className="relative w-full max-w-5xl mx-auto mb-12 px-10">
+          {/* Left Arrow Button */}
+          <button
+            onClick={() => scroll("left")}
+            aria-label="Scroll capsules left"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm text-slate-500 hover:bg-primary hover:text-white hover:border-primary transition-all duration-200 active:scale-90 flex items-center justify-center cursor-pointer"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          {/* Right Arrow Button */}
+          <button
+            onClick={() => scroll("right")}
+            aria-label="Scroll capsules right"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm text-slate-500 hover:bg-primary hover:text-white hover:border-primary transition-all duration-200 active:scale-90 flex items-center justify-center cursor-pointer"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          {/* Left fade overlay */}
+          <div className="pointer-events-none absolute left-8 top-0 bottom-0 w-8 z-10 bg-gradient-to-r from-white to-transparent" />
+          {/* Right fade overlay */}
+          <div className="pointer-events-none absolute right-8 top-0 bottom-0 w-8 z-10 bg-gradient-to-l from-white to-transparent" />
+
+          <div
+            ref={scrollRef}
+            className="flex flex-row flex-nowrap overflow-x-auto justify-start gap-2.5 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-2"
+          >
+            {WEBSITE_CATEGORIES.map((webCat) => {
+              const isActive = activeCategory === webCat.id;
+              const count = filteredCategorizedProducts[webCat.id]?.length || 0;
+              return (
+                <button
+                  key={webCat.id}
+                  onClick={() => {
+                    setActiveCategory(webCat.id);
+                  }}
+                  className={`px-5 py-2.5 rounded-full text-xs font-bold border transition-all duration-300 active:scale-95 cursor-pointer flex items-center gap-2 shrink-0 ${
                     isActive
-                      ? "bg-white/20 text-white"
-                      : "bg-slate-100 text-slate-500"
+                      ? "bg-primary text-white border-primary shadow-md shadow-primary/15"
+                      : "bg-white text-slate-600 border-slate-250 hover:border-slate-350 hover:bg-slate-50"
                   }`}
                 >
-                  {count}
-                </span>
-              </button>
-            );
-          })}
+                  {webCat.label}
+                  <span
+                    className={`text-[9px] px-1.5 py-0.5 rounded-full font-extrabold ${
+                      isActive
+                        ? "bg-white/20 text-white"
+                        : "bg-slate-100 text-slate-500"
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Selected Category Block */}
