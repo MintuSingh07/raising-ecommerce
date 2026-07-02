@@ -29,7 +29,8 @@ import {
   Download,
   ChevronLeft,
   ChevronRight,
-  Check
+  Check,
+  MessageCircle
 } from "lucide-react";
 
 interface ProductDetailsProps {
@@ -687,20 +688,22 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
               </div>
             )}
 
-            {/* Actions CTA Buttons with Lucide Icons */}
+            {/* Actions CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-4 select-none">
-              <Link
-                href="/contact"
+              <a
+                href={`https://wa.me/919468650719?text=${encodeURIComponent(`Hi! I'd like to know more about the RISING ${product.name}. Could you please share details on pricing, availability, and bulk orders?`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start px-6 py-3.5 rounded-lg text-xs font-bold bg-primary text-white border border-primary hover:bg-primary-navy shadow-md shadow-primary/10 transition-all duration-300 active:scale-[0.98]"
               >
                 <div className="flex items-center">
-                  <FileText className="w-4.5 h-4.5 mr-2.5" strokeWidth={2} />
-                  <span>Request a Quote</span>
+                  <MessageCircle className="w-4 h-4 mr-2.5" strokeWidth={2} />
+                  <span>Know more</span>
                 </div>
-                <div className="w-5 h-5 ml-4 rounded bg-white/10 flex items-center justify-center">
+                <div className="w-5 h-5 ml-4 rounded bg-white/20 flex items-center justify-center">
                   <ChevronRight className="w-3.5 h-3.5 text-white" strokeWidth={3} />
                 </div>
-              </Link>
+              </a>
               <button
                 onClick={() => alert("Datasheet download started successfully.")}
                 className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start px-6 py-3.5 rounded-lg text-xs font-bold bg-white text-slate-800 border border-slate-200 hover:border-slate-350 hover:bg-slate-50 transition-all duration-300 active:scale-[0.98]"

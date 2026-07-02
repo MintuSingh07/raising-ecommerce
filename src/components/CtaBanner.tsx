@@ -33,11 +33,11 @@ export default function CtaBanner() {
               </div>
               
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight leading-tight text-white">
-                <BlurText text="Partner With RISING" highlightWords={["RISING"]} highlightClass="text-accent" delay={20} animateBy="words" direction="bottom" />
+                <BlurText text="Distribute With RISING" highlightWords={["RISING"]} highlightClass="text-accent" delay={20} animateBy="words" direction="bottom" />
               </h2>
               
               <div className="text-sm sm:text-base text-blue-50 leading-relaxed max-w-lg">
-                <BlurText text="Join our growing network of distributors and business partners across India and build a brighter, more reliable future together. Get premium access to catalogs and priority shipping." delay={10} animateBy="words" direction="bottom" />
+                <BlurText text="Join our growing network of distributors and dealers across India and build a brighter, more reliable future together. Get premium access to catalogs and priority shipping." delay={10} animateBy="words" direction="bottom" />
               </div>
               
               <div className="flex flex-wrap gap-4 w-full sm:w-auto pt-4">

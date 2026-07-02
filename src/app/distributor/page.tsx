@@ -97,11 +97,11 @@ export default function DistributorPage() {
             
             <div className="max-w-3xl space-y-4 relative z-10">
               <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-widest text-accent bg-accent/10 border border-accent/20 px-3 py-1 rounded-full inline-block">
-                Partnership Opportunities
+                Distributorship Opportunities
               </span>
               
               <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight italic uppercase">
-                <BlurText text="Become a Partner" delay={20} animateBy="words" direction="bottom" />
+                <BlurText text="Become a Distributor" delay={20} animateBy="words" direction="bottom" />
               </h1>
               
               <p className="text-sm sm:text-base text-blue-50/80 leading-relaxed font-medium">
@@ -143,7 +143,7 @@ export default function DistributorPage() {
           <div className="bg-white rounded-[32px] p-6 sm:p-10 border border-slate-100/80 shadow-premium max-w-4xl mx-auto">
             <div className="text-center max-w-xl mx-auto mb-8 space-y-2">
               <h2 className="text-xl sm:text-2xl font-bold text-dark-navy uppercase italic">
-                Partnership Application
+                Distributorship Application
               </h2>
               <p className="text-xs sm:text-sm text-slate-body font-medium">
                 Submit details about your business setup below, and our B2B sales team will evaluate your profile.
@@ -305,7 +305,7 @@ export default function DistributorPage() {
 
               {submitStatus === "success" && (
                 <div className="p-4 bg-emerald-50 text-emerald-800 rounded-xl text-xs sm:text-sm font-semibold border border-emerald-100 animate-fadeIn">
-                  ✓ Your application has been submitted successfully. Our partnership team will contact you.
+                  ✓ Your application has been submitted successfully. Our distributorship team will contact you.
                 </div>
               )}
             </form>
