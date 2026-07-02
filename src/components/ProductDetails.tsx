@@ -769,6 +769,11 @@ export default function ProductDetails({ product, onClose }: ProductDetailsProps
           
           {/* Combined Column 1 & 2: Specifications & Highlights details wrapper */}
           <div className="lg:col-span-9 bg-white border border-slate-100 rounded-[24px] p-6 sm:p-7.5 shadow-[0_8px_30px_rgba(0,0,0,0.015)]">
+            {/* Box heading */}
+            <div className="flex items-center gap-3 mb-6 pb-5 border-b border-slate-100">
+              <h3 className="text-sm font-bold text-dark-navy tracking-tight uppercase">Product Features</h3>
+            </div>
+
             {(filteredFeatures.length > 0 || filteredSpecs.length > 0) ? (
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5">
                 {/* Features */}
