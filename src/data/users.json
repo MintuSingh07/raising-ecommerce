@@ -1,0 +1,9 @@
+[
+  {
+    "id": "9745d3a9-9311-444e-934d-0431f5863d70",
+    "name": "admin",
+    "email": "admin@admin.com",
+    "passwordHash": "c23a93d0b272c30b40d3d2daff150876:e95cd493052cbc64b3835c1467c0c08f0aba3df3ee6d2aff2b4756bbd4b2337cc805b9c560c1872572008c3b5cbd7e44e9180f07b11446dd0aba40f16a301be5",
+    "createdAt": "2026-07-03T12:30:32.634Z"
+  }
+]

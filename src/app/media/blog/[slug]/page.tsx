@@ -212,24 +212,44 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+import { useState, useEffect } from "react";
+
 export default function BlogDetailPage({ params }: PageProps) {
   const resolvedParams = use(params);
   const slug = resolvedParams.slug;
-  const blog = BLOG_POSTS[slug];
+  const [blog, setBlog] = useState<any>(null);
+  const [recommendedBlogs, setRecommendedBlogs] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Dynamic recommendations: suggest other blog posts
-  const recommendedBlogs = useMemo(() => {
-    return Object.entries(BLOG_POSTS)
-      .filter(([key]) => key !== slug)
-      .slice(0, 3)
-      .map(([key, value]) => ({
-        slug: key,
-        title: value.title,
-        date: value.date,
-        image: value.image,
-        accent: value.accent,
-      }));
+  useEffect(() => {
+    async function fetchBlog() {
+      try {
+        const res = await fetch(`/api/public/blogs?slug=${slug}`);
+        if (res.ok) {
+          const data = await res.json();
+          setBlog(data.blog);
+          setRecommendedBlogs(data.recommended || []);
+        }
+      } catch (err) {
+        console.error("Failed to load blog post details:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchBlog();
   }, [slug]);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col min-h-screen bg-white font-sans">
+        <Navbar />
+        <main className="flex-grow flex flex-col items-center justify-center py-32 px-4 text-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!blog) {
     return (
@@ -335,12 +355,12 @@ export default function BlogDetailPage({ params }: PageProps) {
                 </p>
 
                 {/* Content Sections */}
-                {blog.sections.map((sec, idx) => (
+                {blog.sections.map((sec: { heading: string; paragraphs: string[] }, idx: number) => (
                   <div key={idx} className="space-y-4">
                     <h2 className="text-lg sm:text-xl font-bold text-dark-navy uppercase tracking-tight">
                       {sec.heading}
                     </h2>
-                    {sec.paragraphs.map((p, pIdx) => (
+                    {sec.paragraphs.map((p: string, pIdx: number) => (
                       <p
                         key={pIdx}
                         className="text-xs sm:text-sm text-slate-body font-medium leading-relaxed"
@@ -354,7 +374,7 @@ export default function BlogDetailPage({ params }: PageProps) {
                 {/* Article Footer Tags */}
                 <div className="pt-8 border-t border-slate-100 flex flex-wrap items-center gap-2 select-none">
                   <Tag className="w-4 h-4 text-slate-400 mr-1" />
-                  {blog.tags.map((tag, idx) => (
+                  {blog.tags.map((tag: string, idx: number) => (
                     <span
                       key={idx}
                       className="text-[10px] sm:text-xs font-bold text-slate-600 bg-slate-150 rounded-full px-3 py-1 border border-slate-200"

@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
+    // Disable smooth scrolling on admin panel pages
+    if (pathname.startsWith("/admin")) return;
     // Initialize Lenis
     const lenis = new Lenis({
       duration: 1.2,
@@ -76,7 +80,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       }
       document.removeEventListener("click", handleHashClick);
     };
-  }, []);
+  }, [pathname]);
 
   return <>{children}</>;
 }

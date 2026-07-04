@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 import BlurText from "./BlurText";
 import { motion } from "motion/react";
+import * as LucideIcons from "lucide-react";
 import {
   Package,
   Tag,
@@ -78,6 +79,11 @@ interface ProductDetailsProps {
       [key: string]: any;
     };
     variations?: any[];
+    highlights?: any[];
+    productFeatures?: any[];
+    specs?: any[];
+    applications?: any[];
+    inBox?: any[];
   };
   onClose: () => void;
 }
@@ -614,6 +620,77 @@ export default function ProductDetails({
       .filter(Boolean);
   }, [specs]);
 
+  // ── Unified structured detail/highlights lists utilizing custom selected database icons ──
+  const highlightsList = useMemo(() => {
+    if (product.highlights && product.highlights.length > 0) {
+      return product.highlights.map((h: any) => {
+        if (typeof h === "string") {
+          return { text: h, icons: ["Check"] };
+        }
+        if (h.icons && Array.isArray(h.icons)) {
+          return { text: h.text || "", icons: h.icons };
+        }
+        return { text: h.text || "", icons: [h.icon || "Check"] };
+      });
+    }
+    // Fall back to computed quickSpecs
+    return quickSpecs.map((q) => {
+      let icon = "Check";
+      if (q.key === "brightness") icon = "Sun";
+      else if (q.key === "range") icon = "Navigation";
+      else if (q.key === "battery") icon = "Battery";
+      else if (q.key === "backup") icon = "Clock";
+      else if (q.key === "body") icon = "Shield";
+      else if (q.key === "protection") icon = "ShieldAlert";
+      return { text: q.value, icons: [icon] };
+    });
+  }, [product.highlights, quickSpecs]);
+
+  const featuresList = useMemo(() => {
+    if (product.productFeatures && product.productFeatures.length > 0) {
+      return product.productFeatures.map((f: any) => {
+        if (f.icons && Array.isArray(f.icons)) {
+          return { title: f.label, desc: f.detail, icons: f.icons };
+        }
+        return { title: f.label, desc: f.detail, icons: [f.icon || "Check"] };
+      });
+    }
+    // Fall back to parsed HTML description
+    return filteredFeatures.map((feat) => {
+      const { title, desc } = getFormattedHighlight(feat);
+      let icon = "Check";
+      const titleLower = title.toLowerCase();
+      if (titleLower.includes("led") || titleLower.includes("light") || titleLower.includes("smd") || titleLower.includes("bulb")) icon = "Lightbulb";
+      else if (titleLower.includes("beam") || titleLower.includes("range") || titleLower.includes("spot") || titleLower.includes("reflector")) icon = "Navigation";
+      else if (titleLower.includes("battery") || titleLower.includes("mah") || titleLower.includes("recharge")) icon = "Battery";
+      else if (titleLower.includes("mode") || titleLower.includes("strobe") || titleLower.includes("operate")) icon = "Sliders";
+      else if (titleLower.includes("body") || titleLower.includes("abs") || titleLower.includes("durable") || titleLower.includes("rugged") || titleLower.includes("material") || titleLower.includes("metal") || titleLower.includes("aluminium")) icon = "Shield";
+      else if (titleLower.includes("protect") || titleLower.includes("safety") || titleLower.includes("overcharge")) icon = "ShieldCheck";
+      return { title, desc, icons: [icon] };
+    });
+  }, [product.productFeatures, filteredFeatures]);
+
+  const specsList = useMemo(() => {
+    if (product.specs && product.specs.length > 0) {
+      return product.specs.map((s: any) => {
+        if (s.icons && Array.isArray(s.icons)) {
+          return { label: s.label, value: s.value, icons: s.icons };
+        }
+        return { label: s.label, value: s.value, icons: [s.icon || "Check"] };
+      });
+    }
+    // Fall back to parsed Technical specs
+    return filteredSpecs.map((s) => {
+      const labelLower = s.label.toLowerCase();
+      let icon = "Check";
+      if (labelLower.includes("lighting") || labelLower.includes("led") || labelLower.includes("type") || labelLower.includes("watt") || labelLower.includes("lumen") || labelLower.includes("bulb")) icon = "Lightbulb";
+      else if (labelLower.includes("battery") || labelLower.includes("capacity") || labelLower.includes("charge")) icon = "Battery";
+      else if (labelLower.includes("brand") || labelLower.includes("make")) icon = "Award";
+      else if (labelLower.includes("usage") || labelLower.includes("application")) icon = "Sliders";
+      return { label: s.label, value: s.value, icons: [icon] };
+    });
+  }, [product.specs, filteredSpecs]);
+
   // Parse What's in the Box strictly from the JSON model name & features keywords
   const whatsInTheBox = useMemo(() => {
     const list: string[] = [`1x RISING ${product.name}`];
@@ -657,6 +734,45 @@ export default function ProductDetails({
 
     return list;
   }, [product, features]);
+
+  const detailedApplications = useMemo(() => {
+    if (product.applications && product.applications.length > 0) {
+      return product.applications.map((a: any) => {
+        if (typeof a === "string") return { text: a, icons: [] };
+        return { text: a.text || "", icons: a.icons || [] };
+      });
+    }
+    // Fall back to legacy parsed array of strings
+    return applications.map((app) => {
+      const lower = app.toLowerCase();
+      let icon = "Shield";
+      if (lower.includes("industrial") || lower.includes("factory") || lower.includes("mining") || lower.includes("farming") || lower.includes("agriculture")) icon = "Factory";
+      else if (lower.includes("security") || lower.includes("patrol") || lower.includes("signal") || lower.includes("defense")) icon = "Shield";
+      else if (lower.includes("automotive") || lower.includes("car") || lower.includes("bus") || lower.includes("vehicle") || lower.includes("truck")) icon = "Car";
+      else if (lower.includes("outdoor") || lower.includes("camping") || lower.includes("trekking") || lower.includes("forest") || lower.includes("tent")) icon = "Tent";
+      else if (lower.includes("home") || lower.includes("household") || lower.includes("kitchen") || lower.includes("house")) icon = "Home";
+      return { text: app, icons: [icon] };
+    });
+  }, [product.applications, applications]);
+
+  const detailedInBox = useMemo(() => {
+    if (product.inBox && product.inBox.length > 0) {
+      return product.inBox.map((b: any) => {
+        if (typeof b === "string") return { text: b, icons: [] };
+        return { text: b.text || "", icons: b.icons || [] };
+      });
+    }
+    // Fall back to legacy parsed inBox list
+    return whatsInTheBox.map((boxItem) => {
+      const lower = boxItem.toLowerCase();
+      let icon = "Package";
+      if (lower.includes("rising") || lower.includes("torch") || lower.includes("lantern") || lower.includes("headlamp") || lower.includes("lamp")) icon = "Package";
+      else if (lower.includes("cable") || lower.includes("usb") || lower.includes("wire")) icon = "Usb";
+      else if (lower.includes("strap") || lower.includes("belt") || lower.includes("lanyard")) icon = "Bookmark";
+      else if (lower.includes("battery")) icon = "Battery";
+      return { text: boxItem, icons: [icon] };
+    });
+  }, [product.inBox, whatsInTheBox]);
 
   return (
     <section className="py-20 bg-white scroll-mt-20">
@@ -907,52 +1023,31 @@ export default function ProductDetails({
             </div>
 
             {/* Quick Specs Bullet List with Lucide Icons */}
-            {quickSpecs.length > 0 && (
+            {highlightsList.length > 0 && (
               <div className="border-t border-slate-100 pt-6">
                 <ul className="space-y-3.5 text-xs sm:text-sm font-semibold text-dark-navy">
-                  {quickSpecs.map((item, idx) => (
-                    <li key={idx} className="flex items-center gap-3">
-                      {item.key === "brightness" && (
-                        <Sun
-                          className="w-5 h-5 text-amber-500 flex-shrink-0"
-                          strokeWidth={2}
-                        />
-                      )}
-                      {item.key === "range" && (
-                        <Navigation
-                          className="w-5 h-5 text-slate-700 flex-shrink-0 rotate-45"
-                          strokeWidth={2}
-                        />
-                      )}
-                      {item.key === "battery" && (
-                        <Battery
-                          className="w-5 h-5 text-slate-700 flex-shrink-0"
-                          strokeWidth={2}
-                        />
-                      )}
-                      {item.key === "backup" && (
-                        <Clock
-                          className="w-5 h-5 text-slate-700 flex-shrink-0"
-                          strokeWidth={2}
-                        />
-                      )}
-                      {item.key === "body" && (
-                        <Shield
-                          className="w-5 h-5 text-slate-700 flex-shrink-0"
-                          strokeWidth={2}
-                        />
-                      )}
-                      {item.key === "protection" && (
-                        <ShieldCheck
-                          className="w-5 h-5 text-slate-750 flex-shrink-0"
-                          strokeWidth={2}
-                        />
-                      )}
-                      <span className="text-slate-850 leading-tight font-medium">
-                        {item.value}
-                      </span>
-                    </li>
-                  ))}
+                  {highlightsList.map((item, idx) => {
+                    const iconsArray = item.icons || [];
+                    return (
+                      <li key={idx} className="flex items-center gap-3">
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          {iconsArray.map((iconName: string, iconIdx: number) => {
+                            const IconComponent = (LucideIcons as any)[iconName] || LucideIcons.Check;
+                            return (
+                              <IconComponent
+                                key={iconIdx}
+                                className="w-5 h-5 text-slate-705"
+                                strokeWidth={2}
+                              />
+                            );
+                          })}
+                        </div>
+                        <span className="text-slate-850 leading-tight font-medium">
+                          {item.text}
+                        </span>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             )}
@@ -1097,103 +1192,40 @@ export default function ProductDetails({
               </h3>
             </div>
 
-            {filteredFeatures.length > 0 || filteredSpecs.length > 0 ? (
+            {featuresList.length > 0 || specsList.length > 0 ? (
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5">
                 {/* Features */}
-                {filteredFeatures.map((feat, idx) => {
-                  const { title, desc } = getFormattedHighlight(feat);
-                  if (!title) return null;
-
-                  // Keyword mapping for Lucide icons
-                  const isLED =
-                    title.toLowerCase().includes("led") ||
-                    title.toLowerCase().includes("smd") ||
-                    title.toLowerCase().includes("light") ||
-                    title.toLowerCase().includes("bulb");
-                  const isRange =
-                    title.toLowerCase().includes("beam") ||
-                    title.toLowerCase().includes("range") ||
-                    title.toLowerCase().includes("spot") ||
-                    title.toLowerCase().includes("reflector");
-                  const isBattery =
-                    title.toLowerCase().includes("battery") ||
-                    title.toLowerCase().includes("mah") ||
-                    title.toLowerCase().includes("recharge");
-                  const isModes =
-                    title.toLowerCase().includes("mode") ||
-                    title.toLowerCase().includes("strobe") ||
-                    title.toLowerCase().includes("operate");
-                  const isBody =
-                    title.toLowerCase().includes("body") ||
-                    title.toLowerCase().includes("abs") ||
-                    title.toLowerCase().includes("durable") ||
-                    title.toLowerCase().includes("rugged") ||
-                    title.toLowerCase().includes("material") ||
-                    title.toLowerCase().includes("metal") ||
-                    title.toLowerCase().includes("aluminium");
-                  const isProtect =
-                    title.toLowerCase().includes("protect") ||
-                    title.toLowerCase().includes("safety") ||
-                    title.toLowerCase().includes("overcharge");
+                {featuresList.map((item, idx) => {
+                  if (!item.title) return null;
+                  const iconsArray = item.icons || [];
 
                   return (
                     <li key={`feat-${idx}`} className="flex gap-4">
-                      <div className="w-8 h-8 rounded-lg bg-blue-50/50 flex-shrink-0 flex items-center justify-center">
-                        {isLED && (
-                          <Lightbulb
-                            className="w-4.5 h-4.5 text-primary"
-                            strokeWidth={2}
-                          />
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        {iconsArray.map((iconName: string, iconIdx: number) => {
+                          const IconComponent = (LucideIcons as any)[iconName] || LucideIcons.Check;
+                          return (
+                            <div key={iconIdx} className="w-8 h-8 rounded-lg bg-blue-50/50 flex items-center justify-center">
+                              <IconComponent
+                                className="w-4.5 h-4.5 text-primary"
+                                strokeWidth={2}
+                              />
+                            </div>
+                          );
+                        })}
+                        {iconsArray.length === 0 && (
+                          <div className="w-8 h-8 rounded-lg bg-blue-50/50 flex items-center justify-center">
+                            <LucideIcons.Check className="w-4.5 h-4.5 text-primary" strokeWidth={2} />
+                          </div>
                         )}
-                        {isRange && (
-                          <Navigation
-                            className="w-4.5 h-4.5 text-primary rotate-45"
-                            strokeWidth={2}
-                          />
-                        )}
-                        {isBattery && (
-                          <Battery
-                            className="w-4.5 h-4.5 text-primary"
-                            strokeWidth={2}
-                          />
-                        )}
-                        {isModes && (
-                          <Sliders
-                            className="w-4.5 h-4.5 text-primary"
-                            strokeWidth={2}
-                          />
-                        )}
-                        {isBody && (
-                          <Shield
-                            className="w-4.5 h-4.5 text-primary"
-                            strokeWidth={2}
-                          />
-                        )}
-                        {isProtect && (
-                          <ShieldCheck
-                            className="w-4.5 h-4.5 text-primary"
-                            strokeWidth={2}
-                          />
-                        )}
-                        {!isLED &&
-                          !isRange &&
-                          !isBattery &&
-                          !isModes &&
-                          !isBody &&
-                          !isProtect && (
-                            <ShieldCheck
-                              className="w-4.5 h-4.5 text-primary"
-                              strokeWidth={2.5}
-                            />
-                          )}
                       </div>
                       <div className="space-y-0.5">
                         <span className="text-sm font-bold text-dark-navy block leading-tight">
-                          {title}
+                          {item.title}
                         </span>
-                        {desc && (
+                        {item.desc && (
                           <span className="text-xs text-slate-body font-medium block leading-relaxed">
-                            {desc}
+                            {item.desc}
                           </span>
                         )}
                       </div>
@@ -1202,65 +1234,35 @@ export default function ProductDetails({
                 })}
 
                 {/* Specs */}
-                {filteredSpecs.map((spec, idx) => {
-                  const labelLower = spec.label.toLowerCase();
-                  const isLED =
-                    labelLower.includes("lighting") ||
-                    labelLower.includes("led") ||
-                    labelLower.includes("type") ||
-                    labelLower.includes("watt") ||
-                    labelLower.includes("lumen") ||
-                    labelLower.includes("bulb");
-                  const isBattery =
-                    labelLower.includes("battery") ||
-                    labelLower.includes("capacity") ||
-                    labelLower.includes("charge");
-                  const isBrand =
-                    labelLower.includes("brand") || labelLower.includes("make");
-                  const isUsage =
-                    labelLower.includes("usage") ||
-                    labelLower.includes("application");
+                {specsList.map((item, idx) => {
+                  const iconsArray = item.icons || [];
 
                   return (
                     <li key={`spec-${idx}`} className="flex gap-4">
-                      <div className="w-8 h-8 rounded-lg bg-blue-50/50 flex-shrink-0 flex items-center justify-center">
-                        {isLED && (
-                          <Lightbulb
-                            className="w-4.5 h-4.5 text-primary"
-                            strokeWidth={2}
-                          />
-                        )}
-                        {isBattery && (
-                          <Battery
-                            className="w-4.5 h-4.5 text-primary"
-                            strokeWidth={2}
-                          />
-                        )}
-                        {isBrand && (
-                          <Award
-                            className="w-4.5 h-4.5 text-primary"
-                            strokeWidth={2}
-                          />
-                        )}
-                        {isUsage && (
-                          <Sliders
-                            className="w-4.5 h-4.5 text-primary"
-                            strokeWidth={2}
-                          />
-                        )}
-                        {!isLED && !isBattery && !isBrand && !isUsage && (
-                          <ShieldCheck
-                            className="w-4.5 h-4.5 text-primary"
-                            strokeWidth={2.5}
-                          />
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        {iconsArray.map((iconName: string, iconIdx: number) => {
+                          const IconComponent = (LucideIcons as any)[iconName] || LucideIcons.Check;
+                          return (
+                            <div key={iconIdx} className="w-8 h-8 rounded-lg bg-blue-50/50 flex items-center justify-center">
+                              <IconComponent
+                                className="w-4.5 h-4.5 text-primary"
+                                strokeWidth={2}
+                              />
+                            </div>
+                          );
+                        })}
+                        {iconsArray.length === 0 && (
+                          <div className="w-8 h-8 rounded-lg bg-blue-50/50 flex items-center justify-center">
+                            <LucideIcons.Check className="w-4.5 h-4.5 text-primary" strokeWidth={2} />
+                          </div>
                         )}
                       </div>
                       <div className="space-y-0.5">
                         <span className="text-sm font-bold text-dark-navy block leading-tight">
-                          {spec.label}
+                          {item.label}
                         </span>
                         <span className="text-xs text-slate-body font-medium block leading-relaxed">
-                          {spec.label.toLowerCase().includes("color") &&
+                          {item.label.toLowerCase().includes("color") &&
                           colorsList.length > 0 ? (
                             <div className="flex gap-1.5 items-center mt-1">
                               {colorsList.map((color: string) => {
@@ -1275,7 +1277,7 @@ export default function ProductDetails({
                               })}
                             </div>
                           ) : (
-                            spec.value
+                            item.value
                           )}
                         </span>
                       </div>
@@ -1293,81 +1295,35 @@ export default function ProductDetails({
           {/* Column 3: Stacked Cards (Right) - Matching border card with drop shadow */}
           <div className="lg:col-span-3 space-y-6">
             {/* Card 1: Applications (Only render if parsed from JSON) */}
-            {applications.length > 0 && (
+            {detailedApplications.length > 0 && (
               <div className="bg-white border border-slate-100 rounded-[24px] p-5.5 shadow-[0_8px_30px_rgba(0,0,0,0.015)]">
                 <h3 className="text-xs font-bold text-dark-navy uppercase tracking-widest mb-4 pb-2 border-b border-slate-100 select-none">
                   Applications
                 </h3>
                 <ul className="space-y-3.5 text-xs text-slate-body font-semibold">
-                  {applications.map((app, idx) => {
-                    const lower = app.toLowerCase();
-                    const isIndustrial =
-                      lower.includes("industrial") ||
-                      lower.includes("factory") ||
-                      lower.includes("mining") ||
-                      lower.includes("farming") ||
-                      lower.includes("agriculture");
-                    const isSecurity =
-                      lower.includes("security") ||
-                      lower.includes("patrol") ||
-                      lower.includes("signal") ||
-                      lower.includes("railway");
-                    const isAutomotive =
-                      lower.includes("auto") || lower.includes("car");
-                    const isOutdoor =
-                      lower.includes("outdoor") ||
-                      lower.includes("camp") ||
-                      lower.includes("trek");
-                    const isHome =
-                      lower.includes("home") ||
-                      lower.includes("emergen") ||
-                      lower.includes("house");
-
+                  {detailedApplications.map((item, idx) => {
+                    const iconsArray = item.icons || [];
                     return (
                       <li key={idx} className="flex items-center gap-3">
-                        <div className="w-5.5 h-5.5 rounded bg-blue-50/50 flex items-center justify-center flex-shrink-0">
-                          {isIndustrial && (
-                            <Factory
-                              className="w-3.5 h-3.5 text-primary"
-                              strokeWidth={2}
-                            />
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          {iconsArray.map((iconName: string, iconIdx: number) => {
+                            const IconComponent = (LucideIcons as any)[iconName] || LucideIcons.Shield;
+                            return (
+                              <div key={iconIdx} className="w-5.5 h-5.5 rounded bg-blue-50/50 flex items-center justify-center">
+                                <IconComponent
+                                  className="w-3.5 h-3.5 text-primary"
+                                  strokeWidth={2}
+                                />
+                              </div>
+                            );
+                          })}
+                          {iconsArray.length === 0 && (
+                            <div className="w-5.5 h-5.5 rounded bg-blue-50/50 flex items-center justify-center">
+                              <LucideIcons.Shield className="w-3.5 h-3.5 text-primary" strokeWidth={2} />
+                            </div>
                           )}
-                          {isSecurity && (
-                            <Shield
-                              className="w-3.5 h-3.5 text-primary"
-                              strokeWidth={2}
-                            />
-                          )}
-                          {isAutomotive && (
-                            <Car
-                              className="w-3.5 h-3.5 text-primary"
-                              strokeWidth={2}
-                            />
-                          )}
-                          {isOutdoor && (
-                            <Tent
-                              className="w-3.5 h-3.5 text-primary"
-                              strokeWidth={2}
-                            />
-                          )}
-                          {isHome && (
-                            <Home
-                              className="w-3.5 h-3.5 text-primary"
-                              strokeWidth={2}
-                            />
-                          )}
-                          {!isIndustrial &&
-                            !isSecurity &&
-                            !isAutomotive &&
-                            !isOutdoor &&
-                            !isHome && (
-                              <Shield
-                                className="w-3.5 h-3.5 text-primary"
-                                strokeWidth={2}
-                              />
-                            )}
                         </div>
-                        <span className="capitalize">{app}</span>
+                        <span className="capitalize">{item.text}</span>
                       </li>
                     );
                   })}
@@ -1375,66 +1331,36 @@ export default function ProductDetails({
               </div>
             )}
 
-            {/* Card 2: What's in the Box (Only render if parsed from JSON features) */}
-            {whatsInTheBox.length > 0 && (
+            {/* Card 2: What's in the Box */}
+            {detailedInBox.length > 0 && (
               <div className="bg-white border border-slate-100 rounded-[24px] p-5.5 shadow-[0_8px_30px_rgba(0,0,0,0.015)]">
                 <h3 className="text-xs font-bold text-dark-navy uppercase tracking-widest mb-4 pb-2 border-b border-slate-100 select-none">
                   What's in the Box
                 </h3>
                 <ul className="space-y-3.5 text-xs text-slate-body font-semibold">
-                  {whatsInTheBox.map((boxItem, idx) => {
-                    const lower = boxItem.toLowerCase();
-                    const isTorch =
-                      lower.includes("rising") ||
-                      lower.includes("torch") ||
-                      lower.includes("lantern") ||
-                      lower.includes("headlamp") ||
-                      lower.includes("lamp");
-                    const isCable =
-                      lower.includes("cable") ||
-                      lower.includes("usb") ||
-                      lower.includes("wire");
-                    const isStrap =
-                      lower.includes("strap") ||
-                      lower.includes("belt") ||
-                      lower.includes("lanyard");
-                    const isBattery = lower.includes("battery");
-
+                  {detailedInBox.map((item, idx) => {
+                    const iconsArray = item.icons || [];
                     return (
                       <li key={idx} className="flex items-center gap-3">
-                        <div className="w-5.5 h-5.5 rounded bg-amber-50/50 flex items-center justify-center flex-shrink-0">
-                          {isTorch && (
-                            <Package
-                              className="w-3.5 h-3.5 text-accent"
-                              strokeWidth={2}
-                            />
-                          )}
-                          {isCable && (
-                            <Usb
-                              className="w-3.5 h-3.5 text-accent"
-                              strokeWidth={2}
-                            />
-                          )}
-                          {isStrap && (
-                            <Bookmark
-                              className="w-3.5 h-3.5 text-accent"
-                              strokeWidth={2}
-                            />
-                          )}
-                          {isBattery && (
-                            <Battery
-                              className="w-3.5 h-3.5 text-accent"
-                              strokeWidth={2}
-                            />
-                          )}
-                          {!isTorch && !isCable && !isStrap && !isBattery && (
-                            <Package
-                              className="w-3.5 h-3.5 text-accent"
-                              strokeWidth={2}
-                            />
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          {iconsArray.map((iconName: string, iconIdx: number) => {
+                            const IconComponent = (LucideIcons as any)[iconName] || LucideIcons.Package;
+                            return (
+                              <div key={iconIdx} className="w-5.5 h-5.5 rounded bg-amber-50/50 flex items-center justify-center">
+                                <IconComponent
+                                  className="w-3.5 h-3.5 text-accent"
+                                  strokeWidth={2}
+                                />
+                              </div>
+                            );
+                          })}
+                          {iconsArray.length === 0 && (
+                            <div className="w-5.5 h-5.5 rounded bg-amber-50/50 flex items-center justify-center">
+                              <LucideIcons.Package className="w-3.5 h-3.5 text-accent" strokeWidth={2} />
+                            </div>
                           )}
                         </div>
-                        <span>{boxItem}</span>
+                        <span>{item.text}</span>
                       </li>
                     );
                   })}

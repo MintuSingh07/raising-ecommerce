@@ -3,17 +3,33 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
-const slides = [
-  { id: 1, image: "/banner-1.png" },
-  { id: 2, image: "/banner-2.png" },
-  { id: 3, image: "/banner-3.png" },
-];
-
 export default function Hero() {
+  const [slides, setSlides] = useState<any[]>([
+    { id: 1, image: "/banner-1.png" },
+    { id: 2, image: "/banner-2.png" },
+    { id: 3, image: "/banner-3.png" },
+  ]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [startX, setStartX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
+
+  useEffect(() => {
+    async function loadBanners() {
+      try {
+        const res = await fetch("/api/public/banners");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            setSlides(data);
+          }
+        }
+      } catch (err) {
+        console.error("Error loading banners:", err);
+      }
+    }
+    loadBanners();
+  }, []);
 
   // Auto-play slides (paused when dragging)
   useEffect(() => {

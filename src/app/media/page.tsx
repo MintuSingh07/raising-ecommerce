@@ -112,9 +112,38 @@ function SectionLabel({ text, count }: { text: string; count?: number }) {
   );
 }
 
+import { useEffect } from "react";
+
 // ─── Page ─────────────────────────────────────────────────────────────────
 export default function MediaPage() {
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
+  const [blogsList, setBlogsList] = useState<any[]>([]);
+  const [videosList, setVideosList] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [bRes, vRes] = await Promise.all([
+          fetch("/api/public/blogs"),
+          fetch("/api/public/media"),
+        ]);
+        if (bRes.ok) {
+          const bData = await bRes.json();
+          setBlogsList(bData);
+        }
+        if (vRes.ok) {
+          const vData = await vRes.json();
+          setVideosList(vData);
+        }
+      } catch (err) {
+        console.error("Error fetching media data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadData();
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-white font-sans">
@@ -153,109 +182,133 @@ export default function MediaPage() {
           </div>
 
           {/* ── BLOGS ────────────────────────────────────────────────────── */}
-          <SectionLabel text="Blog" count={blogs.length} />
+          <SectionLabel text="Blog" count={isLoading ? undefined : blogsList.length} />
 
           {/* Blog cards grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
-            {blogs.map((blog, idx) => (
-              <Link
-                key={idx}
-                href={`/media/blog/${blog.slug}`}
-                className="group flex flex-col rounded-[28px] overflow-hidden bg-white border border-slate-100/80 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_48px_rgba(0,0,0,0.10)] hover:-translate-y-1.5 transition-all duration-350 cursor-pointer"
-              >
-                {/* Full-bleed image with gradient scrim */}
-                <div className={`relative h-52 overflow-hidden bg-gradient-to-br ${blog.accent} flex-shrink-0`}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={blog.image}
-                    alt={blog.title}
-                    className="absolute inset-0 w-full h-full object-contain p-8 transition-transform duration-500 group-hover:scale-110 mix-blend-luminosity opacity-70"
-                  />
-                  {/* Bottom scrim */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="animate-pulse rounded-[28px] bg-slate-50 border border-slate-100 h-96" />
+              ))}
+            </div>
+          ) : blogsList.length === 0 ? (
+            <div className="text-center py-12 text-slate-500 text-sm mb-24">
+              No blog posts found.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
+              {blogsList.map((blog, idx) => (
+                <Link
+                  key={idx}
+                  href={`/media/blog/${blog.slug}`}
+                  className="group flex flex-col rounded-[28px] overflow-hidden bg-white border border-slate-100/80 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_48px_rgba(0,0,0,0.10)] hover:-translate-y-1.5 transition-all duration-350 cursor-pointer"
+                >
+                  {/* Full-bleed image with gradient scrim */}
+                  <div className={`relative h-52 overflow-hidden bg-gradient-to-br ${blog.accent || "from-blue-600/30 to-blue-900/60"} flex-shrink-0`}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={blog.image || "/logo.png"}
+                      alt={blog.title}
+                      className="absolute inset-0 w-full h-full object-contain p-8 transition-transform duration-500 group-hover:scale-110 mix-blend-luminosity opacity-70"
+                    />
+                    {/* Bottom scrim */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-                  {/* Category pill — floats top-left */}
-                  <span className="absolute top-4 left-4 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-white shadow-sm">
-                    {blog.category}
-                  </span>
-
-                  {/* Date — bottom-left on image */}
-                  <span className="absolute bottom-4 left-4 text-[10px] font-semibold text-white/70 tracking-wide">
-                    {blog.date}
-                  </span>
-                </div>
-
-                {/* Card body */}
-                <div className="flex flex-col flex-1 p-6 gap-3">
-                  <h3 className="text-[15px] font-bold text-slate-900 leading-snug tracking-tight group-hover:text-primary transition-colors duration-300 line-clamp-2">
-                    {blog.title}
-                  </h3>
-                  <p className="text-xs text-slate-500 leading-relaxed line-clamp-3 flex-1">
-                    {blog.excerpt}
-                  </p>
-
-                  {/* Footer row */}
-                  <div className="flex items-center justify-between pt-3 mt-auto border-t border-slate-100">
-                    <span className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
-                      <Clock className="w-3.5 h-3.5" />
-                      {blog.readTime}
+                    {/* Category pill — floats top-left */}
+                    <span className="absolute top-4 left-4 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-white shadow-sm">
+                      {blog.category}
                     </span>
-                    <span className="flex items-center gap-1 text-xs font-bold text-primary group-hover:gap-2 transition-all duration-200">
-                      Read Article
-                      <ArrowUpRight className="w-3.5 h-3.5" />
+
+                    {/* Date — bottom-left on image */}
+                    <span className="absolute bottom-4 left-4 text-[10px] font-semibold text-white/70 tracking-wide">
+                      {blog.date}
                     </span>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+
+                  {/* Card body */}
+                  <div className="flex flex-col flex-1 p-6 gap-3">
+                    <h3 className="text-[15px] font-bold text-slate-900 leading-snug tracking-tight group-hover:text-primary transition-colors duration-300 line-clamp-2">
+                      {blog.title}
+                    </h3>
+                    <p className="text-xs text-slate-500 leading-relaxed line-clamp-3 flex-1">
+                      {blog.excerpt}
+                    </p>
+
+                    {/* Footer row */}
+                    <div className="flex items-center justify-between pt-3 mt-auto border-t border-slate-100">
+                      <span className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
+                        <Clock className="w-3.5 h-3.5" />
+                        {blog.readTime}
+                      </span>
+                      <span className="flex items-center gap-1 text-xs font-bold text-primary group-hover:gap-2 transition-all duration-200">
+                        Read Article
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
 
           {/* ── VIDEOS ───────────────────────────────────────────────────── */}
-          <SectionLabel text="Videos" count={videos.length} />
+          <SectionLabel text="Videos" count={isLoading ? undefined : videosList.length} />
 
           {/* Pinterest-style Masonry Grid */}
-          <div className="columns-2 sm:columns-3 lg:columns-4 gap-4 pb-20 [column-fill:_balance]">
-            {videos.map((video, idx) => (
-              <div
-                key={video.id}
-                className={`break-inside-avoid mb-4 group relative overflow-hidden rounded-2xl bg-slate-900 border border-slate-800 shadow-md hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)] hover:-translate-y-1 transition-all duration-300 cursor-pointer ${MASONRY_HEIGHTS[idx % MASONRY_HEIGHTS.length]}`}
-                onClick={() => setActiveVideo(video.id)}
-                role="button"
-                tabIndex={0}
-                aria-label={`Play ${video.title}`}
-                onKeyDown={(e) => e.key === "Enter" && setActiveVideo(video.id)}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`}
-                  alt={video.title}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+          {isLoading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pb-20">
+              {[1, 2, 4, 3].map((i) => (
+                <div key={i} className="animate-pulse rounded-2xl bg-slate-900 border border-slate-800 h-48" />
+              ))}
+            </div>
+          ) : videosList.length === 0 ? (
+            <div className="text-center py-12 text-slate-500 text-sm pb-20">
+              No videos found.
+            </div>
+          ) : (
+            <div className="columns-2 sm:columns-3 lg:columns-4 gap-4 pb-20 [column-fill:_balance]">
+              {videosList.map((video, idx) => (
+                <div
+                  key={video.id}
+                  className={`break-inside-avoid mb-4 group relative overflow-hidden rounded-2xl bg-slate-900 border border-slate-800 shadow-md hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)] hover:-translate-y-1 transition-all duration-300 cursor-pointer ${MASONRY_HEIGHTS[idx % MASONRY_HEIGHTS.length]}`}
+                  onClick={() => setActiveVideo(video.id)}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Play ${video.title}`}
+                  onKeyDown={(e) => e.key === "Enter" && setActiveVideo(video.id)}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`}
+                    alt={video.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
-                {/* Play button */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center group-hover:bg-primary/80 group-hover:border-primary/60 transition-all duration-300 shadow-lg">
-                    <Play className="w-5 h-5 text-white fill-white translate-x-0.5" />
+                  {/* Play button */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center group-hover:bg-primary/80 group-hover:border-primary/60 transition-all duration-300 shadow-lg">
+                      <Play className="w-5 h-5 text-white fill-white translate-x-0.5" />
+                    </div>
+                  </div>
+
+                  {/* Badge */}
+                  <div className="absolute top-3 left-3">
+                    <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full bg-black/50 backdrop-blur-md text-white/80 border border-white/10">
+                      {video.category}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
+                    <p className="text-white text-xs sm:text-sm font-semibold leading-snug line-clamp-2 drop-shadow-lg">
+                      {video.title}
+                    </p>
                   </div>
                 </div>
-
-                {/* Badge */}
-                <div className="absolute top-3 left-3">
-                  <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full bg-black/50 backdrop-blur-md text-white/80 border border-white/10">
-                    {video.category}
-                  </span>
-                </div>
-
-                {/* Title */}
-                <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
-                  <p className="text-white text-xs sm:text-sm font-semibold leading-snug line-clamp-2 drop-shadow-lg">
-                    {video.title}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
         </div>
       </main>
