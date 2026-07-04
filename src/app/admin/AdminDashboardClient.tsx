@@ -554,11 +554,26 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
   const handleMediaSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setApiMessage(null);
+
+    let videoId = mediaForm.id.trim();
+    if (videoId.includes("/") || videoId.includes("youtube.com") || videoId.includes("youtu.be")) {
+      const match = videoId.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
+      if (match && match[1]) {
+        videoId = match[1];
+      } else {
+        alert("Invalid YouTube Link. Please copy-paste a valid YouTube video URL.");
+        return;
+      }
+    }
+
     try {
       const res = await fetch("/api/admin/media", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(mediaForm),
+        body: JSON.stringify({
+          ...mediaForm,
+          id: videoId,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Operation failed");
@@ -1443,16 +1458,16 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
             </div>
             <form onSubmit={handleMediaSubmit} className="p-6 space-y-4 text-sm">
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">YouTube Video ID *</label>
+                <label className="block text-xs font-bold text-slate-550 uppercase tracking-wider mb-1">YouTube Video Link *</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. umJrIUCI13c"
+                  placeholder="e.g. https://www.youtube.com/watch?v=umJrIUCI13c"
                   value={mediaForm.id}
                   onChange={(e) => setMediaForm({ ...mediaForm, id: e.target.value })}
-                  className="w-full text-base px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6] font-mono"
+                  className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6]"
                 />
-                <p className="text-[10px] text-slate-400 mt-1">This is the string of characters at the end of the YouTube video link.</p>
+                <p className="text-[10px] text-slate-400 mt-1">Paste the full YouTube URL directly. We will automatically extract the video ID.</p>
               </div>
 
               <div>
