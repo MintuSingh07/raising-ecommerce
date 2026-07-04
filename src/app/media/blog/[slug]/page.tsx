@@ -349,27 +349,38 @@ export default function BlogDetailPage({ params }: PageProps) {
 
               {/* Paragraphs body */}
               <div className="p-6 sm:p-10 space-y-8">
-                {/* Introduction Paragraph (Large) */}
-                <p className="text-base sm:text-lg text-slate-700 leading-relaxed font-semibold italic border-l-4 border-primary pl-4 py-1">
-                  {blog.intro}
-                </p>
-
-                {/* Content Sections */}
-                {blog.sections.map((sec: { heading: string; paragraphs: string[] }, idx: number) => (
-                  <div key={idx} className="space-y-4">
-                    <h2 className="text-lg sm:text-xl font-bold text-dark-navy uppercase tracking-tight">
-                      {sec.heading}
-                    </h2>
-                    {sec.paragraphs.map((p: string, pIdx: number) => (
-                      <p
-                        key={pIdx}
-                        className="text-xs sm:text-sm text-slate-body font-medium leading-relaxed"
-                      >
-                        {p}
+                {blog.htmlContent ? (
+                  <div
+                    className="prose max-w-none text-xs sm:text-sm text-slate-700 leading-relaxed font-medium space-y-4"
+                    dangerouslySetInnerHTML={{ __html: blog.htmlContent }}
+                  />
+                ) : (
+                  <>
+                    {/* Introduction Paragraph (Large) */}
+                    {blog.intro && (
+                      <p className="text-base sm:text-lg text-slate-700 leading-relaxed font-semibold italic border-l-4 border-primary pl-4 py-1">
+                        {blog.intro}
                       </p>
+                    )}
+
+                    {/* Content Sections */}
+                    {blog.sections?.map((sec: { heading: string; paragraphs: string[] }, idx: number) => (
+                      <div key={idx} className="space-y-4">
+                        <h2 className="text-lg sm:text-xl font-bold text-dark-navy uppercase tracking-tight">
+                          {sec.heading}
+                        </h2>
+                        {sec.paragraphs?.map((p: string, pIdx: number) => (
+                          <p
+                            key={pIdx}
+                            className="text-xs sm:text-sm text-slate-body font-medium leading-relaxed"
+                          >
+                            {p}
+                          </p>
+                        ))}
+                      </div>
                     ))}
-                  </div>
-                ))}
+                  </>
+                )}
 
                 {/* Article Footer Tags */}
                 <div className="pt-8 border-t border-slate-100 flex flex-wrap items-center gap-2 select-none">

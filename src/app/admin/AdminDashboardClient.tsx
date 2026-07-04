@@ -23,6 +23,16 @@ import {
   Check,
   AlertCircle,
   Loader2,
+  Bold,
+  Italic,
+  Underline,
+  List,
+  ListOrdered,
+  Link as LinkIcon,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  ChevronDown,
 } from "lucide-react";
 
 interface AdminDashboardClientProps {
@@ -37,6 +47,260 @@ interface AdminDashboardClientProps {
 }
 
 type TabType = "dashboard" | "products" | "categories" | "settings" | "blogs" | "media" | "banners";
+
+import { useRef } from "react";
+
+function RichTextEditor({ value, onChange }: { value: string; onChange: (html: string) => void }) {
+  const editorRef = useRef<HTMLDivElement>(null);
+  const isFirstMount = useRef(true);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Sync value to editor ref on load
+  useEffect(() => {
+    if (editorRef.current && isFirstMount.current) {
+      editorRef.current.innerHTML = value || "";
+      isFirstMount.current = false;
+    }
+  }, [value]);
+
+  const handleInput = () => {
+    if (editorRef.current) {
+      onChange(editorRef.current.innerHTML);
+    }
+  };
+
+  const exec = (cmd: string, val: string = "") => {
+    document.execCommand(cmd, false, val);
+    handleInput();
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+      exec("insertImage", data.url);
+    } catch (err: any) {
+      alert(`Image upload failed: ${err.message}`);
+    } finally {
+      setIsUploading(false);
+      e.target.value = ""; // Reset
+    }
+  };
+
+  const colors = [
+    { name: "Black", hex: "#000000" },
+    { name: "Gray", hex: "#64748B" },
+    { name: "Blue", hex: "#0A52D6" },
+    { name: "Green", hex: "#16A34A" },
+    { name: "Red", hex: "#EF4444" },
+  ];
+
+  return (
+    <div className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-3xs flex flex-col min-h-[400px]">
+      {/* Editor Toolbar */}
+      <div className="flex flex-wrap items-center gap-1.5 p-2.5 bg-slate-50 border-b border-slate-200 select-none">
+        
+        {/* Undo/Redo */}
+        <button
+          type="button"
+          onClick={() => exec("undo")}
+          className="p-2 px-3 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer transition"
+          title="Undo"
+        >
+          Undo
+        </button>
+        <button
+          type="button"
+          onClick={() => exec("redo")}
+          className="p-2 px-3 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer transition"
+          title="Redo"
+        >
+          Redo
+        </button>
+
+        <div className="w-px h-6 bg-slate-250 mx-1" />
+
+        {/* Text Formats */}
+        <button
+          type="button"
+          onClick={() => exec("bold")}
+          className="p-2.5 text-xs font-bold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 cursor-pointer transition"
+          title="Bold"
+        >
+          <Bold className="w-3.5 h-3.5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => exec("italic")}
+          className="p-2.5 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 cursor-pointer transition"
+          title="Italic"
+        >
+          <Italic className="w-3.5 h-3.5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => exec("underline")}
+          className="p-2.5 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 cursor-pointer transition"
+          title="Underline"
+        >
+          <Underline className="w-3.5 h-3.5" />
+        </button>
+
+        <div className="w-px h-6 bg-slate-250 mx-1" />
+
+        {/* Header Sizes */}
+        <button
+          type="button"
+          onClick={() => exec("formatBlock", "h2")}
+          className="p-2 px-3 text-xs font-extrabold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer transition"
+          title="Large Heading"
+        >
+          H2
+        </button>
+        <button
+          type="button"
+          onClick={() => exec("formatBlock", "h3")}
+          className="p-2 px-3 text-xs font-extrabold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer transition"
+          title="Sub Heading"
+        >
+          H3
+        </button>
+        <button
+          type="button"
+          onClick={() => exec("formatBlock", "p")}
+          className="p-2 px-3 text-xs font-bold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer transition"
+          title="Normal Text"
+        >
+          Paragraph
+        </button>
+
+        <div className="w-px h-6 bg-slate-250 mx-1" />
+
+        {/* Alignments */}
+        <button
+          type="button"
+          onClick={() => exec("justifyLeft")}
+          className="p-2.5 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 cursor-pointer transition"
+          title="Align Left"
+        >
+          <AlignLeft className="w-3.5 h-3.5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => exec("justifyCenter")}
+          className="p-2.5 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 cursor-pointer transition"
+          title="Align Center"
+        >
+          <AlignCenter className="w-3.5 h-3.5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => exec("justifyRight")}
+          className="p-2.5 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 cursor-pointer transition"
+          title="Align Right"
+        >
+          <AlignRight className="w-3.5 h-3.5" />
+        </button>
+
+        <div className="w-px h-6 bg-slate-250 mx-1" />
+
+        {/* Lists */}
+        <button
+          type="button"
+          onClick={() => exec("insertUnorderedList")}
+          className="p-2.5 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 cursor-pointer transition"
+          title="Bullet List"
+        >
+          <List className="w-3.5 h-3.5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => exec("insertOrderedList")}
+          className="p-2.5 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 cursor-pointer transition"
+          title="Numbered List"
+        >
+          <ListOrdered className="w-3.5 h-3.5" />
+        </button>
+
+        <div className="w-px h-6 bg-slate-250 mx-1" />
+
+        {/* Link */}
+        <button
+          type="button"
+          onClick={() => {
+            const url = prompt("Enter Link URL (e.g. https://google.com):");
+            if (url) exec("createLink", url);
+          }}
+          className="p-2 px-3 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-[#0A52D6] hover:bg-slate-50 cursor-pointer transition flex items-center gap-1"
+          title="Insert Link"
+        >
+          <LinkIcon className="w-3.5 h-3.5" /> Link
+        </button>
+
+        {/* Image Uploader */}
+        <label
+          className="p-2 px-3 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-[#16A34A] hover:bg-slate-50 cursor-pointer transition flex items-center gap-1 shadow-3xs"
+          title="Upload Image"
+        >
+          <ImageIcon className="w-3.5 h-3.5" />
+          {isUploading ? "Uploading..." : "Insert Image"}
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="hidden"
+            disabled={isUploading}
+          />
+        </label>
+
+        <div className="w-px h-6 bg-slate-250 mx-1" />
+
+        {/* Text Color Picker */}
+        <div className="flex items-center gap-1 bg-white border border-slate-200 px-2 py-1 rounded-lg">
+          <span className="text-[10px] font-extrabold uppercase text-slate-400">Color:</span>
+          {colors.map((c) => (
+            <button
+              key={c.hex}
+              type="button"
+              onClick={() => exec("foreColor", c.hex)}
+              className="w-4 h-4 rounded-full border border-slate-350 hover:scale-110 active:scale-95 transition cursor-pointer"
+              style={{ backgroundColor: c.hex }}
+              title={c.name}
+            />
+          ))}
+        </div>
+
+        {/* Clear formatting */}
+        <button
+          type="button"
+          onClick={() => exec("removeFormat")}
+          className="p-2 text-xs font-semibold rounded-lg bg-red-50 border border-red-100 text-red-600 hover:bg-red-100 cursor-pointer transition ml-auto"
+          title="Clear all text formatting"
+        >
+          Clear Style
+        </button>
+      </div>
+
+      {/* Editable Area */}
+      <div
+        ref={editorRef}
+        contentEditable
+        onInput={handleInput}
+        className="p-6 flex-1 focus:outline-none prose max-w-none text-sm bg-white overflow-y-auto leading-relaxed border-t border-slate-100 min-h-[350px]"
+        style={{ outline: "none" }}
+      />
+    </div>
+  );
+}
 
 export default function AdminDashboardClient({ user, stats: initialStats }: AdminDashboardClientProps) {
   const [activeTab, setActiveTab] = useState<TabType>("dashboard");
@@ -101,8 +365,7 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
     excerpt: "",
     image: "",
     accent: "from-blue-600/30 to-blue-900/60",
-    intro: "",
-    sections: [{ heading: "", paragraphsRaw: "" }],
+    htmlContent: "",
     author: "RISING Admin",
     authorRole: "Technical Team",
     tagsRaw: "",
@@ -255,13 +518,6 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
     const payload = {
       ...blogForm,
       tags: blogForm.tagsRaw.split(",").map(t => t.trim()).filter(Boolean),
-      content: {
-        intro: blogForm.intro,
-        sections: blogForm.sections.map(s => ({
-          heading: s.heading,
-          paragraphs: s.paragraphsRaw.split("\n").map(p => p.trim()).filter(Boolean),
-        })),
-      },
     };
 
     try {
@@ -366,20 +622,20 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
   const openBlogModal = (item?: any) => {
     setEditItem(item || null);
     if (item) {
+      const legacyHtml = item.htmlContent || (
+        (item.intro ? `<p><strong>${item.intro}</strong></p>` : "") +
+        (item.sections || []).map((s: any) => `<h2>${s.heading}</h2>${(s.paragraphs || []).map((p: string) => `<p>${p}</p>`).join("")}`).join("")
+      );
       setBlogForm({
-        slug: item.slug,
-        title: item.title,
-        category: item.category,
+        slug: item.slug || "",
+        title: item.title || "",
+        category: item.category || "Insights",
         readTime: item.readTime || "",
         date: item.date || "",
-        excerpt: item.excerpt,
-        image: item.image,
+        excerpt: item.excerpt || "",
+        image: item.image || "",
         accent: item.accent || "from-blue-600/30 to-blue-900/60",
-        intro: item.content?.intro || "",
-        sections: item.content?.sections?.map((s: any) => ({
-          heading: s.heading,
-          paragraphsRaw: (s.paragraphs || []).join("\n"),
-        })) || [{ heading: "", paragraphsRaw: "" }],
+        htmlContent: legacyHtml,
         author: item.author || "RISING Admin",
         authorRole: item.authorRole || "Technical Team",
         tagsRaw: (item.tags || []).join(", "),
@@ -394,8 +650,7 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
         excerpt: "",
         image: "",
         accent: "from-blue-600/30 to-blue-900/60",
-        intro: "",
-        sections: [{ heading: "", paragraphsRaw: "" }],
+        htmlContent: "",
         author: "RISING Admin",
         authorRole: "Technical Team",
         tagsRaw: "",
@@ -1044,218 +1299,129 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
 
       {/* Blog Post Add/Edit Modal */}
       {activeModal === "blog" && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl border border-slate-200 max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl animate-scale-in">
-            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 rounded-t-2xl">
-              <h3 className="font-extrabold text-slate-900 text-lg">{editItem ? "Edit Article" : "Write New Article"}</h3>
-              <button onClick={() => setActiveModal(null)} className="p-1 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700">
-                <X className="w-5 h-5" />
+        <div className="fixed inset-0 z-[100] bg-slate-50 overflow-y-auto flex flex-col">
+          <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col p-6 bg-white border-x border-slate-200/60 shadow-xs">
+            
+            {/* Header */}
+            <div className="pb-5 border-b border-slate-100 flex justify-between items-center bg-white">
+              <div>
+                <span className="text-xs font-bold text-[#0A52D6] uppercase tracking-wider bg-blue-50 border border-blue-100/50 px-2 py-0.5 rounded">
+                  Blog Editor
+                </span>
+                <h3 className="font-extrabold text-slate-900 text-2xl tracking-tight mt-1.5">
+                  {editItem ? "Edit Article" : "Write New Article"}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveModal(null)}
+                className="inline-flex items-center gap-1.5 px-4 py-2 border border-slate-200 text-slate-700 font-semibold rounded-lg text-sm hover:bg-slate-50 cursor-pointer shadow-3xs transition-all"
+              >
+                <X className="w-4 h-4" /> Exit Editor
               </button>
             </div>
-            <form onSubmit={handleBlogSubmit} className="p-6 overflow-y-auto space-y-4 text-sm flex-1">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Title *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Kisan Torch Revolution"
-                    value={blogForm.title}
-                    onChange={(e) => setBlogForm({ ...blogForm, title: e.target.value })}
-                    className="w-full text-base px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6] focus:ring-1 focus:ring-[#0A52D6]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Slug (URL Path) *</label>
-                  <input
-                    type="text"
-                    required
-                    disabled={!!editItem}
-                    placeholder="e.g. kisan-torch-revolution"
-                    value={blogForm.slug}
-                    onChange={(e) => setBlogForm({ ...blogForm, slug: e.target.value })}
-                    className="w-full text-base px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6] focus:ring-1 focus:ring-[#0A52D6] bg-slate-50/50 font-mono text-xs"
-                  />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Category *</label>
-                  <select
-                    value={blogForm.category}
-                    onChange={(e) => setBlogForm({ ...blogForm, category: e.target.value })}
-                    className="w-full text-base px-3 py-2 border border-slate-200 rounded-lg bg-white"
-                  >
-                    <option value="Insights">Insights</option>
-                    <option value="Story">Story</option>
-                    <option value="Product">Product</option>
-                    <option value="Guide">Guide</option>
-                    <option value="Brand">Brand</option>
-                  </select>
+            <form onSubmit={handleBlogSubmit} className="py-6 space-y-6 flex-1 flex flex-col justify-between">
+              <div className="space-y-6">
+                
+                {/* Title & Category */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider mb-1">Title *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Why Rechargeable Flashlights Are the Future"
+                      value={blogForm.title}
+                      onChange={(e) => setBlogForm({ ...blogForm, title: e.target.value })}
+                      className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6] focus:ring-1 focus:ring-[#0A52D6] bg-slate-50/20 font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider mb-1">Category *</label>
+                    <select
+                      value={blogForm.category}
+                      onChange={(e) => setBlogForm({ ...blogForm, category: e.target.value })}
+                      className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:border-[#0A52D6] font-bold"
+                    >
+                      <option value="Insights">Insights</option>
+                      <option value="Story">Story</option>
+                      <option value="Product">Product</option>
+                      <option value="Guide">Guide</option>
+                      <option value="Brand">Brand</option>
+                    </select>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Read Time *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. 4 min read"
-                    value={blogForm.readTime}
-                    onChange={(e) => setBlogForm({ ...blogForm, readTime: e.target.value })}
-                    className="w-full text-base px-3 py-2 border border-slate-200 rounded-lg"
-                  />
-                </div>
-              </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Excerpt (Summary) *</label>
-                <textarea
-                  rows={2}
-                  required
-                  placeholder="Brief summary shown on media list card..."
-                  value={blogForm.excerpt}
-                  onChange={(e) => setBlogForm({ ...blogForm, excerpt: e.target.value })}
-                  className="w-full text-base px-3 py-2 border border-slate-200 rounded-lg"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Featured Cover Image Upload */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Image URL</label>
-                  <input
-                    type="text"
-                    placeholder="/product_torch.png"
-                    value={blogForm.image}
-                    onChange={(e) => setBlogForm({ ...blogForm, image: e.target.value })}
-                    className="w-full text-base px-3 py-2 border border-slate-200 rounded-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Accent CSS (Gradient Scrim)</label>
-                  <input
-                    type="text"
-                    placeholder="from-blue-600/30 to-blue-900/60"
-                    value={blogForm.accent}
-                    onChange={(e) => setBlogForm({ ...blogForm, accent: e.target.value })}
-                    className="w-full text-base px-3 py-2 border border-slate-200 rounded-lg font-mono text-xs"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div>
-                  <label className="block font-bold text-slate-500 uppercase tracking-wider mb-1">Author Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={blogForm.author}
-                    onChange={(e) => setBlogForm({ ...blogForm, author: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-slate-500 uppercase tracking-wider mb-1">Author Role *</label>
-                  <input
-                    type="text"
-                    required
-                    value={blogForm.authorRole}
-                    onChange={(e) => setBlogForm({ ...blogForm, authorRole: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Tags (Comma Separated)</label>
-                <input
-                  type="text"
-                  placeholder="LED Technology, Rural Work, Guide"
-                  value={blogForm.tagsRaw}
-                  onChange={(e) => setBlogForm({ ...blogForm, tagsRaw: e.target.value })}
-                  className="w-full text-base px-3 py-2 border border-slate-200 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Introduction Paragraph *</label>
-                <textarea
-                  rows={3}
-                  required
-                  placeholder="Full intro paragraph details..."
-                  value={blogForm.intro}
-                  onChange={(e) => setBlogForm({ ...blogForm, intro: e.target.value })}
-                  className="w-full text-base px-3 py-2 border border-slate-200 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Sub-sections</label>
-                  <button
-                    type="button"
-                    onClick={() => setBlogForm({ ...blogForm, sections: [...blogForm.sections, { heading: "", paragraphsRaw: "" }] })}
-                    className="text-xs text-[#0A52D6] hover:underline font-bold flex items-center gap-0.5"
-                  >
-                    <Plus className="w-3.5 h-3.5" /> Add Section
-                  </button>
-                </div>
-                <div className="space-y-4 max-h-[160px] overflow-y-auto pr-1">
-                  {blogForm.sections.map((sec, idx) => (
-                    <div key={idx} className="border border-slate-100 rounded-xl p-3 bg-slate-50/50 space-y-2 relative">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const updated = blogForm.sections.filter((_, i) => i !== idx);
-                          setBlogForm({ ...blogForm, sections: updated.length > 0 ? updated : [{ heading: "", paragraphsRaw: "" }] });
+                  <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider mb-1">Featured Cover Image *</label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="text"
+                      required
+                      placeholder="Upload cover image or enter URL..."
+                      value={blogForm.image}
+                      onChange={(e) => setBlogForm({ ...blogForm, image: e.target.value })}
+                      className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6] bg-slate-50/20 font-semibold"
+                    />
+                    <label className="shrink-0 px-4 py-2 border border-slate-250 hover:border-slate-350 text-slate-700 bg-slate-50 hover:bg-slate-100 font-semibold rounded-lg text-sm transition-all shadow-3xs cursor-pointer select-none">
+                      Upload Image
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          try {
+                            const formData = new FormData();
+                            formData.append("file", file);
+                            const res = await fetch("/api/admin/upload", {
+                              method: "POST",
+                              body: formData,
+                            });
+                            const data = await res.json();
+                            if (!res.ok) throw new Error(data.error || "Upload failed");
+                            setBlogForm({ ...blogForm, image: data.url });
+                          } catch (err: any) {
+                            alert(`Upload failed: ${err.message}`);
+                          }
                         }}
-                        className="absolute top-2 right-2 text-red-500 p-1 hover:bg-red-50 rounded"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                      <div>
-                        <input
-                          type="text"
-                          required
-                          placeholder="Heading (e.g. 1. Technical Savings)"
-                          value={sec.heading}
-                          onChange={(e) => {
-                            const updated = [...blogForm.sections];
-                            updated[idx].heading = e.target.value;
-                            setBlogForm({ ...blogForm, sections: updated });
-                          }}
-                          className="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-xs"
-                        />
-                      </div>
-                      <div>
-                        <textarea
-                          rows={2}
-                          required
-                          placeholder="Paragraph content (Use enter/new line for multiple paragraphs)"
-                          value={sec.paragraphsRaw}
-                          onChange={(e) => {
-                            const updated = [...blogForm.sections];
-                            updated[idx].paragraphsRaw = e.target.value;
-                            setBlogForm({ ...blogForm, sections: updated });
-                          }}
-                          className="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-xs"
-                        />
-                      </div>
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                  {blogForm.image && (
+                    <div className="mt-2.5 p-2 bg-slate-50 rounded-xl border border-slate-200 max-w-[200px] relative group">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={blogForm.image} alt="Preview" className="rounded-lg object-contain w-full max-h-[120px] bg-white border border-slate-100" />
                     </div>
-                  ))}
+                  )}
                 </div>
+
+                {/* Rich Content Editor */}
+                <div>
+                  <label className="block text-sm font-extrabold text-slate-555 uppercase tracking-wider mb-1.5">Article Content *</label>
+                  <RichTextEditor
+                    value={blogForm.htmlContent}
+                    onChange={(html) => setBlogForm({ ...blogForm, htmlContent: html })}
+                  />
+                </div>
+
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex justify-end gap-2">
+              {/* Actions Footer */}
+              <div className="pt-6 border-t border-slate-200 flex justify-between items-center mt-8">
                 <button
                   type="button"
                   onClick={() => setActiveModal(null)}
-                  className="px-4 py-2 border border-slate-200 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 cursor-pointer"
+                  className="px-5 py-2.5 border border-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 cursor-pointer text-sm shadow-3xs transition-all"
                 >
-                  Cancel
+                  Cancel & Exit
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#0A52D6] hover:bg-[#0B4294] text-white font-semibold rounded-lg shadow-xs cursor-pointer"
+                  className="px-8 py-2.5 bg-[#0A52D6] hover:bg-[#0B4294] text-white font-semibold rounded-xl shadow-xs cursor-pointer text-sm transition-all font-bold"
                 >
                   {editItem ? "Save Changes" : "Publish Article"}
                 </button>

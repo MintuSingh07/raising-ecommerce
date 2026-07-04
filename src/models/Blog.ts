@@ -9,13 +9,17 @@ const BlogSchema = new mongoose.Schema({
   excerpt: { type: String, required: true, trim: true },
   image: { type: String },
   accent: { type: String, default: "from-blue-600/30 to-blue-900/60" },
-  intro: { type: String, required: true },
-  sections: [
-    {
-      heading: { type: String, required: true },
-      paragraphs: [{ type: String }],
-    },
-  ],
+  intro: { type: String, default: "" },
+  sections: {
+    type: [
+      {
+        heading: { type: String },
+        paragraphs: [{ type: String }],
+      },
+    ],
+    default: [],
+  },
+  htmlContent: { type: String, default: "" },
   author: { type: String, required: true, default: "RISING Admin" },
   authorRole: { type: String, required: true, default: "Technical Team" },
   tags: [{ type: String }],
