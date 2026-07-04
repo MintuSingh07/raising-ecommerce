@@ -19,6 +19,24 @@ interface Category {
   label: string;
 }
 
+const DEFAULT_CATEGORIES: Category[] = [
+  { id: "rechargeable-led-flashlight", label: "Rechargeable LED Flash Light" },
+  { id: "kisan-torch", label: "Kisan Torch" },
+  { id: "metal-flashlights", label: "Metal Flash Lights" },
+  { id: "led-headlamp", label: "LED Headlamp" },
+  { id: "led-table-lamp", label: "LED Table Lamp" },
+  { id: "solar-lantern-searchlight", label: "Solar Lantern and Search Light" },
+  { id: "led-lantern", label: "LED Lantern" },
+  { id: "led-usb-lamp", label: "LED USB Lamp" },
+  { id: "solar-energy-kit", label: "Solar Energy Kit" },
+  { id: "power-extension-board", label: "Power Extension Board" },
+  { id: "village-remote", label: "Village & Remote" },
+  { id: "corporate-gifting", label: "Corporate Gifting" },
+  { id: "defense-security", label: "Defense & Security" },
+  { id: "farming-fields", label: "Farming & Fields" },
+  { id: "industrial-yards", label: "Industrial Yards" },
+];
+
 const PREDEFINED_COLORS = [
   { name: "Black", hex: "#1E293B" },
   { name: "Yellow", hex: "#EAB308" },
@@ -258,6 +276,8 @@ function ProductFormContent() {
   const [expandedColor, setExpandedColor] = useState<string | null>(null);
   const [uploadingColor, setUploadingColor] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [isCatDropdownOpen, setIsCatDropdownOpen] = useState(false);
+  const [catSearchQuery, setCatSearchQuery] = useState("");
 
   // Form state matching public/products_structured.json and mongoose model
   const [productForm, setProductForm] = useState({
@@ -265,12 +285,14 @@ function ProductFormContent() {
     name: "",
     subtitle: "",
     category: "",
+    categories: [] as string[],
     badge: "",
     featured: false,
     rating: "5",
     reviewCount: "12",
     image: "",
     datasheetUrl: "",
+    video: "",
     description: "",
     highlights: [] as { text: string; icons: string[] }[],
     productFeatures: [] as { label: string; detail: string; icons: string[] }[],
@@ -310,7 +332,7 @@ function ProductFormContent() {
           const catData = await catRes.json();
           setCategories(catData);
           if (catData.length > 0 && !editId) {
-            setProductForm((prev) => ({ ...prev, category: catData[0].id }));
+            setProductForm((prev) => ({ ...prev, category: catData[0].id, categories: [catData[0].id] }));
           }
         }
 
@@ -325,13 +347,15 @@ function ProductFormContent() {
                 id: item.id,
                 name: item.name,
                 subtitle: item.subtitle || "",
-                category: item.category,
+                category: item.category || "",
+                categories: item.categories || (item.category ? [item.category] : []),
                 badge: item.badge || "",
                 featured: !!item.featured,
                 rating: String(item.rating ?? 5),
                 reviewCount: String(item.reviewCount ?? 12),
                 image: item.image || "",
                 datasheetUrl: item.datasheetUrl || "",
+                video: item.video || "",
                 description: item.description || "",
                 highlights: (item.highlights || []).map((h: any) => {
                   if (typeof h === "string") {
@@ -389,7 +413,8 @@ function ProductFormContent() {
       id: productForm.id,
       name: productForm.name,
       subtitle: productForm.subtitle,
-      category: productForm.category,
+      category: productForm.categories[0] || productForm.category || "",
+      categories: productForm.categories.length > 0 ? productForm.categories : (productForm.category ? [productForm.category] : []),
       badge: productForm.badge,
       featured: productForm.featured,
       rating: Number(productForm.rating) || 5,
@@ -397,6 +422,7 @@ function ProductFormContent() {
       image: productForm.image || (productForm.colors[0]?.image || ""),
       gallery: productForm.colors.flatMap((c) => c.gallery || []),
       datasheetUrl: productForm.datasheetUrl,
+      video: productForm.video,
       description: productForm.description,
       highlights: productForm.highlights.filter((h) => h.text.trim()),
       productFeatures: productForm.productFeatures.filter((f) => f.label.trim() && f.detail.trim()),
@@ -483,15 +509,15 @@ function ProductFormContent() {
               <div className="space-y-6">
                 <div className="bg-slate-50/50 border border-slate-100 rounded-2xl p-5 space-y-4">
                   <div className="border-b border-slate-200/60 pb-2">
-                    <h4 className="text-xs font-extrabold text-[#0A52D6] uppercase tracking-widest flex items-center gap-2">
+                    <h4 className="text-sm font-extrabold text-[#0A52D6] uppercase tracking-widest flex items-center gap-2">
                       <span className="w-5 h-px bg-[#0A52D6]" /> 1. Product Basics
                     </h4>
-                    <p className="text-[11px] text-slate-400 mt-0.5">Identify this product, name it, and upload its main cover photo.</p>
+                    <p className="text-xs text-slate-400 mt-0.5">Identify this product, name it, and upload its main cover photo.</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">SKU / Model Code *</label>
+                      <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider mb-1">SKU / Model Code *</label>
                       <input
                         type="text"
                         required
@@ -499,48 +525,165 @@ function ProductFormContent() {
                         placeholder="e.g. RT-4002"
                         value={productForm.id}
                         onChange={(e) => setProductForm({ ...productForm, id: e.target.value })}
-                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6] disabled:bg-slate-100 font-mono text-xs bg-white font-bold"
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6] disabled:bg-slate-100 font-mono text-sm bg-white font-bold"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Product Name *</label>
+                      <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider mb-1">Product Name *</label>
                       <input
                         type="text"
                         required
                         placeholder="e.g. Toofan"
                         value={productForm.name}
                         onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6] bg-white text-xs font-bold"
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6] bg-white text-sm font-bold"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Subtitle / Short Tagline</label>
+                    <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider mb-1">Subtitle / Short Tagline</label>
                     <input
                       type="text"
                       placeholder="e.g. 8000 mAh Rechargeable Li-ion battery, 10 W power, LED lamp"
                       value={productForm.subtitle}
                       onChange={(e) => setProductForm({ ...productForm, subtitle: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6] bg-white text-xs"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6] bg-white text-sm"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Category *</label>
-                      <select
-                        required
-                        value={productForm.category}
-                        onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
-                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6] bg-white text-xs font-bold"
-                      >
-                        {categories.map((cat) => (
-                          <option key={cat.id} value={cat.id}>
-                            {cat.label}
-                          </option>
-                        ))}
-                      </select>
+                      <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider mb-1">Categories *</label>
+                      <div className="relative">
+                        {(() => {
+                          const activeCategories = categories && categories.length > 0 ? categories : DEFAULT_CATEGORIES;
+                          return (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => setIsCatDropdownOpen(!isCatDropdownOpen)}
+                                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-left bg-white text-sm font-bold flex items-center justify-between gap-1.5 focus:outline-none focus:border-[#0A52D6] shadow-3xs"
+                              >
+                                <span className="truncate">
+                                  {productForm.categories && productForm.categories.length > 0
+                                    ? productForm.categories
+                                        .map((slug) => activeCategories.find((c) => c.id === slug)?.label || slug)
+                                        .join(", ")
+                                    : "Select Categories..."}
+                                </span>
+                                <LucideIcons.ChevronDown className="w-4 h-4 text-slate-500 shrink-0" />
+                              </button>
+
+                              {isCatDropdownOpen && (
+                                <>
+                                  <div className="fixed inset-0 z-40" onClick={() => setIsCatDropdownOpen(false)} />
+                                  <div className="absolute left-0 right-0 z-50 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-lg p-2.5 space-y-2 max-h-64 overflow-y-auto">
+                                    <div className="flex items-center gap-1.5 px-2 py-1.5 bg-slate-50 rounded-lg border border-slate-100">
+                                      <LucideIcons.Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                      <input
+                                        type="text"
+                                        placeholder="Search categories..."
+                                        value={catSearchQuery}
+                                        onChange={(e) => setCatSearchQuery(e.target.value)}
+                                        className="w-full bg-transparent text-xs focus:outline-none text-slate-700"
+                                      />
+                                      {catSearchQuery && (
+                                        <button type="button" onClick={() => setCatSearchQuery("")} className="text-slate-450 hover:text-slate-600">
+                                          <LucideIcons.X className="w-3 h-3" />
+                                        </button>
+                                      )}
+                                    </div>
+
+                                    <div className="space-y-1">
+                                      {(() => {
+                                        const filtered = activeCategories.filter((cat) =>
+                                          cat.label.toLowerCase().includes(catSearchQuery.toLowerCase())
+                                        );
+
+                                        const productTypeCategories = filtered.filter((cat) =>
+                                          [
+                                            "rechargeable-led-flashlight",
+                                            "kisan-torch",
+                                            "metal-flashlights",
+                                            "led-headlamp",
+                                            "led-table-lamp",
+                                            "solar-lantern-searchlight",
+                                            "led-lantern",
+                                            "led-usb-lamp",
+                                            "solar-energy-kit",
+                                            "power-extension-board"
+                                          ].includes(cat.id)
+                                        );
+
+                                        const applicationCategories = filtered.filter((cat) =>
+                                          [
+                                            "village-remote",
+                                            "corporate-gifting",
+                                            "defense-security",
+                                            "farming-fields",
+                                            "industrial-yards"
+                                          ].includes(cat.id)
+                                        );
+
+                                        const otherCategories = filtered.filter((cat) =>
+                                          !productTypeCategories.some((c) => c.id === cat.id) &&
+                                          !applicationCategories.some((c) => c.id === cat.id)
+                                        );
+
+                                        const renderGroup = (title: string, items: typeof activeCategories) => {
+                                          if (items.length === 0) return null;
+                                          return (
+                                            <div className="space-y-1 pt-1.5 first:pt-0">
+                                              <div className="text-[10px] font-extrabold text-[#0A52D6] uppercase tracking-wider px-2 py-0.5 bg-blue-50/50 rounded-sm mb-1">
+                                                {title}
+                                              </div>
+                                              {items.map((cat) => {
+                                                const isChecked = productForm.categories?.includes(cat.id);
+                                                return (
+                                                  <label
+                                                    key={cat.id}
+                                                    className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-slate-50 cursor-pointer select-none text-xs font-semibold text-slate-700"
+                                                  >
+                                                    <input
+                                                      type="checkbox"
+                                                      checked={isChecked}
+                                                      onChange={() => {
+                                                        const updated = isChecked
+                                                          ? (productForm.categories || []).filter((id) => id !== cat.id)
+                                                          : [...(productForm.categories || []), cat.id];
+                                                        setProductForm({
+                                                          ...productForm,
+                                                          categories: updated,
+                                                          category: updated[0] || "",
+                                                        });
+                                                      }}
+                                                      className="rounded border-slate-350 text-[#0A52D6] focus:ring-[#0A52D6]"
+                                                    />
+                                                    <span>{cat.label}</span>
+                                                  </label>
+                                                );
+                                              })}
+                                            </div>
+                                          );
+                                        };
+
+                                        return (
+                                          <div className="space-y-3">
+                                            {renderGroup("Product Types", productTypeCategories)}
+                                            {renderGroup("Applications & Target Uses", applicationCategories)}
+                                            {renderGroup("Other Categories", otherCategories)}
+                                          </div>
+                                        );
+                                      })()}
+                                    </div>
+                                  </div>
+                                </>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </div>
                     </div>
 
                     <label className="flex items-center gap-2 cursor-pointer select-none pb-1 mt-6">
@@ -556,20 +699,20 @@ function ProductFormContent() {
                           }`}
                         />
                       </div>
-                      <span className="text-xs font-bold text-slate-600">Featured</span>
+                      <span className="text-sm font-bold text-slate-600">Featured</span>
                     </label>
                   </div>
 
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Product Datasheet PDF</label>
+                    <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider mb-1">Product Datasheet PDF</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
                         placeholder="Or enter PDF URL here..."
                         value={productForm.datasheetUrl}
                         onChange={(e) => setProductForm({ ...productForm, datasheetUrl: e.target.value })}
-                        className="flex-1 w-full px-3 py-2 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none focus:border-[#0A52D6]"
+                        className="flex-1 w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-[#0A52D6]"
                       />
                       <input
                         type="file"
@@ -603,14 +746,57 @@ function ProductFormContent() {
                         </label>
                       </div>
                     </div>
+
+                  <div>
+                    <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider mb-1">Product Video</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        placeholder="Or enter Video URL here..."
+                        value={productForm.video}
+                        onChange={(e) => setProductForm({ ...productForm, video: e.target.value })}
+                        className="flex-1 w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-[#0A52D6]"
+                      />
+                      <input
+                        type="file"
+                        accept="video/*"
+                        id="video-upload"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          setUploadingColor("video");
+                          try {
+                            const url = await uploadFile(file);
+                            setProductForm({ ...productForm, video: url });
+                          } catch (err: any) {
+                            alert(err.message);
+                          } finally {
+                            setUploadingColor(null);
+                          }
+                        }}
+                      />
+                      <label
+                        htmlFor="video-upload"
+                        className="px-3 py-2 border border-slate-200 text-slate-600 font-bold rounded-lg text-xs bg-slate-50 hover:bg-slate-100 cursor-pointer shrink-0 transition-colors flex items-center gap-1 shadow-2xs"
+                      >
+                        {uploadingColor === "video" ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-[#0A52D6]" />
+                        ) : (
+                          <Plus className="w-3.5 h-3.5" />
+                        )}
+                        Upload Video
+                      </label>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="bg-slate-50/50 border border-slate-100 rounded-2xl p-5 space-y-4">
                   <div className="border-b border-slate-200/60 pb-2">
-                    <h4 className="text-xs font-extrabold text-[#0A52D6] uppercase tracking-widest flex items-center gap-2">
+                    <h4 className="text-sm font-extrabold text-[#0A52D6] uppercase tracking-widest flex items-center gap-2">
                       <span className="w-5 h-px bg-[#0A52D6]" /> 2. Colors & Images
                     </h4>
-                    <p className="text-[11px] text-slate-400 mt-0.5">Select the active colors and upload matching product photos for each.</p>
+                    <p className="text-xs text-slate-400 mt-0.5">Select the active colors and upload matching product photos for each.</p>
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
@@ -633,7 +819,7 @@ function ProductFormContent() {
                             }
                             setProductForm({ ...productForm, colors: updated });
                           }}
-                          className={`flex items-center gap-2.5 p-3 rounded-xl border text-left transition-all ${
+                          className={`flex items-center gap-2 px-2.5 py-2.5 rounded-xl border text-left transition-all ${
                             isEnabled
                               ? "border-[#0A52D6] bg-blue-50/40 shadow-xs"
                               : "border-slate-200 bg-white hover:border-slate-300"
@@ -643,9 +829,9 @@ function ProductFormContent() {
                             className="w-5 h-5 rounded-full border border-slate-200/50 shrink-0 shadow-2xs"
                             style={{ backgroundColor: col.hex }}
                           />
-                          <div className="overflow-hidden">
-                            <p className="text-xs font-bold text-slate-900 leading-tight">{col.name}</p>
-                          </div>
+                          <span className="text-sm font-bold text-slate-900 leading-none whitespace-nowrap shrink-0">
+                            {col.name}
+                          </span>
                         </button>
                       );
                     })}
@@ -671,7 +857,7 @@ function ProductFormContent() {
                                   className="w-4 h-4 rounded-full border border-slate-200/50 shadow-2xs"
                                   style={{ backgroundColor: hex }}
                                 />
-                                <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">
+                                <span className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">
                                   {color.name} Variant Media
                                 </span>
                               </div>
@@ -691,7 +877,7 @@ function ProductFormContent() {
                             </div>
 
                             <div className="space-y-3">
-                              <span className="block text-[10px] font-bold text-slate-450 uppercase tracking-wider">Variant Images ({sideImages.length} uploaded)</span>
+                              <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Variant Images ({sideImages.length} uploaded)</span>
                               
                               {sideImages.length > 0 && (
                                 <div className="grid grid-cols-5 gap-2 pb-2">
@@ -747,7 +933,7 @@ function ProductFormContent() {
                                 />
                                 <label
                                   htmlFor={`images-${color.name}`}
-                                  className="px-4 py-2.5 border border-dashed border-slate-300 hover:border-[#0A52D6] text-slate-600 hover:text-[#0A52D6] font-bold rounded-lg text-xs cursor-pointer bg-slate-50/50 hover:bg-blue-50/20 transition-all flex items-center gap-1.5 shadow-3xs"
+                                  className="px-4 py-2.5 border border-dashed border-slate-300 hover:border-[#0A52D6] text-slate-600 hover:text-[#0A52D6] font-bold rounded-lg text-sm cursor-pointer bg-slate-50/50 hover:bg-blue-50/20 transition-all flex items-center gap-1.5 shadow-3xs"
                                 >
                                   {uploadingColor === color.name ? (
                                     <>
@@ -777,15 +963,15 @@ function ProductFormContent() {
                 {/* CARD 3: Details & Custom Attributes */}
                 <div className="bg-slate-50/50 border border-slate-100 rounded-2xl p-5 space-y-5">
                   <div className="border-b border-slate-200/60 pb-2">
-                    <h4 className="text-xs font-extrabold text-[#0A52D6] uppercase tracking-widest flex items-center gap-2">
+                    <h4 className="text-sm font-extrabold text-[#0A52D6] uppercase tracking-widest flex items-center gap-2">
                       <span className="w-5 h-px bg-[#0A52D6]" /> 3. Details & Specifications
                     </h4>
-                    <p className="text-[11px] text-slate-400 mt-0.5">Define highlights, specifications, and details with custom Lucide icons.</p>
+                    <p className="text-xs text-slate-400 mt-0.5">Define highlights, specifications, and details with custom Lucide icons.</p>
                   </div>
 
                   {/* Highlights List */}
                   <div className="space-y-3">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Quick Highlights</label>
+                    <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider">Quick Highlights</label>
                     <div className="space-y-4">
                       {productForm.highlights.map((item, idx) => (
                         <div key={idx} className="bg-white border border-slate-200/80 rounded-xl p-3.5 space-y-2.5 shadow-2xs hover:border-slate-300 transition-colors">
@@ -800,7 +986,7 @@ function ProductFormContent() {
                                 updated[idx].text = e.target.value;
                                 setProductForm({ ...productForm, highlights: updated });
                               }}
-                              className="flex-1 w-full px-3 py-2 border border-slate-200 focus:border-[#0A52D6] rounded-lg text-xs bg-slate-50/20 focus:bg-white focus:outline-none transition-colors"
+                              className="flex-1 w-full px-3 py-2 border border-slate-200 focus:border-[#0A52D6] rounded-lg text-sm bg-slate-50/20 focus:bg-white focus:outline-none transition-colors"
                             />
                             <button
                               type="button"
@@ -817,7 +1003,7 @@ function ProductFormContent() {
                           
                           {/* Multi Icon Picker Selector */}
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider shrink-0 select-none">Icons:</span>
+                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider shrink-0 select-none">Icons:</span>
                             <MultiIconPicker
                               value={item.icons || []}
                               onChange={(newIcons) => {
@@ -837,7 +1023,7 @@ function ProductFormContent() {
                             highlights: [...productForm.highlights, { text: "", icons: [] }],
                           })
                         }
-                        className="text-xs text-[#0A52D6] hover:underline font-extrabold flex items-center gap-1 mt-1 cursor-pointer"
+                        className="text-sm text-[#0A52D6] hover:underline font-extrabold flex items-center gap-1 mt-1 cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" /> Add Highlight
                       </button>
@@ -846,14 +1032,14 @@ function ProductFormContent() {
 
                   {/* Technical Specs List */}
                   <div className="space-y-3 pt-3 border-t border-slate-200/60">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Technical Specifications</label>
+                    <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider">Technical Specifications</label>
                     <div className="space-y-4">
                       {productForm.specs.map((item, idx) => (
                         <div key={idx} className="bg-white border border-slate-200/80 rounded-xl p-3.5 space-y-2.5 shadow-2xs hover:border-slate-300 transition-colors">
                           <div className="flex gap-2.5 items-center">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 flex-1">
                               <div>
-                                <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Label</label>
+                                <label className="block text-xs font-bold text-slate-450 uppercase tracking-wider mb-0.5">Label</label>
                                 <input
                                   type="text"
                                   required
@@ -864,11 +1050,11 @@ function ProductFormContent() {
                                     updated[idx].label = e.target.value;
                                     setProductForm({ ...productForm, specs: updated });
                                   }}
-                                  className="w-full px-3 py-2 border border-slate-200 focus:border-[#0A52D6] rounded-lg text-xs bg-slate-50/20 focus:bg-white focus:outline-none transition-colors"
+                                  className="w-full px-3 py-2 border border-slate-200 focus:border-[#0A52D6] rounded-lg text-sm bg-slate-50/20 focus:bg-white focus:outline-none transition-colors"
                                 />
                               </div>
                               <div>
-                                <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Value</label>
+                                <label className="block text-xs font-bold text-slate-450 uppercase tracking-wider mb-0.5">Value</label>
                                 <input
                                   type="text"
                                   required
@@ -879,7 +1065,7 @@ function ProductFormContent() {
                                     updated[idx].value = e.target.value;
                                     setProductForm({ ...productForm, specs: updated });
                                   }}
-                                  className="w-full px-3 py-2 border border-slate-200 focus:border-[#0A52D6] rounded-lg text-xs bg-slate-50/20 focus:bg-white focus:outline-none transition-colors"
+                                  className="w-full px-3 py-2 border border-slate-200 focus:border-[#0A52D6] rounded-lg text-sm bg-slate-50/20 focus:bg-white focus:outline-none transition-colors"
                                 />
                               </div>
                             </div>
@@ -898,7 +1084,7 @@ function ProductFormContent() {
                           
                           {/* Multi Icon Picker Selector */}
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider shrink-0 select-none">Icons:</span>
+                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider shrink-0 select-none">Icons:</span>
                             <MultiIconPicker
                               value={item.icons || []}
                               onChange={(newIcons) => {
@@ -918,7 +1104,7 @@ function ProductFormContent() {
                             specs: [...productForm.specs, { label: "", value: "", icons: [] }],
                           })
                         }
-                        className="text-xs text-[#0A52D6] hover:underline font-extrabold flex items-center gap-1 mt-1 cursor-pointer"
+                        className="text-sm text-[#0A52D6] hover:underline font-extrabold flex items-center gap-1 mt-1 cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" /> Add Spec Row
                       </button>
@@ -927,14 +1113,14 @@ function ProductFormContent() {
 
                   {/* Features List */}
                   <div className="space-y-3 pt-3 border-t border-slate-200/60">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Product Features</label>
+                    <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider">Product Features</label>
                     <div className="space-y-4">
                       {productForm.productFeatures.map((item, idx) => (
                         <div key={idx} className="bg-white border border-slate-200/80 rounded-xl p-3.5 space-y-2.5 shadow-2xs hover:border-slate-300 transition-colors">
                           <div className="flex gap-2.5 items-center">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 flex-1">
                               <div>
-                                <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Feature Title</label>
+                                <label className="block text-xs font-bold text-slate-450 uppercase tracking-wider mb-0.5">Feature Title</label>
                                 <input
                                   type="text"
                                   required
@@ -945,11 +1131,11 @@ function ProductFormContent() {
                                     updated[idx].label = e.target.value;
                                     setProductForm({ ...productForm, productFeatures: updated });
                                   }}
-                                  className="w-full px-3 py-2 border border-slate-200 focus:border-[#0A52D6] rounded-lg text-xs bg-slate-50/20 focus:bg-white focus:outline-none transition-colors"
+                                  className="w-full px-3 py-2 border border-slate-200 focus:border-[#0A52D6] rounded-lg text-sm bg-slate-50/20 focus:bg-white focus:outline-none transition-colors"
                                 />
                               </div>
                               <div>
-                                <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Feature Detail</label>
+                                <label className="block text-xs font-bold text-slate-450 uppercase tracking-wider mb-0.5">Feature Detail</label>
                                 <input
                                   type="text"
                                   required
@@ -960,7 +1146,7 @@ function ProductFormContent() {
                                     updated[idx].detail = e.target.value;
                                     setProductForm({ ...productForm, productFeatures: updated });
                                   }}
-                                  className="w-full px-3 py-2 border border-slate-200 focus:border-[#0A52D6] rounded-lg text-xs bg-slate-50/20 focus:bg-white focus:outline-none transition-colors"
+                                  className="w-full px-3 py-2 border border-slate-200 focus:border-[#0A52D6] rounded-lg text-sm bg-slate-50/20 focus:bg-white focus:outline-none transition-colors"
                                 />
                               </div>
                             </div>
@@ -979,7 +1165,7 @@ function ProductFormContent() {
                           
                           {/* Multi Icon Picker Selector */}
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider shrink-0 select-none">Icons:</span>
+                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider shrink-0 select-none">Icons:</span>
                             <MultiIconPicker
                               value={item.icons || []}
                               onChange={(newIcons) => {
@@ -999,7 +1185,7 @@ function ProductFormContent() {
                             productFeatures: [...productForm.productFeatures, { label: "", detail: "", icons: [] }],
                           })
                         }
-                        className="text-xs text-[#0A52D6] hover:underline font-extrabold flex items-center gap-1 mt-1 cursor-pointer"
+                        className="text-sm text-[#0A52D6] hover:underline font-extrabold flex items-center gap-1 mt-1 cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" /> Add Feature Row
                       </button>
@@ -1008,7 +1194,7 @@ function ProductFormContent() {
 
                   {/* What's in the Box List */}
                   <div className="space-y-3 pt-3 border-t border-slate-200/60">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">What's in the Box</label>
+                    <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider">What's in the Box</label>
                     <div className="space-y-4">
                       {productForm.inBox.map((item, idx) => (
                         <div key={idx} className="bg-white border border-slate-200/80 rounded-xl p-3.5 space-y-2.5 shadow-2xs hover:border-slate-300 transition-colors">
@@ -1023,7 +1209,7 @@ function ProductFormContent() {
                                 updated[idx].text = e.target.value;
                                 setProductForm({ ...productForm, inBox: updated });
                               }}
-                              className="flex-1 w-full px-3 py-2 border border-slate-200 focus:border-[#0A52D6] rounded-lg text-xs bg-slate-50/20 focus:bg-white focus:outline-none transition-colors"
+                              className="flex-1 w-full px-3 py-2 border border-slate-200 focus:border-[#0A52D6] rounded-lg text-sm bg-slate-50/20 focus:bg-white focus:outline-none transition-colors"
                             />
                             <button
                               type="button"
@@ -1040,7 +1226,7 @@ function ProductFormContent() {
 
                           {/* Multi Icon Picker Selector */}
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider shrink-0 select-none">Icons:</span>
+                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider shrink-0 select-none">Icons:</span>
                             <MultiIconPicker
                               value={item.icons || []}
                               onChange={(newIcons) => {
@@ -1060,7 +1246,7 @@ function ProductFormContent() {
                             inBox: [...productForm.inBox, { text: "", icons: [] }],
                           })
                         }
-                        className="text-xs text-[#0A52D6] hover:underline font-extrabold flex items-center gap-1 mt-1 cursor-pointer"
+                        className="text-sm text-[#0A52D6] hover:underline font-extrabold flex items-center gap-1 mt-1 cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" /> Add Box Item
                       </button>
@@ -1069,7 +1255,7 @@ function ProductFormContent() {
 
                   {/* Applications & Usage List */}
                   <div className="space-y-3 pt-3 border-t border-slate-200/60">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Applications & Usage</label>
+                    <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider">Applications & Usage</label>
                     <div className="space-y-4">
                       {productForm.applications.map((item, idx) => (
                         <div key={idx} className="bg-white border border-slate-200/80 rounded-xl p-3.5 space-y-2.5 shadow-2xs hover:border-slate-300 transition-colors">
@@ -1084,7 +1270,7 @@ function ProductFormContent() {
                                 updated[idx].text = e.target.value;
                                 setProductForm({ ...productForm, applications: updated });
                               }}
-                              className="flex-1 w-full px-3 py-2 border border-slate-200 focus:border-[#0A52D6] rounded-lg text-xs bg-slate-50/20 focus:bg-white focus:outline-none transition-colors"
+                              className="flex-1 w-full px-3 py-2 border border-slate-200 focus:border-[#0A52D6] rounded-lg text-sm bg-slate-50/20 focus:bg-white focus:outline-none transition-colors"
                             />
                             <button
                               type="button"
@@ -1101,7 +1287,7 @@ function ProductFormContent() {
 
                           {/* Multi Icon Picker Selector */}
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider shrink-0 select-none">Icons:</span>
+                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider shrink-0 select-none">Icons:</span>
                             <MultiIconPicker
                               value={item.icons || []}
                               onChange={(newIcons) => {
@@ -1121,7 +1307,7 @@ function ProductFormContent() {
                             applications: [...productForm.applications, { text: "", icons: [] }],
                           })
                         }
-                        className="text-xs text-[#0A52D6] hover:underline font-extrabold flex items-center gap-1 mt-1 cursor-pointer"
+                        className="text-sm text-[#0A52D6] hover:underline font-extrabold flex items-center gap-1 mt-1 cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" /> Add Application
                       </button>
@@ -1130,13 +1316,13 @@ function ProductFormContent() {
 
                   {/* Detailed Description */}
                   <div className="space-y-2 pt-3 border-t border-slate-200/60">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Detailed Description</label>
+                    <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider">Detailed Description</label>
                     <textarea
                       rows={4}
                       placeholder="Write any additional details or user instructions here..."
                       value={productForm.description}
                       onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6] bg-white text-xs leading-relaxed"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6] bg-white text-sm leading-relaxed"
                     />
                   </div>
                 </div>

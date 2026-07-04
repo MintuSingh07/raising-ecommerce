@@ -22,6 +22,7 @@ import {
   FileText,
   Check,
   AlertCircle,
+  Loader2,
 } from "lucide-react";
 
 interface AdminDashboardClientProps {
@@ -59,6 +60,14 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
   const [seedSuccess, setSeedSuccess] = useState<string | null>(null);
   const [seedError, setSeedError] = useState<string | null>(null);
   const [apiMessage, setApiMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  // Categories Form state
+  const [categoryForm, setCategoryForm] = useState({
+    id: "",
+    label: "",
+    desc: "",
+  });
+  const [isSavingCategory, setIsSavingCategory] = useState(false);
 
   // Form Modals states
   const [activeModal, setActiveModal] = useState<"blog" | "media" | "banner" | null>(null);
@@ -114,7 +123,7 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
     async function loadTabData() {
       setIsLoading(true);
       try {
-        if (activeTab === "products" || activeTab === "dashboard") {
+        if (activeTab === "products" || activeTab === "categories" || activeTab === "dashboard") {
           const res = await fetch("/api/public/products");
           if (res.ok) {
             const data = await res.json();
@@ -195,6 +204,45 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
       if (!res.ok) throw new Error(data.error || "Deletion failed");
       setApiMessage({ type: "success", text: "Product deleted successfully!" });
       setProducts(prev => prev.filter(p => p.id !== id));
+    } catch (err: any) {
+      setApiMessage({ type: "error", text: err.message });
+    }
+  };
+
+  const handleCreateCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setApiMessage(null);
+    setIsSavingCategory(true);
+    try {
+      const res = await fetch("/api/admin/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(categoryForm),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to create category");
+      setApiMessage({ type: "success", text: "Category created successfully!" });
+      setCategories(prev => {
+        const updated = [...prev, data.category];
+        return updated.sort((a, b) => (a.createdAt || "").localeCompare(b.createdAt || ""));
+      });
+      setCategoryForm({ id: "", label: "", desc: "" });
+    } catch (err: any) {
+      setApiMessage({ type: "error", text: err.message });
+    } finally {
+      setIsSavingCategory(false);
+    }
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    if (!confirm(`Are you sure you want to delete the category "${id}"?`)) return;
+    setApiMessage(null);
+    try {
+      const res = await fetch(`/api/admin/categories?id=${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Deletion failed");
+      setApiMessage({ type: "success", text: "Category deleted successfully!" });
+      setCategories(prev => prev.filter(c => c.id !== id));
     } catch (err: any) {
       setApiMessage({ type: "error", text: err.message });
     }
@@ -625,17 +673,158 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
             )}
 
             {activeTab === "categories" && (
-              <div className="space-y-4">
-                <p className="text-slate-500 text-sm">Below are the categories fetched directly from MongoDB Categories collection:</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {categories.map((cat) => (
-                    <div key={cat.id} className="border border-slate-200 rounded-xl p-4 bg-slate-50/20">
-                      <h4 className="font-bold text-slate-900">{cat.label}</h4>
-                      <p className="text-xs text-slate-400 mt-0.5">ID: {cat.id}</p>
-                      <p className="text-xs text-slate-600 mt-2">{cat.desc}</p>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                
+                {/* Left Column: Create Category Card */}
+                <div className="bg-slate-50/50 border border-slate-200 rounded-2xl p-5 space-y-4 lg:col-span-1">
+                  <div className="border-b border-slate-200/60 pb-2">
+                    <h3 className="text-sm font-extrabold text-[#0A52D6] uppercase tracking-widest flex items-center gap-2">
+                      <span className="w-5 h-px bg-[#0A52D6]" /> Create Category
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">Add a new category for your website products.</p>
+                  </div>
+
+                  <form onSubmit={handleCreateCategory} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-550 uppercase tracking-wider mb-1">
+                        Category Label / Name
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Tactical Lights"
+                        value={categoryForm.label}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          // Auto-generate slug from label if slug field is empty or was auto-generated
+                          const autoSlug = val.trim().toLowerCase().replace(/[^a-z0-9-_]/g, "-").replace(/-+/g, "-");
+                          setCategoryForm((prev) => ({
+                            ...prev,
+                            label: val,
+                            id: prev.id === "" || prev.id === autoSlug.substring(0, autoSlug.length - 1) ? autoSlug : prev.id,
+                          }));
+                        }}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-[#0A52D6]"
+                      />
                     </div>
-                  ))}
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-550 uppercase tracking-wider mb-1">
+                        Category Slug / ID (lowercase, no spaces)
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. tactical-lights"
+                        value={categoryForm.id}
+                        onChange={(e) => {
+                          const val = e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, "");
+                          setCategoryForm({ ...categoryForm, id: val });
+                        }}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-[#0A52D6]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-550 uppercase tracking-wider mb-1">
+                        Description
+                      </label>
+                      <textarea
+                        rows={3}
+                        placeholder="Provide a brief overview for this product category..."
+                        value={categoryForm.desc}
+                        onChange={(e) => setCategoryForm({ ...categoryForm, desc: e.target.value })}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-[#0A52D6] leading-relaxed"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSavingCategory}
+                      className="w-full py-2 bg-[#0A52D6] hover:bg-[#0B4294] disabled:bg-slate-200 disabled:text-slate-400 text-white font-semibold rounded-lg shadow-xs cursor-pointer text-sm transition-all flex items-center justify-center gap-1.5"
+                    >
+                      {isSavingCategory ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" /> Saving...
+                        </>
+                      ) : (
+                        <>
+                          <PlusCircle className="w-4 h-4" /> Create Category
+                        </>
+                      )}
+                    </button>
+                  </form>
                 </div>
+
+                {/* Right Column: Categories List */}
+                <div className="space-y-4 lg:col-span-2">
+                  <div className="border-b border-slate-100 pb-2">
+                    <h3 className="text-sm font-extrabold text-slate-800 uppercase tracking-widest">
+                      Active Categories ({categories.length})
+                    </h3>
+                  </div>
+
+                  {categories.length === 0 ? (
+                    <div className="text-center py-12 text-slate-450 border border-dashed border-slate-200 rounded-xl">
+                      No categories found in database. Create one on the left.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {categories.map((cat) => {
+                        const associatedCount = products.filter(
+                          (p) => p.category?.toLowerCase() === cat.id?.toLowerCase()
+                        ).length;
+
+                        return (
+                          <div
+                            key={cat.id}
+                            className="border border-slate-200 rounded-xl p-4 bg-white shadow-3xs flex flex-col justify-between hover:border-slate-350 transition-all group"
+                          >
+                            <div>
+                              <div className="flex items-start justify-between gap-2">
+                                <div>
+                                  <h4 className="font-extrabold text-slate-900 text-sm leading-tight">
+                                    {cat.label}
+                                  </h4>
+                                  <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mt-1">
+                                    Slug: {cat.id}
+                                  </span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteCategory(cat.id)}
+                                  className="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors shrink-0 cursor-pointer"
+                                  title={`Delete ${cat.label}`}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                              <p className="text-xs text-slate-500 mt-2.5 line-clamp-3 leading-relaxed">
+                                {cat.desc || "No description provided."}
+                              </p>
+                            </div>
+                            
+                            <div className="border-t border-slate-100 pt-3 mt-4 flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                                Status
+                              </span>
+                              <span
+                                className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${
+                                  associatedCount > 0
+                                    ? "bg-blue-50 border-blue-100 text-[#0A52D6]"
+                                    : "bg-slate-50 border-slate-100 text-slate-500"
+                                }`}
+                              >
+                                {associatedCount} {associatedCount === 1 ? "Product" : "Products"}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
               </div>
             )}
 

@@ -60,6 +60,31 @@ const WEBSITE_CATEGORIES = [
     label: "Power Extension Board",
     desc: "Multi-socket surge-protected power extension boards for safety and convenience.",
   },
+  {
+    id: "village-remote",
+    label: "Village & Remote",
+    desc: "Targeted lighting solutions optimized for villages and remote off-grid locations.",
+  },
+  {
+    id: "corporate-gifting",
+    label: "Corporate Gifting",
+    desc: "Premium, functional corporate gifting lights and table lamps.",
+  },
+  {
+    id: "defense-security",
+    label: "Defense & Security",
+    desc: "Tactical, durable flashlights and headlamps engineered for security personnel.",
+  },
+  {
+    id: "farming-fields",
+    label: "Farming & Fields",
+    desc: "Heavy-duty lights and torches custom-designed for farming and fields work.",
+  },
+  {
+    id: "industrial-yards",
+    label: "Industrial Yards",
+    desc: "High-power industrial flashlights and headlamps built for rough, industrial conditions.",
+  },
 ];
 
 const SEED_BLOGS = [

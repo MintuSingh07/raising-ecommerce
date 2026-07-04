@@ -8,6 +8,34 @@ const ProductSchema = new mongoose.Schema({
   category: { type: String, required: true, trim: true },           // category slug
   badge: { type: String, trim: true },                               // "BEST SELLER" | "NEW" | ""
   featured: { type: Boolean, default: false },
+  
+  // ── WooCommerce metadata alignment ──────────────────────────────────────────
+  brand: { type: String, trim: true },
+  categories: [{ type: String }],
+  tags: [{ type: String }],
+  video: { type: String, trim: true },
+  
+  pricing: {
+    regular: { type: Number },
+    sale: { type: Number },
+    saleStart: { type: String },
+    saleEnd: { type: String },
+  },
+  
+  inventory: {
+    inStock: { type: Boolean, default: true },
+    stock: { type: Number },
+    lowStockAmount: { type: Number },
+    backordersAllowed: { type: Boolean, default: false },
+    soldIndividually: { type: Boolean, default: false }
+  },
+  
+  dimensions: {
+    weightKg: { type: Number },
+    lengthCm: { type: Number },
+    widthCm: { type: Number },
+    heightCm: { type: Number }
+  },
 
   // ── Social proof ────────────────────────────────────────────────────────────
   rating: { type: Number, min: 0, max: 5, default: 0 },
