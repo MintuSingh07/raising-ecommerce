@@ -8,7 +8,7 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ProductDetails from "@/components/ProductDetails";
 import BlurText from "@/components/BlurText";
-import productData from "../../../../public/products_structured.json";
+import { useProducts } from "@/hooks/useProducts";
 import { type Product } from "@/components/ProductCatalog";
 import { Package, ChevronRight, Home, ArrowLeft } from "lucide-react";
 
@@ -140,6 +140,7 @@ export default function CategoryPage({ params }: PageProps) {
   const resolvedParams = use(params);
   const categoryId = resolvedParams.category;
 
+  const { products: allProducts, isLoading } = useProducts();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
@@ -158,30 +159,29 @@ export default function CategoryPage({ params }: PageProps) {
 
   // Group all products to filter the ones belonging to the active category
   const products = useMemo(() => {
-    const allProducts = productData.products as Product[];
     const filtered = allProducts.filter(p => {
       const cats = p.categories.map(c => c.toLowerCase());
       
       if (categoryId === "led-headlamp") {
-        return cats.includes("led headlamp");
+        return cats.includes("led headlamp") || cats.includes("led-headlamp");
       } else if (categoryId === "led-lantern") {
-        return cats.includes("led lantern");
+        return cats.includes("led lantern") || cats.includes("led-lantern");
       } else if (categoryId === "led-table-lamp") {
-        return cats.includes("led table lamp") || cats.includes("corporate gifting");
+        return cats.includes("led table lamp") || cats.includes("led-table-lamp") || cats.includes("corporate gifting") || cats.includes("corporate-gifting");
       } else if (categoryId === "led-usb-lamp") {
-        return cats.includes("led usb lamp");
+        return cats.includes("led usb lamp") || cats.includes("led-usb-lamp");
       } else if (categoryId === "metal-flashlights") {
-        return cats.includes("metal flashlights") || cats.includes("defence/security") || cats.includes("industrial");
+        return cats.includes("metal flashlights") || cats.includes("metal-flashlights") || cats.includes("defence/security") || cats.includes("defense-security") || cats.includes("defense & security") || cats.includes("industrial");
       } else if (categoryId === "rechargeable-led-flashlight") {
-        return cats.includes("rechargeable led flashlight");
+        return cats.includes("rechargeable led flashlight") || cats.includes("rechargeable-led-flashlight");
       } else if (categoryId === "kisan-torch") {
-        return cats.includes("kisan torch") || cats.includes("farming") || cats.includes("remote areas/village");
+        return cats.includes("kisan torch") || cats.includes("kisan-torch") || cats.includes("farming") || cats.includes("remote areas/village") || cats.includes("village-remote") || cats.includes("village & remote");
       } else if (categoryId === "solar-energy-kit") {
-        return cats.includes("solar energy kit");
+        return cats.includes("solar energy kit") || cats.includes("solar-energy-kit");
       } else if (categoryId === "solar-lantern-searchlight") {
-        return cats.includes("solar lantern & searchlight");
+        return cats.includes("solar lantern & searchlight") || cats.includes("solar-lantern-searchlight");
       } else if (categoryId === "power-extension-board") {
-        return cats.includes("power extension board");
+        return cats.includes("power extension board") || cats.includes("power-extension-board");
       }
       return false;
     });
@@ -192,7 +192,7 @@ export default function CategoryPage({ params }: PageProps) {
       const bVal = (b.featured === 1 || b.tags.includes("top-product")) ? 1 : 0;
       return bVal - aVal;
     });
-  }, [categoryId]);
+  }, [categoryId, allProducts]);
 
   // Apply search query within this category
   const filteredProducts = useMemo(() => {
@@ -246,7 +246,15 @@ export default function CategoryPage({ params }: PageProps) {
       <Navbar />
 
       <main className="flex-grow">
-        {selectedProduct ? (
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-32 text-slate-500 font-sans">
+            <svg className="animate-spin -ml-1 mr-3 h-10 w-10 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span className="text-sm font-semibold mt-4">Loading collection...</span>
+          </div>
+        ) : selectedProduct ? (
           <ProductDetails 
             product={selectedProduct} 
             onClose={() => setSelectedProduct(null)} 

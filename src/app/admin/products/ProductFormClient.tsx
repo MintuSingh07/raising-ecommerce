@@ -808,6 +808,7 @@ function ProductFormContent() {
                         <button
                           key={col.name}
                           type="button"
+                          disabled={isEnabled}
                           onClick={() => {
                             let updated = [...productForm.colors];
                             if (isEnabled) {
@@ -821,8 +822,8 @@ function ProductFormContent() {
                           }}
                           className={`flex items-center gap-2 px-2.5 py-2.5 rounded-xl border text-left transition-all ${
                             isEnabled
-                              ? "border-[#0A52D6] bg-blue-50/40 shadow-xs"
-                              : "border-slate-200 bg-white hover:border-slate-300"
+                              ? "border-[#0A52D6]/60 bg-blue-50/20 opacity-75 cursor-not-allowed select-none"
+                              : "border-slate-200 bg-white hover:border-slate-300 cursor-pointer"
                           }`}
                         >
                           <span

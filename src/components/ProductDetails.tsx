@@ -230,10 +230,19 @@ export default function ProductDetails({
   );
 
   const { rating, reviews } = useMemo(() => {
+    let numericId = typeof product.id === "number" ? product.id : parseInt(String(product.id), 10);
+    if (isNaN(numericId)) {
+      let hash = 0;
+      const str = String(product.id);
+      for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      numericId = Math.abs(hash);
+    }
     // Generate deterministic rating between 4.5 and 5.0
-    const r = 4.5 + ((product.id * 7 + 3) % 6) * 0.1;
+    const r = 4.5 + ((numericId * 7 + 3) % 6) * 0.1;
     // Generate deterministic reviews count between 40 and 190
-    const revs = 40 + ((product.id * 13 + 17) % 150);
+    const revs = 40 + ((numericId * 13 + 17) % 150);
     return { rating: parseFloat(r.toFixed(1)), reviews: revs };
   }, [product.id]);
 

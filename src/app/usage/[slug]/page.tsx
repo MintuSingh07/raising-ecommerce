@@ -8,7 +8,7 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ProductDetails from "@/components/ProductDetails";
 import BlurText from "@/components/BlurText";
-import productData from "../../../../public/products_structured.json";
+import { useProducts } from "@/hooks/useProducts";
 import { type Product } from "@/components/ProductCatalog";
 import { Package, ChevronRight, Home, ArrowLeft } from "lucide-react";
 
@@ -130,6 +130,7 @@ export default function UsagePage({ params }: PageProps) {
   const resolvedParams = use(params);
   const slug = resolvedParams.slug;
 
+  const { products: allProducts, isLoading } = useProducts();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
@@ -150,10 +151,26 @@ export default function UsagePage({ params }: PageProps) {
   const products = useMemo(() => {
     if (!usageInfo) return [];
 
-    const allProducts = productData.products as Product[];
     const filtered = allProducts.filter((p) => {
       const cats = p.categories.map((c) => c.toLowerCase());
-      return cats.includes(usageInfo.jsonCategory);
+      
+      const checkVal = usageInfo.jsonCategory.toLowerCase();
+      if (checkVal === "remote areas/village") {
+        return cats.includes("remote areas/village") || cats.includes("village-remote") || cats.includes("village & remote") || cats.includes("village & remote areas");
+      }
+      if (checkVal === "corporate gifting") {
+        return cats.includes("corporate gifting") || cats.includes("corporate-gifting");
+      }
+      if (checkVal === "defence/security") {
+        return cats.includes("defence/security") || cats.includes("defense-security") || cats.includes("defense & security");
+      }
+      if (checkVal === "farming") {
+        return cats.includes("farming") || cats.includes("farming-fields") || cats.includes("farming & fields");
+      }
+      if (checkVal === "industrial") {
+        return cats.includes("industrial") || cats.includes("industrial-yards") || cats.includes("industrial yards");
+      }
+      return cats.includes(checkVal);
     });
 
     // Sort: best sellers first
@@ -162,7 +179,7 @@ export default function UsagePage({ params }: PageProps) {
       const bVal = b.featured === 1 || b.tags.includes("top-product") ? 1 : 0;
       return bVal - aVal;
     });
-  }, [usageInfo]);
+  }, [usageInfo, allProducts]);
 
   // Filter products by search query
   const filteredProducts = useMemo(() => {
@@ -224,7 +241,15 @@ export default function UsagePage({ params }: PageProps) {
       <Navbar />
 
       <main className="flex-grow">
-        {selectedProduct ? (
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-32 text-slate-500 font-sans">
+            <svg className="animate-spin -ml-1 mr-3 h-10 w-10 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span className="text-sm font-semibold mt-4">Loading application page...</span>
+          </div>
+        ) : selectedProduct ? (
           <ProductDetails
             product={selectedProduct}
             onClose={() => setSelectedProduct(null)}
