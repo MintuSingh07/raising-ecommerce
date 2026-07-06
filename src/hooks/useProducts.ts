@@ -11,19 +11,16 @@ async function fetchProductsFromApi(): Promise<Product[]> {
 
   pendingPromise = fetch("/api/public/products")
     .then((res) => {
-      if (!res.ok) throw new Error("Failed to fetch products from API");
-      return res.json();
+      if (!res.ok) return staticProductData.products as Product[];
+      return res.json().then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          cachedProducts = data as Product[];
+          return cachedProducts;
+        }
+        return staticProductData.products as Product[];
+      });
     })
-    .then((data) => {
-      if (Array.isArray(data) && data.length > 0) {
-        cachedProducts = data as Product[];
-        return cachedProducts;
-      }
-      throw new Error("API returned empty or invalid products array");
-    })
-    .catch((err) => {
-      console.warn("API fetch error, falling back to static product data:", err);
-      // Fallback to static JSON structure
+    .catch(() => {
       return staticProductData.products as Product[];
     })
     .finally(() => {
