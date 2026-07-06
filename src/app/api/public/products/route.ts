@@ -172,7 +172,8 @@ export async function GET() {
         gallery: p.gallery || [],
         datasheetUrl: p.datasheetUrl || "",
         description: p.description || "",
-        colors: p.colors || []
+        colors: p.colors || [],
+        rawCategories: p.categories || []
       };
     });
 

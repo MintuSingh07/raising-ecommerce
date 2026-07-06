@@ -348,7 +348,7 @@ function ProductFormContent() {
                 name: item.name,
                 subtitle: item.subtitle || "",
                 category: item.category || "",
-                categories: item.categories || (item.category ? [item.category] : []),
+                categories: item.rawCategories || item.categories || (item.category ? [item.category] : []),
                 badge: item.badge || "",
                 featured: !!item.featured,
                 rating: String(item.rating ?? 5),
