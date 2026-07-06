@@ -173,7 +173,7 @@ export async function GET() {
         datasheetUrl: p.datasheetUrl || "",
         description: p.description || "",
         colors: p.colors || [],
-        rawCategories: p.categories || []
+        rawCategories: p.categories && p.categories.length > 0 ? p.categories : (p.category ? [p.category] : [])
       };
     });
 

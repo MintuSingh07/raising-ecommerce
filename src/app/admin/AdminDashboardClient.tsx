@@ -1128,9 +1128,19 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                           <td className="py-3 px-4 font-mono text-xs text-slate-500">{prod.id}</td>
                           <td className="py-3 px-4 font-bold text-slate-900">{prod.name}</td>
                           <td className="py-3 px-4">
-                            <span className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
-                              {prod.category}
-                            </span>
+                            <div className="flex flex-wrap gap-1">
+                              {prod.categories && prod.categories.length > 0 ? (
+                                prod.categories.map((cat: string) => (
+                                  <span key={cat} className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded whitespace-nowrap">
+                                    {cat}
+                                  </span>
+                                ))
+                              ) : (
+                                <span className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded whitespace-nowrap">
+                                  {prod.category}
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td className="py-3 px-4 text-right">
                             <div className="flex justify-end gap-2">
