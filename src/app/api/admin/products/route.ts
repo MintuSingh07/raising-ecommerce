@@ -94,6 +94,7 @@ export async function PUT(request: NextRequest) {
 
     await dbConnect();
     const body = await request.json();
+    const { originalId } = body;
     const fields = extractFields(body);
 
     if (!fields.id) {
@@ -103,10 +104,20 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Remove `id` from the update payload — it's the key, not an updatable field
-    const { id, ...updatePayload } = fields;
+    const queryId = originalId || fields.id;
 
-    const product = await Product.findOneAndUpdate({ id }, updatePayload, {
+    // If changing the SKU ID, check if the new ID is already taken
+    if (originalId && originalId !== fields.id) {
+      const existing = await Product.findOne({ id: fields.id });
+      if (existing) {
+        return Response.json(
+          { error: "A product with the new SKU/ID already exists" },
+          { status: 400 }
+        );
+      }
+    }
+
+    const product = await Product.findOneAndUpdate({ id: queryId }, fields, {
       new: true,
     });
 

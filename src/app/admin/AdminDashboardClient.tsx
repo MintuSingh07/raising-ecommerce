@@ -330,8 +330,11 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
     id: "",
     label: "",
     desc: "",
+    image: "",
   });
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
   const [isSavingCategory, setIsSavingCategory] = useState(false);
+  const [isUploadingCategoryCover, setIsUploadingCategoryCover] = useState(false);
 
   // Form Modals states
   const [activeModal, setActiveModal] = useState<"blog" | "media" | "banner" | null>(null);
@@ -472,29 +475,56 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
     }
   };
 
-  const handleCreateCategory = async (e: React.FormEvent) => {
+  const handleCategorySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setApiMessage(null);
     setIsSavingCategory(true);
     try {
+      const method = editingCategoryId ? "PUT" : "POST";
+      const payload = editingCategoryId 
+        ? { originalId: editingCategoryId, ...categoryForm }
+        : categoryForm;
+
       const res = await fetch("/api/admin/categories", {
-        method: "POST",
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(categoryForm),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to create category");
-      setApiMessage({ type: "success", text: "Category created successfully!" });
+      if (!res.ok) throw new Error(data.error || `Failed to ${editingCategoryId ? 'update' : 'create'} category`);
+      
+      setApiMessage({ 
+        type: "success", 
+        text: `Category ${editingCategoryId ? 'updated' : 'created'} successfully!` 
+      });
+
       setCategories(prev => {
-        const updated = [...prev, data.category];
+        let updated;
+        if (editingCategoryId) {
+          updated = prev.map(c => c.id === editingCategoryId ? data.category : c);
+        } else {
+          updated = [...prev, data.category];
+        }
         return updated.sort((a, b) => (a.createdAt || "").localeCompare(b.createdAt || ""));
       });
-      setCategoryForm({ id: "", label: "", desc: "" });
+
+      setCategoryForm({ id: "", label: "", desc: "", image: "" });
+      setEditingCategoryId(null);
     } catch (err: any) {
       setApiMessage({ type: "error", text: err.message });
     } finally {
       setIsSavingCategory(false);
     }
+  };
+
+  const handleEditCategory = (cat: any) => {
+    setCategoryForm({
+      id: cat.id,
+      label: cat.label,
+      desc: cat.desc || "",
+      image: cat.image || "",
+    });
+    setEditingCategoryId(cat.id);
   };
 
   const handleDeleteCategory = async (id: string) => {
@@ -506,6 +536,10 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
       if (!res.ok) throw new Error(data.error || "Deletion failed");
       setApiMessage({ type: "success", text: "Category deleted successfully!" });
       setCategories(prev => prev.filter(c => c.id !== id));
+      if (editingCategoryId === id) {
+        setCategoryForm({ id: "", label: "", desc: "", image: "" });
+        setEditingCategoryId(null);
+      }
     } catch (err: any) {
       setApiMessage({ type: "error", text: err.message });
     }
@@ -949,12 +983,14 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                 <div className="bg-slate-50/50 border border-slate-200 rounded-2xl p-5 space-y-4 lg:col-span-1">
                   <div className="border-b border-slate-200/60 pb-2">
                     <h3 className="text-sm font-extrabold text-[#0A52D6] uppercase tracking-widest flex items-center gap-2">
-                      <span className="w-5 h-px bg-[#0A52D6]" /> Create Category
+                      <span className="w-5 h-px bg-[#0A52D6]" /> {editingCategoryId ? "Edit Category" : "Create Category"}
                     </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">Add a new category for your website products.</p>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {editingCategoryId ? "Modify this category details and cover photo." : "Add a new category for your website products."}
+                    </p>
                   </div>
 
-                  <form onSubmit={handleCreateCategory} className="space-y-4">
+                  <form onSubmit={handleCategorySubmit} className="space-y-4">
                     <div>
                       <label className="block text-xs font-bold text-slate-550 uppercase tracking-wider mb-1">
                         Category Label / Name
@@ -1008,6 +1044,62 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                       />
                     </div>
 
+                    <div>
+                      <label className="block text-xs font-bold text-slate-550 uppercase tracking-wider mb-1">
+                        Category Cover Photo
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <label className="flex items-center justify-center gap-1.5 px-3 py-2 border border-slate-200 text-slate-600 font-bold rounded-lg text-xs bg-slate-50 hover:bg-slate-100 cursor-pointer transition-colors shadow-2xs">
+                          {isUploadingCategoryCover ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-[#0A52D6]" />
+                          ) : (
+                            <Plus className="w-3.5 h-3.5" />
+                          )}
+                          Upload Cover Photo
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              setIsUploadingCategoryCover(true);
+                              try {
+                                const formData = new FormData();
+                                formData.append("file", file);
+                                const res = await fetch("/api/admin/upload", {
+                                  method: "POST",
+                                  body: formData,
+                                });
+                                const data = await res.json();
+                                if (!res.ok) throw new Error(data.error || "Upload failed");
+                                setCategoryForm({ ...categoryForm, image: data.url });
+                              } catch (err: any) {
+                                alert(`Upload failed: ${err.message}`);
+                              } finally {
+                                setIsUploadingCategoryCover(false);
+                              }
+                            }}
+                            className="hidden"
+                          />
+                        </label>
+                        {categoryForm.image && (
+                          <button
+                            type="button"
+                            onClick={() => setCategoryForm({ ...categoryForm, image: "" })}
+                            className="text-xs text-red-600 hover:text-red-700 font-semibold"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                      {categoryForm.image && (
+                        <div className="mt-2.5 p-1.5 bg-slate-100 border border-slate-200 rounded-lg max-w-[120px] relative group">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={categoryForm.image} alt="Cover Preview" className="rounded object-contain w-full max-h-[80px]" />
+                        </div>
+                      )}
+                    </div>
+
                     <button
                       type="submit"
                       disabled={isSavingCategory}
@@ -1019,10 +1111,24 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                         </>
                       ) : (
                         <>
-                          <PlusCircle className="w-4 h-4" /> Create Category
+                          {editingCategoryId ? <Check className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}
+                          {editingCategoryId ? "Update Category" : "Create Category"}
                         </>
                       )}
                     </button>
+
+                    {editingCategoryId && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCategoryForm({ id: "", label: "", desc: "", image: "" });
+                          setEditingCategoryId(null);
+                        }}
+                        className="w-full py-2 border border-slate-200 text-slate-500 hover:bg-slate-50 font-semibold rounded-lg text-sm mt-2 transition-all cursor-pointer text-center"
+                      >
+                        Cancel Edit
+                      </button>
+                    )}
                   </form>
                 </div>
 
@@ -1052,22 +1158,40 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                           >
                             <div>
                               <div className="flex items-start justify-between gap-2">
-                                <div>
-                                  <h4 className="font-extrabold text-slate-900 text-sm leading-tight">
-                                    {cat.label}
-                                  </h4>
-                                  <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mt-1">
-                                    Slug: {cat.id}
-                                  </span>
+                                <div className="flex gap-3">
+                                  {cat.image && (
+                                    <div className="relative w-12 h-12 rounded border border-slate-200 overflow-hidden bg-slate-50 shrink-0">
+                                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                                      <img src={cat.image} alt={cat.label} className="w-full h-full object-cover" />
+                                    </div>
+                                  )}
+                                  <div>
+                                    <h4 className="font-extrabold text-slate-900 text-sm leading-tight">
+                                      {cat.label}
+                                    </h4>
+                                    <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mt-1">
+                                      Slug: {cat.id}
+                                    </span>
+                                  </div>
                                 </div>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteCategory(cat.id)}
-                                  className="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors shrink-0 cursor-pointer"
-                                  title={`Delete ${cat.label}`}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
+                                <div className="flex gap-1.5 shrink-0">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEditCategory(cat)}
+                                    className="p-1.5 rounded-lg text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer"
+                                    title={`Edit ${cat.label}`}
+                                  >
+                                    <Edit className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteCategory(cat.id)}
+                                    className="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-650 transition-colors shrink-0 cursor-pointer"
+                                    title={`Delete ${cat.label}`}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
                               </div>
                               <p className="text-xs text-slate-500 mt-2.5 line-clamp-3 leading-relaxed">
                                 {cat.desc || "No description provided."}

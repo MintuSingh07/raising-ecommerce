@@ -410,6 +410,7 @@ function ProductFormContent() {
 
     const method = editId ? "PUT" : "POST";
     const payload = {
+      originalId: editId || null,
       id: productForm.id,
       name: productForm.name,
       subtitle: productForm.subtitle,
@@ -521,11 +522,10 @@ function ProductFormContent() {
                       <input
                         type="text"
                         required
-                        disabled={!!editId}
                         placeholder="e.g. RT-4002"
                         value={productForm.id}
                         onChange={(e) => setProductForm({ ...productForm, id: e.target.value })}
-                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6] disabled:bg-slate-100 font-mono text-sm bg-white font-bold"
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6] font-mono text-sm bg-white font-bold"
                       />
                     </div>
                     <div>

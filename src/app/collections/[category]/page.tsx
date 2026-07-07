@@ -143,6 +143,7 @@ export default function CategoryPage({ params }: PageProps) {
   const { products: allProducts, isLoading } = useProducts();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [dbCategories, setDbCategories] = useState<any[]>([]);
 
   // Scroll to top on mount and category change
   useEffect(() => {
@@ -152,10 +153,27 @@ export default function CategoryPage({ params }: PageProps) {
     }
   }, [categoryId]);
 
+  // Fetch dynamic categories on mount
+  useEffect(() => {
+    fetch("/api/public/categories")
+      .then((res) => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setDbCategories(data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Find the category info
   const categoryInfo = useMemo(() => {
-    return WEBSITE_CATEGORIES.find(c => c.id === categoryId);
-  }, [categoryId]);
+    const activeCategories = dbCategories.length > 0 ? dbCategories : WEBSITE_CATEGORIES;
+    const found = activeCategories.find((c) => c.id === categoryId);
+    return found || { id: categoryId, label: categoryId.replace(/-/g, " "), desc: "" };
+  }, [categoryId, dbCategories]);
 
   // Group all products to filter the ones belonging to the active category
   const products = useMemo(() => {
@@ -277,7 +295,20 @@ export default function CategoryPage({ params }: PageProps) {
 
             {/* Category Header Card */}
             <div className="relative overflow-hidden rounded-[36px] bg-gradient-to-br from-slate-900 via-dark-navy to-slate-950 text-white p-8 sm:p-12 mb-12 shadow-premium border border-white/5">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(10,82,214,0.18)_0%,transparent_70%)] pointer-events-none" />
+              {(categoryInfo as any).image ? (
+                <>
+                  <Image
+                    src={(categoryInfo as any).image}
+                    alt={categoryInfo.label}
+                    fill
+                    priority
+                    className="object-cover opacity-25"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent pointer-events-none" />
+                </>
+              ) : (
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(10,82,214,0.18)_0%,transparent_70%)] pointer-events-none" />
+              )}
               
               <div className="max-w-3xl space-y-4 relative z-10">
                 <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-widest text-accent bg-accent/10 border border-accent/20 px-3 py-1 rounded-full inline-block">

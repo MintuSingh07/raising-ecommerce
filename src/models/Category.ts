@@ -4,6 +4,7 @@ const CategorySchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true, trim: true }, // Slug
   label: { type: String, required: true, trim: true },
   desc: { type: String, trim: true },
+  image: { type: String, trim: true },
   createdAt: { type: Date, default: Date.now },
 });
 
