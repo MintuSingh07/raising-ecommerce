@@ -273,6 +273,12 @@ function ProductFormContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [apiMessage, setApiMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [currentEditId, setCurrentEditId] = useState<string | null>(null);
+  const [dbProductId, setDbProductId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setCurrentEditId(editId);
+  }, [editId]);
 
   // Accordion drop-down state for active color image sections
   const [expandedColor, setExpandedColor] = useState<string | null>(null);
@@ -333,18 +339,19 @@ function ProductFormContent() {
         if (catRes.ok) {
           const catData = await catRes.json();
           setCategories(catData);
-          if (catData.length > 0 && !editId) {
+          if (catData.length > 0 && !currentEditId) {
             setProductForm((prev) => ({ ...prev, category: catData[0].id, categories: [catData[0].id] }));
           }
         }
 
         // If editing, fetch the specific product details
-        if (editId) {
+        if (currentEditId) {
           const prodRes = await fetch("/api/public/products");
           if (prodRes.ok) {
             const allProducts = await prodRes.json();
-            const item = allProducts.find((p: any) => String(p.id) === String(editId));
+            const item = allProducts.find((p: any) => String(p.id).toLowerCase() === String(currentEditId).toLowerCase());
             if (item) {
+              setDbProductId(item.id);
               setProductForm({
                 id: item.id,
                 name: item.name,
@@ -403,16 +410,16 @@ function ProductFormContent() {
     }
 
     loadData();
-  }, [editId]);
+  }, [currentEditId]);
 
   const handleProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setApiMessage(null);
     setIsSaving(true);
 
-    const method = editId ? "PUT" : "POST";
+    const method = currentEditId ? "PUT" : "POST";
     const payload = {
-      originalId: editId || null,
+      originalId: dbProductId || currentEditId || null,
       id: productForm.id,
       name: productForm.name,
       subtitle: productForm.subtitle,
@@ -451,8 +458,15 @@ function ProductFormContent() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Operation failed");
 
-      setApiMessage({ type: "success", text: editId ? "Product updated successfully!" : "Product created successfully!" });
+      setApiMessage({ type: "success", text: currentEditId ? "Product updated successfully!" : "Product created successfully!" });
       
+      // If we just created the product, transition to Edit mode in the URL so that subsequent saves use PUT
+      if (!currentEditId && data.product && data.product.id) {
+        setCurrentEditId(data.product.id);
+        setDbProductId(data.product.id);
+        window.history.replaceState(null, "", `/admin/products/edit?id=${data.product.id}`);
+      }
+
       // Redirect back to dashboard page after short delay so they see the success banner
       setTimeout(() => {
         router.push("/admin?tab=products");
@@ -492,7 +506,7 @@ function ProductFormContent() {
               Simple Product Creator
             </span>
             <h1 className="text-lg font-black text-slate-900 tracking-tight mt-0.5">
-              {editId ? `Edit Product: ${productForm.name}` : "Upload Product Details"}
+              {currentEditId ? `Edit Product: ${productForm.name}` : "Upload Product Details"}
             </h1>
           </div>
         </div>
@@ -1333,7 +1347,7 @@ function ProductFormContent() {
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" /> Saving...
                   </>
-                ) : editId ? (
+                ) : currentEditId ? (
                   "Save Changes"
                 ) : (
                   "Create Product"

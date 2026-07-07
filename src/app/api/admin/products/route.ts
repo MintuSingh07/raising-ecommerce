@@ -107,7 +107,7 @@ export async function PUT(request: NextRequest) {
     const queryId = originalId || fields.id;
 
     // If changing the SKU ID, check if the new ID is already taken
-    if (originalId && originalId !== fields.id) {
+    if (originalId && originalId.toLowerCase() !== fields.id.toLowerCase()) {
       const existing = await Product.findOne({ id: fields.id });
       if (existing) {
         return Response.json(
