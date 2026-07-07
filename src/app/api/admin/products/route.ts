@@ -25,6 +25,7 @@ function extractFields(body: any) {
     colors,
     applications,
     inBox,
+    video,
   } = body;
 
   return {
@@ -40,6 +41,7 @@ function extractFields(body: any) {
     image: image || "",
     gallery: gallery || [],
     datasheetUrl: datasheetUrl || "",
+    video: video || "",
     description: description || "",
     highlights: highlights || [],
     productFeatures: productFeatures || [],
