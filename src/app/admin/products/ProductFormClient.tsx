@@ -764,46 +764,14 @@ function ProductFormContent() {
                     </div>
 
                   <div>
-                    <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider mb-1">Product Video</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        placeholder="Or enter Video URL here..."
-                        value={productForm.video}
-                        onChange={(e) => setProductForm({ ...productForm, video: e.target.value })}
-                        className="flex-1 w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-[#0A52D6]"
-                      />
-                      <input
-                        type="file"
-                        accept="video/*"
-                        id="video-upload"
-                        className="hidden"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          setUploadingColor("video");
-                          try {
-                            const url = await uploadFile(file);
-                            setProductForm({ ...productForm, video: url });
-                          } catch (err: any) {
-                            alert(err.message);
-                          } finally {
-                            setUploadingColor(null);
-                          }
-                        }}
-                      />
-                      <label
-                        htmlFor="video-upload"
-                        className="px-3 py-2 border border-slate-200 text-slate-600 font-bold rounded-lg text-xs bg-slate-50 hover:bg-slate-100 cursor-pointer shrink-0 transition-colors flex items-center gap-1 shadow-2xs"
-                      >
-                        {uploadingColor === "video" ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin text-[#0A52D6]" />
-                        ) : (
-                          <Plus className="w-3.5 h-3.5" />
-                        )}
-                        Upload Video
-                      </label>
-                    </div>
+                    <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider mb-1">Product YouTube Video</label>
+                    <input
+                      type="text"
+                      placeholder="Paste YouTube Video URL (e.g. https://www.youtube.com/watch?v=...)"
+                      value={productForm.video}
+                      onChange={(e) => setProductForm({ ...productForm, video: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-[#0A52D6]"
+                    />
                   </div>
                 </div>
 
