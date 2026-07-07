@@ -220,6 +220,22 @@ function getColorBubbleStyle(colorName: string): {
   };
 }
 
+function getYouTubeEmbedUrl(url: string): string | null {
+  if (!url) return null;
+  const cleanUrl = url.trim();
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = cleanUrl.match(regExp);
+  if (match && match[2].length === 11) {
+    return `https://www.youtube.com/embed/${match[2]}`;
+  }
+  const shortsRegExp = /\/shorts\/([a-zA-Z0-9_-]{11})/;
+  const shortsMatch = cleanUrl.match(shortsRegExp);
+  if (shortsMatch && shortsMatch[1]) {
+    return `https://www.youtube.com/embed/${shortsMatch[1]}`;
+  }
+  return null;
+}
+
 export default function ProductDetails({
   product,
   onClose,
@@ -300,7 +316,13 @@ export default function ProductDetails({
 
   const [selectedColor, setSelectedColor] = useState("");
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [showVideo, setShowVideo] = useState(false);
   const thumbRef = useRef<HTMLDivElement>(null);
+
+  const embedUrl = useMemo(() => {
+    if (!product.video) return null;
+    return getYouTubeEmbedUrl(product.video);
+  }, [product.video]);
 
   const allImages = useMemo<string[]>(() => {
     const baseImages = product.media.images || [];
@@ -819,17 +841,54 @@ export default function ProductDetails({
             <div className="relative w-full aspect-square bg-gradient-to-b from-[#1E293B] via-[#0F172A] to-[#020617] rounded-[28px] flex items-center justify-center overflow-hidden shadow-premium group">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(10,82,214,0.15)_0%,transparent_65%)] pointer-events-none" />
 
-              {allImages.length > 0 ? (
-                <Image
-                  src={allImages[activeImageIndex]}
-                  alt={product.name}
-                  fill
-                  className="object-cover transition-transform duration-500 hover:scale-105"
-                  sizes="(max-width: 1024px) 100vw, 600px"
-                  priority
-                />
+              {showVideo && product.video ? (
+                <div className="absolute inset-0 w-full h-full bg-black z-25">
+                  {embedUrl ? (
+                    <iframe
+                      src={`${embedUrl}?autoplay=1`}
+                      title={`${product.name} Video`}
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <video
+                      src={product.video}
+                      controls
+                      autoPlay
+                      className="w-full h-full object-contain"
+                    />
+                  )}
+                  <button
+                    onClick={() => setShowVideo(false)}
+                    className="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white p-2 rounded-full transition-all hover:scale-105 z-30 cursor-pointer shadow-md flex items-center justify-center border-0"
+                    title="Close Video"
+                  >
+                    <LucideIcons.X className="w-5 h-5" />
+                  </button>
+                </div>
+              ) : allImages.length > 0 ? (
+                <>
+                  <Image
+                    src={allImages[activeImageIndex]}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-transform duration-500 hover:scale-105"
+                    sizes="(max-width: 1024px) 100vw, 600px"
+                    priority
+                  />
+                  {product.video && (
+                    <button
+                      onClick={() => setShowVideo(true)}
+                      className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-black/55 hover:bg-primary/95 text-white flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95 cursor-pointer border border-white/20 z-10"
+                      title="Play Video"
+                    >
+                      <LucideIcons.Play className="w-6 h-6 ml-1 text-white fill-white" />
+                    </button>
+                  )}
+                </>
               ) : (
-                <div className="flex flex-col items-center justify-center text-slate-650">
+                <div className="flex flex-col items-center justify-center text-slate-655">
                   <Package
                     className="w-16 h-16 text-slate-500"
                     strokeWidth={1}
@@ -841,23 +900,24 @@ export default function ProductDetails({
               )}
 
               {/* Best Seller Badge */}
-              {(product.featured === 1 ||
+              {!showVideo && (product.featured === 1 ||
                 product.tags.includes("top-product")) && (
-                <span className="absolute top-5 left-5 bg-accent text-dark-navy text-[10px] font-extrabold uppercase px-3.5 py-1.5 rounded-md shadow-sm select-none tracking-wider">
+                <span className="absolute top-5 left-5 bg-accent text-dark-navy text-[10px] font-extrabold uppercase px-3.5 py-1.5 rounded-md shadow-sm select-none tracking-wider z-10">
                   Best Seller
                 </span>
               )}
 
               {/* Left/Right Slider Overlay Buttons */}
-              {allImages.length > 1 && (
+              {!showVideo && allImages.length > 1 && (
                 <>
                   <button
-                    onClick={() =>
+                    onClick={() => {
                       setActiveImageIndex(
                         (prev) =>
                           (prev - 1 + allImages.length) % allImages.length,
-                      )
-                    }
+                      );
+                      setShowVideo(false);
+                    }}
                     className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white hover:bg-slate-50 border border-slate-200/85 flex items-center justify-center text-slate-800 shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all hover:scale-105 active:scale-95 cursor-pointer z-10"
                     aria-label="Previous image"
                   >
@@ -867,11 +927,12 @@ export default function ProductDetails({
                     />
                   </button>
                   <button
-                    onClick={() =>
+                    onClick={() => {
                       setActiveImageIndex(
                         (prev) => (prev + 1) % allImages.length,
-                      )
-                    }
+                      );
+                      setShowVideo(false);
+                    }}
                     className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white hover:bg-slate-50 border border-slate-200/85 flex items-center justify-center text-slate-800 shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all hover:scale-105 active:scale-95 cursor-pointer z-10"
                     aria-label="Next image"
                   >
@@ -885,7 +946,7 @@ export default function ProductDetails({
             </div>
 
             {/* Thumbnails strip with object-cover and soft shadows (no borders) */}
-            {allImages.length > 1 && (
+            {(allImages.length > 1 || product.video) && (
               <div className="relative flex items-center w-full px-8 mt-4 select-none">
                 {/* Left scroll arrow */}
                 <button
@@ -915,11 +976,14 @@ export default function ProductDetails({
                   className="flex flex-row flex-nowrap overflow-x-auto scrollbar-none gap-2.5 w-full scroll-smooth py-1"
                 >
                   {allImages.map((img: string, idx: number) => {
-                    const isActive = activeImageIndex === idx;
+                    const isActive = !showVideo && activeImageIndex === idx;
                     return (
                       <button
                         key={idx}
-                        onClick={() => setActiveImageIndex(idx)}
+                        onClick={() => {
+                          setActiveImageIndex(idx);
+                          setShowVideo(false);
+                        }}
                         className={`relative w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] rounded-xl bg-slate-50 overflow-hidden transition-all shrink-0 cursor-pointer ${
                           isActive
                             ? "ring-2 ring-primary ring-offset-2 scale-102 shadow-md"
@@ -934,17 +998,33 @@ export default function ProductDetails({
                           className="object-cover"
                           sizes="80px"
                         />
-
-                        {idx === 0 && product.video && (
-                          <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
-                            <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-primary shadow-sm">
-                              <ChevronRight className="w-3.5 h-3.5 text-primary ml-0.5 fill-primary" />
-                            </div>
-                          </div>
-                        )}
                       </button>
                     );
                   })}
+
+                  {/* Dynamic Video Thumbnail */}
+                  {product.video && (
+                    <button
+                      onClick={() => setShowVideo(true)}
+                      className={`relative w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] rounded-xl bg-slate-900 overflow-hidden transition-all shrink-0 cursor-pointer flex items-center justify-center ${
+                        showVideo
+                          ? "ring-2 ring-primary ring-offset-2 scale-102 shadow-md"
+                          : "shadow-sm border border-slate-200 hover:scale-102"
+                      }`}
+                    >
+                      {allImages[0] && (
+                        <Image
+                          src={allImages[0]}
+                          alt="Video Thumbnail"
+                          fill
+                          loading="lazy"
+                          className="object-cover opacity-40"
+                          sizes="80px"
+                        />
+                      )}
+                      <LucideIcons.Play className="w-5 h-5 text-white relative z-10" fill="white" />
+                    </button>
+                  )}
                 </div>
 
                 {/* Right edge fade out overlay */}
