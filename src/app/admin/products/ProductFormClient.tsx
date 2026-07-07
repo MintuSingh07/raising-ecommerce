@@ -17,24 +17,25 @@ import {
 interface Category {
   id: string;
   label: string;
+  section?: string;
 }
 
 const DEFAULT_CATEGORIES: Category[] = [
-  { id: "rechargeable-led-flashlight", label: "Rechargeable LED Flash Light" },
-  { id: "kisan-torch", label: "Kisan Torch" },
-  { id: "metal-flashlights", label: "Metal Flash Lights" },
-  { id: "led-headlamp", label: "LED Headlamp" },
-  { id: "led-table-lamp", label: "LED Table Lamp" },
-  { id: "solar-lantern-searchlight", label: "Solar Lantern and Search Light" },
-  { id: "led-lantern", label: "LED Lantern" },
-  { id: "led-usb-lamp", label: "LED USB Lamp" },
-  { id: "solar-energy-kit", label: "Solar Energy Kit" },
-  { id: "power-extension-board", label: "Power Extension Board" },
-  { id: "village-remote", label: "Village & Remote" },
-  { id: "corporate-gifting", label: "Corporate Gifting" },
-  { id: "defense-security", label: "Defense & Security" },
-  { id: "farming-fields", label: "Farming & Fields" },
-  { id: "industrial-yards", label: "Industrial Yards" },
+  { id: "rechargeable-led-flashlight", label: "Rechargeable LED Flash Light", section: "product-types" },
+  { id: "kisan-torch", label: "Kisan Torch", section: "product-types" },
+  { id: "metal-flashlights", label: "Metal Flash Lights", section: "product-types" },
+  { id: "led-headlamp", label: "LED Headlamp", section: "product-types" },
+  { id: "led-table-lamp", label: "LED Table Lamp", section: "product-types" },
+  { id: "solar-lantern-searchlight", label: "Solar Lantern and Search Light", section: "product-types" },
+  { id: "led-lantern", label: "LED Lantern", section: "product-types" },
+  { id: "led-usb-lamp", label: "LED USB Lamp", section: "product-types" },
+  { id: "solar-energy-kit", label: "Solar Energy Kit", section: "product-types" },
+  { id: "power-extension-board", label: "Power Extension Board", section: "product-types" },
+  { id: "village-remote", label: "Village & Remote", section: "applications-target-uses" },
+  { id: "corporate-gifting", label: "Corporate Gifting", section: "applications-target-uses" },
+  { id: "defense-security", label: "Defense & Security", section: "applications-target-uses" },
+  { id: "farming-fields", label: "Farming & Fields", section: "applications-target-uses" },
+  { id: "industrial-yards", label: "Industrial Yards", section: "applications-target-uses" },
 ];
 
 const PREDEFINED_COLORS = [
@@ -618,7 +619,8 @@ function ProductFormContent() {
                                         );
 
                                         const productTypeCategories = filtered.filter((cat) =>
-                                          [
+                                          cat.section === "product-types" ||
+                                          (!cat.section && [
                                             "rechargeable-led-flashlight",
                                             "kisan-torch",
                                             "metal-flashlights",
@@ -629,17 +631,18 @@ function ProductFormContent() {
                                             "led-usb-lamp",
                                             "solar-energy-kit",
                                             "power-extension-board"
-                                          ].includes(cat.id)
+                                          ].includes(cat.id))
                                         );
 
                                         const applicationCategories = filtered.filter((cat) =>
-                                          [
+                                          cat.section === "applications-target-uses" ||
+                                          (!cat.section && [
                                             "village-remote",
                                             "corporate-gifting",
                                             "defense-security",
                                             "farming-fields",
                                             "industrial-yards"
-                                          ].includes(cat.id)
+                                          ].includes(cat.id))
                                         );
 
                                         const otherCategories = filtered.filter((cat) =>

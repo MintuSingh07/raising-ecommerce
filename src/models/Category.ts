@@ -5,6 +5,7 @@ const CategorySchema = new mongoose.Schema({
   label: { type: String, required: true, trim: true },
   desc: { type: String, trim: true },
   image: { type: String, trim: true },
+  section: { type: String, default: "product-types", trim: true },
   createdAt: { type: Date, default: Date.now },
 });
 

@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 
     await dbConnect();
     const body = await request.json();
-    const { id, label, desc, image } = body;
+    const { id, label, desc, image, section } = body;
 
     if (!id || !label) {
       return Response.json(
@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
       label: label.trim(),
       desc: (desc || "").trim(),
       image: image || "",
+      section: section || "product-types",
     });
 
     return Response.json({ success: true, category });
@@ -101,7 +102,7 @@ export async function PUT(request: NextRequest) {
 
     await dbConnect();
     const body = await request.json();
-    const { originalId, id, label, desc, image } = body;
+    const { originalId, id, label, desc, image, section } = body;
 
     if (!originalId || !id || !label) {
       return Response.json(
@@ -136,6 +137,7 @@ export async function PUT(request: NextRequest) {
         label: label.trim(),
         desc: (desc || "").trim(),
         image: image || "",
+        section: section || "product-types",
       },
       { new: true }
     );

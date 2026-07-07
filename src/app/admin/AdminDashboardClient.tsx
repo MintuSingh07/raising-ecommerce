@@ -331,6 +331,7 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
     label: "",
     desc: "",
     image: "",
+    section: "product-types",
   });
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
   const [isSavingCategory, setIsSavingCategory] = useState(false);
@@ -508,7 +509,7 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
         return updated.sort((a, b) => (a.createdAt || "").localeCompare(b.createdAt || ""));
       });
 
-      setCategoryForm({ id: "", label: "", desc: "", image: "" });
+      setCategoryForm({ id: "", label: "", desc: "", image: "", section: "product-types" });
       setEditingCategoryId(null);
     } catch (err: any) {
       setApiMessage({ type: "error", text: err.message });
@@ -523,6 +524,7 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
       label: cat.label,
       desc: cat.desc || "",
       image: cat.image || "",
+      section: cat.section || "product-types",
     });
     setEditingCategoryId(cat.id);
   };
@@ -537,7 +539,7 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
       setApiMessage({ type: "success", text: "Category deleted successfully!" });
       setCategories(prev => prev.filter(c => c.id !== id));
       if (editingCategoryId === id) {
-        setCategoryForm({ id: "", label: "", desc: "", image: "" });
+        setCategoryForm({ id: "", label: "", desc: "", image: "", section: "product-types" });
         setEditingCategoryId(null);
       }
     } catch (err: any) {
@@ -1016,6 +1018,20 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
 
                     <div>
                       <label className="block text-xs font-bold text-slate-550 uppercase tracking-wider mb-1">
+                        Category Section / Group
+                      </label>
+                      <select
+                        value={categoryForm.section || "product-types"}
+                        onChange={(e) => setCategoryForm({ ...categoryForm, section: e.target.value })}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-[#0A52D6]"
+                      >
+                        <option value="product-types">Product Types</option>
+                        <option value="applications-target-uses">Applications & Target Uses</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-550 uppercase tracking-wider mb-1">
                         Category Slug / ID (lowercase, no spaces)
                       </label>
                       <input
@@ -1121,7 +1137,7 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                       <button
                         type="button"
                         onClick={() => {
-                          setCategoryForm({ id: "", label: "", desc: "", image: "" });
+                          setCategoryForm({ id: "", label: "", desc: "", image: "", section: "product-types" });
                           setEditingCategoryId(null);
                         }}
                         className="w-full py-2 border border-slate-200 text-slate-500 hover:bg-slate-50 font-semibold rounded-lg text-sm mt-2 transition-all cursor-pointer text-center"
@@ -1169,8 +1185,11 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                                     <h4 className="font-extrabold text-slate-900 text-sm leading-tight">
                                       {cat.label}
                                     </h4>
-                                    <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mt-1">
+                                    <span className="text-[10px] font-bold text-slate-455 uppercase tracking-wider block mt-1">
                                       Slug: {cat.id}
+                                    </span>
+                                    <span className="text-[9px] font-extrabold text-[#0A52D6] uppercase tracking-wider block mt-0.5">
+                                      Group: {cat.section === "applications-target-uses" ? "Applications & Uses" : "Product Types"}
                                     </span>
                                   </div>
                                 </div>
