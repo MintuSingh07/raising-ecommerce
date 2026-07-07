@@ -165,16 +165,18 @@ function MultiIconPicker({ value = [], onChange }: MultiIconPickerProps) {
 
   const toggleIcon = (iconName: string) => {
     if (value.includes(iconName)) {
-      onChange(value.filter((n) => n !== iconName));
+      onChange([]);
     } else {
-      onChange([...value, iconName]);
+      onChange([iconName]);
     }
+    setIsOpen(false);
+    setSearch("");
   };
 
   return (
     <div className="flex flex-wrap items-center gap-1.5 p-1 px-2 border border-slate-200 rounded-xl bg-slate-50/50 w-full min-h-[38px]">
       {value.length === 0 ? (
-        <span className="text-[10px] text-slate-400 font-bold select-none mr-2">No icons selected</span>
+        <span className="text-[10px] text-slate-400 font-bold select-none mr-2">No icon selected</span>
       ) : (
         <div className="flex flex-wrap gap-1">
           {value.map((iconName) => {
@@ -189,7 +191,7 @@ function MultiIconPicker({ value = [], onChange }: MultiIconPickerProps) {
                 <button
                   type="button"
                   onClick={() => toggleIcon(iconName)}
-                  className="text-red-400 hover:text-red-600 font-bold hover:scale-115 transition-transform cursor-pointer text-xs"
+                  className="text-red-400 hover:text-[#EF4444] font-bold hover:scale-115 transition-transform cursor-pointer text-xs"
                 >
                   &times;
                 </button>
@@ -206,7 +208,7 @@ function MultiIconPicker({ value = [], onChange }: MultiIconPickerProps) {
           className="px-2.5 py-1 text-[10px] font-extrabold text-slate-500 hover:text-[#0A52D6] bg-white border border-slate-200 hover:border-[#0A52D6] rounded-lg transition-all cursor-pointer flex items-center gap-1 hover:shadow-2xs"
         >
           <Plus className="w-3 h-3" />
-          Add Icon
+          {value.length > 0 ? "Change Icon" : "Select Icon"}
         </button>
 
         {isOpen && (
