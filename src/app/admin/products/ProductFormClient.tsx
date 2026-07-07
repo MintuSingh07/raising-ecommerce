@@ -1218,17 +1218,7 @@ function ProductFormContent() {
                     </div>
                   </div>
 
-                  {/* Detailed Description */}
-                  <div className="space-y-2 pt-3 border-t border-slate-200/60">
-                    <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider">Detailed Description</label>
-                    <textarea
-                      rows={4}
-                      placeholder="Write any additional details or user instructions here..."
-                      value={productForm.description}
-                      onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6] bg-white text-sm leading-relaxed"
-                    />
-                  </div>
+
                 </div>
               </div>
             </div>
