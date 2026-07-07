@@ -39,6 +39,7 @@ interface ProductDetailsProps {
     id: number;
     type: string;
     name: string;
+    subtitle?: string;
     video: string;
     sku: string | null;
     gtin_upc_ean_isbn: string | null;
@@ -1064,13 +1065,19 @@ export default function ProductDetails({
               <h1 className="text-3xl sm:text-4xl lg:text-[42px] font-bold text-dark-navy tracking-tight leading-[1.15]">
                 {product.name}
               </h1>
-              {features.length > 0 && (
+              {product.subtitle ? (
                 <p className="text-sm sm:text-base text-slate-body font-medium leading-relaxed max-w-xl">
-                  {getFormattedHighlight(features[0]).title}.{" "}
-                  {features[1]
-                    ? getFormattedHighlight(features[1]).title
-                    : "High performance illumination. Built for every challenge."}
+                  {product.subtitle}
                 </p>
+              ) : (
+                features.length > 0 && (
+                  <p className="text-sm sm:text-base text-slate-body font-medium leading-relaxed max-w-xl">
+                    {getFormattedHighlight(features[0]).title}.{" "}
+                    {features[1]
+                      ? getFormattedHighlight(features[1]).title
+                      : "High performance illumination. Built for every challenge."}
+                  </p>
+                )
               )}
             </div>
 
