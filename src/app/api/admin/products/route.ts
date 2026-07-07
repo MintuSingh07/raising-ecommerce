@@ -28,7 +28,7 @@ function extractFields(body: any) {
   } = body;
 
   return {
-    id,
+    id: id ? String(id).trim() : "",
     name,
     subtitle: subtitle || "",
     category,
@@ -107,7 +107,7 @@ export async function PUT(request: NextRequest) {
     const queryId = originalId || fields.id;
 
     // If changing the SKU ID, check if the new ID is already taken
-    if (originalId && originalId.toLowerCase() !== fields.id.toLowerCase()) {
+    if (originalId && String(originalId).toLowerCase() !== String(fields.id).toLowerCase()) {
       const existing = await Product.findOne({ id: fields.id });
       if (existing) {
         return Response.json(
