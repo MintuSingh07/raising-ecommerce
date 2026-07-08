@@ -460,12 +460,12 @@ export default function ProductCatalog({
         </div>
 
         {/* Category Capsules Wrapper with arrows & fade effect */}
-        <div className="relative w-full max-w-5xl mx-auto mb-12 px-10">
+        <div className="relative w-full max-w-5xl mx-auto mb-12 px-0 sm:px-10">
           {/* Left Arrow Button */}
           <button
             onClick={() => scroll("left")}
             aria-label="Scroll capsules left"
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm text-slate-500 hover:bg-primary hover:text-white hover:border-primary transition-all duration-200 active:scale-90 flex items-center justify-center cursor-pointer"
+            className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm text-slate-500 hover:bg-primary hover:text-white hover:border-primary transition-all duration-200 active:scale-90 items-center justify-center cursor-pointer"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
@@ -476,7 +476,7 @@ export default function ProductCatalog({
           <button
             onClick={() => scroll("right")}
             aria-label="Scroll capsules right"
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm text-slate-500 hover:bg-primary hover:text-white hover:border-primary transition-all duration-200 active:scale-90 flex items-center justify-center cursor-pointer"
+            className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm text-slate-500 hover:bg-primary hover:text-white hover:border-primary transition-all duration-200 active:scale-90 items-center justify-center cursor-pointer"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
@@ -484,13 +484,13 @@ export default function ProductCatalog({
           </button>
 
           {/* Left fade overlay */}
-          <div className="pointer-events-none absolute left-8 top-0 bottom-0 w-8 z-10 bg-gradient-to-r from-white to-transparent" />
+          <div className="pointer-events-none hidden sm:block absolute left-8 top-0 bottom-0 w-8 z-10 bg-gradient-to-r from-white to-transparent" />
           {/* Right fade overlay */}
-          <div className="pointer-events-none absolute right-8 top-0 bottom-0 w-8 z-10 bg-gradient-to-l from-white to-transparent" />
+          <div className="pointer-events-none hidden sm:block absolute right-8 top-0 bottom-0 w-8 z-10 bg-gradient-to-l from-white to-transparent" />
 
           <div
             ref={scrollRef}
-            className="flex flex-row flex-nowrap overflow-x-auto justify-start gap-2.5 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-2"
+            className="flex flex-row flex-nowrap overflow-x-auto justify-start gap-2.5 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-2 px-4 sm:px-0"
           >
             {WEBSITE_CATEGORIES.map((webCat) => {
               const isActive = activeCategory === webCat.id;
