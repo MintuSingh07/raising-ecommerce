@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "motion/react";
 import BlurText from "./BlurText";
 
@@ -74,6 +75,33 @@ const STRIP_2_TESTIMONIALS = [
 ];
 
 export default function Testimonials() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState(0);
+
+  const allTestimonials = [...STRIP_1_TESTIMONIALS, ...STRIP_2_TESTIMONIALS];
+
+  const handlePrev = () => {
+    setActiveIndex((prev) => (prev - 1 + allTestimonials.length) % allTestimonials.length);
+  };
+
+  const handleNext = () => {
+    setActiveIndex((prev) => (prev + 1) % allTestimonials.length);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const endX = e.changedTouches[0].clientX;
+    const diff = touchStart - endX;
+    if (diff > 50) {
+      handleNext();
+    } else if (diff < -50) {
+      handlePrev();
+    }
+  };
+
   return (
     <section className="py-24 bg-white border-t border-slate-100 overflow-hidden scroll-mt-20">
       
@@ -113,8 +141,8 @@ export default function Testimonials() {
             </span>
             <BlurText className="justify-center" text="Testimonials" delay={30} animateBy="words" direction="bottom" />
           </div>
-          <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-dark-navy tracking-tight leading-tight uppercase w-full flex justify-center whitespace-nowrap flex-nowrap">
-            <BlurText className="justify-center !flex-nowrap whitespace-nowrap" text="Trusted by Distributors &amp; Users" highlightWords={["Distributors"]} delay={20} animateBy="words" direction="bottom" />
+          <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-dark-navy tracking-tight leading-tight uppercase w-full flex justify-center">
+            <BlurText className="justify-center" text="Trusted by Distributors &amp; Users" highlightWords={["Distributors"]} delay={20} animateBy="words" direction="bottom" />
           </h2>
           <p className="text-sm sm:text-base text-slate-body font-medium leading-relaxed">
             Read how our high-performance lighting systems power industries, farms, and businesses across India.
@@ -122,8 +150,8 @@ export default function Testimonials() {
         </div>
       </div>
 
-      {/* Testimonials Strips Section */}
-      <div className="space-y-8 relative w-full">
+      {/* Testimonials Strips Section - Desktop */}
+      <div className="hidden md:block space-y-8 relative w-full">
         {/* Left & Right Fade Gradients */}
         <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-32 md:w-48 z-10 bg-gradient-to-r from-white via-white/50 to-transparent" />
         <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-32 md:w-48 z-10 bg-gradient-to-l from-white via-white/50 to-transparent" />
@@ -156,6 +184,39 @@ export default function Testimonials() {
           </div>
         </div>
       </div>
+
+      {/* Testimonials Swipeable Slider - Mobile/Tablet */}
+      <div className="block md:hidden px-4 select-none relative w-full overflow-hidden">
+        <div 
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          className="relative max-w-sm mx-auto overflow-hidden rounded-[28px]"
+        >
+          <div className="flex transition-transform duration-500 ease-out" style={{ transform: `translateX(-${activeIndex * 100}%)` }}>
+            {allTestimonials.map((t, idx) => (
+              <div key={`mobile-card-${idx}`} className="w-full shrink-0 px-1">
+                <TestimonialCard testimonial={t} isMobile={true} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Carousel Indicators / Nav Dots */}
+        <div className="flex justify-center items-center gap-2 mt-6">
+          {allTestimonials.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setActiveIndex(idx)}
+              className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                activeIndex === idx 
+                  ? "w-6 bg-primary" 
+                  : "w-2 bg-slate-200 hover:bg-slate-350"
+              }`}
+              aria-label={`Go to review ${idx + 1}`}
+            />
+          ))}
+        </div>
+      </div>
     </section>
   );
 }
@@ -163,6 +224,7 @@ export default function Testimonials() {
 // Reusable Testimonial Card Component
 function TestimonialCard({
   testimonial,
+  isMobile = false,
 }: {
   testimonial: {
     quote: string;
@@ -172,9 +234,10 @@ function TestimonialCard({
     rating: number;
     tag: string;
   };
+  isMobile?: boolean;
 }) {
   return (
-    <div className="w-[300px] sm:w-[380px] bg-slate-50/50 border border-slate-100 rounded-[28px] p-6 sm:p-8 flex flex-col justify-between h-[340px] relative hover:shadow-[0_15px_30px_rgba(0,0,0,0.03)] hover:border-primary/10 transition-all duration-300 select-none shrink-0">
+    <div className={`bg-slate-50/50 border border-slate-100 rounded-[28px] p-6 sm:p-8 flex flex-col justify-between h-[340px] relative hover:shadow-[0_15px_30px_rgba(0,0,0,0.03)] hover:border-primary/10 transition-all duration-300 select-none shrink-0 ${isMobile ? "w-full" : "w-[300px] sm:w-[380px]"}`}>
       {/* Quote decoration */}
       <span className="text-4xl sm:text-5xl font-serif text-primary/15 absolute left-6 top-16 select-none pointer-events-none">
         “
