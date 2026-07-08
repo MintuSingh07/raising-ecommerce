@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import BlurText from "./BlurText";
 
@@ -79,6 +79,13 @@ export default function Testimonials() {
   const [touchStart, setTouchStart] = useState(0);
 
   const allTestimonials = [...STRIP_1_TESTIMONIALS, ...STRIP_2_TESTIMONIALS];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      handleNext();
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [activeIndex]);
 
   const handlePrev = () => {
     setActiveIndex((prev) => (prev - 1 + allTestimonials.length) % allTestimonials.length);
