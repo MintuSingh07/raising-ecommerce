@@ -103,11 +103,11 @@ export default function FeaturedProducts({ setSelectedProduct }: FeaturedProduct
   }
 
   return (
-    <section id="bestselling" className="py-24 bg-slate-50 scroll-mt-20">
+    <section id="bestselling" className="py-24 bg-slate-50 scroll-mt-20 overflow-hidden w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-6">
           <div className="flex flex-col items-start space-y-4">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/[0.04] border border-primary/10 text-xs font-medium uppercase tracking-wider text-primary">
               <span className="relative flex h-2 w-2">
@@ -122,7 +122,7 @@ export default function FeaturedProducts({ setSelectedProduct }: FeaturedProduct
           </div>
           
           {/* Navigation Arrows */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 self-start sm:self-center">
             <button 
               onClick={() => handleScroll("left")}
               className="w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-light hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 active:scale-95 cursor-pointer shadow-sm"

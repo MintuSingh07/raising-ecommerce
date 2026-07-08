@@ -57,9 +57,9 @@ export default function StatsBanner() {
   ];
 
   return (
-    <div className="relative w-[90%] max-w-7xl mx-auto -mt-10 z-20">
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-premium py-2 sm:py-4 md:py-6 px-3 sm:px-6">
-        <div className="grid grid-cols-4 gap-1 sm:gap-6 lg:gap-8 divide-x divide-slate-100">
+    <div className="relative w-[90%] max-w-7xl mx-auto -mt-6 sm:-mt-10 z-20">
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-premium py-3 sm:py-4 md:py-6 px-4 sm:px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-4 gap-x-2 md:gap-6 lg:gap-8 md:divide-x divide-slate-100">
           {stats.map((stat, idx) => (
             <motion.div
               key={idx}
@@ -67,18 +67,18 @@ export default function StatsBanner() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: idx * 0.1, ease: "easeOut" }}
-              className={`flex flex-col sm:flex-row items-center gap-1 sm:gap-3 lg:gap-4 text-center sm:text-left ${
-                idx > 0 ? "pl-1 sm:pl-4 lg:pl-6" : ""
-              }`}
+              className={`flex flex-col sm:flex-row items-center gap-2 sm:gap-3 lg:gap-4 text-center sm:text-left ${
+                idx % 2 !== 0 ? "pl-1 sm:pl-0" : ""
+              } md:pl-4 lg:pl-6 ${idx === 0 ? "md:pl-0" : ""}`}
             >
               <div className="flex-shrink-0 p-1 sm:p-2 bg-blue-50/50 rounded-lg sm:rounded-xl">
                 {stat.icon}
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-[10px] sm:text-sm md:text-lg lg:text-2xl font-semibold text-dark-navy leading-none tracking-tight">
+                <span className="text-xs sm:text-sm md:text-lg lg:text-2xl font-semibold text-dark-navy leading-none tracking-tight">
                   {stat.value}
                 </span>
-                <span className="text-[8px] sm:text-[10px] md:text-xs font-medium text-slate-light mt-0.5 sm:mt-1 leading-tight">
+                <span className="text-[9px] sm:text-[10px] md:text-xs font-medium text-slate-light mt-0.5 sm:mt-1 leading-tight">
                   {stat.label}
                 </span>
               </div>

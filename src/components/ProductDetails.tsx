@@ -32,6 +32,7 @@ import {
   ChevronRight,
   Check,
   MessageCircle,
+  ArrowLeft,
 } from "lucide-react";
 
 interface ProductDetailsProps {
@@ -809,6 +810,17 @@ export default function ProductDetails({
   return (
     <section className="py-20 bg-white scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 sm:mt-10">
+        {/* Mobile Go Back button */}
+        <div className="flex sm:hidden items-center mb-6">
+          <button
+            onClick={onClose}
+            className="inline-flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-primary transition-colors cursor-pointer bg-slate-50 border border-slate-200/80 px-4 py-2.5 rounded-full shadow-xs"
+          >
+            <ArrowLeft className="w-4 h-4 text-slate-600" />
+            <span>Back to Products</span>
+          </button>
+        </div>
+
         {/* Breadcrumb Navigation */}
         <nav className="flex items-center space-x-2 text-[11px] sm:text-xs font-semibold text-slate-light mb-8 select-none tracking-wide">
           <button

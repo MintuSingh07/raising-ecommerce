@@ -113,7 +113,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className={`scroll-mt-20 relative overflow-hidden w-full h-screen h-[100dvh] min-h-[500px] bg-white select-none ${
+      className={`scroll-mt-20 relative overflow-hidden w-full h-[60dvh] sm:h-screen sm:h-[100dvh] min-h-[400px] sm:min-h-[500px] bg-white select-none ${
         isDragging ? "cursor-grabbing" : "cursor-grab"
       }`}
       onTouchStart={handleTouchStart}
@@ -151,7 +151,11 @@ export default function Hero() {
                   src={slide.image}
                   alt={`RISING Banner ${index + 1}`}
                   fill
-                  className={`object-cover ${index === 1 ? "object-[center_60%]" : "object-center"} pointer-events-none select-none`}
+                  className={`object-cover ${
+                    index === 1 
+                      ? "object-[center_60%]" 
+                      : "object-[20%_center] sm:object-center"
+                  } pointer-events-none select-none`}
                   sizes="100vw"
                   priority={index === 0}
                   draggable={false}

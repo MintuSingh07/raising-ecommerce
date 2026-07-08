@@ -78,7 +78,7 @@ export default function Categories() {
   ];
 
   return (
-    <section id="collections" className="py-20 bg-slate-50/40 border-y border-slate-100/50 scroll-mt-20">
+    <section id="collections" className="py-20 bg-slate-50/40 border-y border-slate-100/50 scroll-mt-20 overflow-hidden w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Section Header */}
