@@ -27,13 +27,22 @@ export default function DistributorPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitStatus("idle");
     
-    // Simulate API request
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const res = await fetch("/api/public/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "distributor", data: formData }),
+      });
+      
+      if (!res.ok) {
+        throw new Error("Failed to submit application");
+      }
+      
       setSubmitStatus("success");
       setFormData({
         companyName: "",
@@ -45,10 +54,14 @@ export default function DistributorPage() {
         investment: "",
         message: "",
       });
-      
+    } catch (err) {
+      console.error(err);
+      setSubmitStatus("error");
+    } finally {
+      setIsSubmitting(false);
       // Reset status after a few seconds
       setTimeout(() => setSubmitStatus("idle"), 5000);
-    }, 1500);
+    }
   };
 
   const benefits = [
@@ -154,7 +167,7 @@ export default function DistributorPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label htmlFor="companyName" className="text-xs font-bold text-dark-navy uppercase tracking-wider block">
-                    Company Name
+                    Company Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -170,7 +183,7 @@ export default function DistributorPage() {
 
                 <div className="space-y-2">
                   <label htmlFor="contactName" className="text-xs font-bold text-dark-navy uppercase tracking-wider block">
-                    Contact Person Name
+                    Contact Person Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -188,7 +201,7 @@ export default function DistributorPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label htmlFor="email" className="text-xs font-bold text-dark-navy uppercase tracking-wider block">
-                    Business Email
+                    Business Email <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
@@ -204,7 +217,7 @@ export default function DistributorPage() {
 
                 <div className="space-y-2">
                   <label htmlFor="phone" className="text-xs font-bold text-dark-navy uppercase tracking-wider block">
-                    Contact Number
+                    Contact Number <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="tel"
@@ -228,7 +241,6 @@ export default function DistributorPage() {
                     type="text"
                     id="location"
                     name="location"
-                    required
                     value={formData.location}
                     onChange={handleChange}
                     placeholder="e.g. Jodhpur, Rajasthan"
@@ -244,7 +256,6 @@ export default function DistributorPage() {
                     type="number"
                     id="experience"
                     name="experience"
-                    required
                     value={formData.experience}
                     onChange={handleChange}
                     placeholder="e.g. 5"
@@ -259,7 +270,6 @@ export default function DistributorPage() {
                   <select
                     id="investment"
                     name="investment"
-                    required
                     value={formData.investment}
                     onChange={handleChange}
                     className="w-full px-4 py-3 rounded-xl bg-slate-50/50 border border-slate-200 text-slate-800 text-sm font-semibold focus:outline-none focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all duration-300 cursor-pointer"
@@ -306,6 +316,11 @@ export default function DistributorPage() {
               {submitStatus === "success" && (
                 <div className="p-4 bg-emerald-50 text-emerald-800 rounded-xl text-xs sm:text-sm font-semibold border border-emerald-100 animate-fadeIn">
                   ✓ Your application has been submitted successfully. Our distributorship team will contact you.
+                </div>
+              )}
+              {submitStatus === "error" && (
+                <div className="p-4 bg-red-50 text-red-800 rounded-xl text-xs sm:text-sm font-semibold border border-red-100 animate-fadeIn">
+                  ✗ There was an error submitting your application. Please try again.
                 </div>
               )}
             </form>

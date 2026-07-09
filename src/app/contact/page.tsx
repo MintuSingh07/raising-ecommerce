@@ -24,19 +24,32 @@ export default function ContactPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitStatus("idle");
     
-    // Simulate API request
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const res = await fetch("/api/public/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "contact", data: formData }),
+      });
+      
+      if (!res.ok) {
+        throw new Error("Failed to send message");
+      }
+      
       setSubmitStatus("success");
       setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
-      
+    } catch (err) {
+      console.error(err);
+      setSubmitStatus("error");
+    } finally {
+      setIsSubmitting(false);
       // Reset status after a few seconds
       setTimeout(() => setSubmitStatus("idle"), 5000);
-    }, 1500);
+    }
   };
 
   return (
@@ -187,6 +200,11 @@ export default function ContactPage() {
                 {submitStatus === "success" && (
                   <div className="p-4 bg-emerald-50 text-emerald-800 rounded-xl text-xs sm:text-sm font-semibold border border-emerald-100 animate-fadeIn">
                     ✓ Your message has been sent successfully. We will contact you soon.
+                  </div>
+                )}
+                {submitStatus === "error" && (
+                  <div className="p-4 bg-red-50 text-red-800 rounded-xl text-xs sm:text-sm font-semibold border border-red-100 animate-fadeIn">
+                    ✗ There was an error sending your message. Please try again.
                   </div>
                 )}
               </form>
