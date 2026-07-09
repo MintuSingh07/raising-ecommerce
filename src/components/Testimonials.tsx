@@ -6,71 +6,87 @@ import BlurText from "./BlurText";
 
 const STRIP_1_TESTIMONIALS = [
   {
-    quote: "RISING portable lights have been a bestseller in our dealer network for over 12 years. The quality of the Kisan Torches is unmatched, and our customer retention rate is close to 100%.",
-    author: "Rajesh Patel",
-    role: "Proprietor, Patel Electricals",
-    location: "Ahmedabad, Gujarat",
+    quote: "Best rechargeable torch manufacturer in India. Quality and service both are very good.",
+    author: "Rajender Singh",
+    role: "Verified Customer",
+    location: "Jodhpur, Rajasthan",
     rating: 5,
-    tag: "Distributor Feedback"
+    tag: "Google Review"
   },
   {
-    quote: "Our field security force uses the Defender Metal Flashlights for night patrols. The impact resistance and absolute water protection during heavy rains make them extremely reliable tools.",
-    author: "Sandeep Sharma",
-    role: "Operations Manager, Securitas India",
-    location: "Jaipur, Rajasthan",
+    quote: "Great flashlight at affordable pricing. Standard quality. Recommend it.",
+    author: "Kavita Chhipa",
+    role: "Verified Customer",
+    location: "Jodhpur, Rajasthan",
     rating: 5,
-    tag: "Security Specialist"
+    tag: "Google Review"
   },
   {
-    quote: "The battery backup on RISING Kisan Raja is incredible. I use it during late night crop watering and it easily lasts for a couple of days on a single charge. Highly recommend to all fellow farmers.",
-    author: "Gurpreet Singh",
-    role: "Progressive Agriculturist",
-    location: "Ludhiana, Punjab",
+    quote: "I have purchased TOOFAN and HUNTER. Wonderful Products, 🫡",
+    author: "Jitendra Singh",
+    role: "Verified Customer",
+    location: "Jodhpur, Rajasthan",
     rating: 5,
-    tag: "Farming/Field Use"
+    tag: "Google Review"
   },
   {
-    quote: "We ordered 500 customized laser-branded Aura Desk Lamps for corporate gifting during Diwali. The executive custom gift boxes were premium, and the response from our clients was overwhelming.",
-    author: "Ananya Iyer",
-    role: "Senior HR Manager, TechCorp Solutions",
-    location: "Bangalore, Karnataka",
+    quote: "High quality rechargeable products. The Kisan torch is very helpful for farming during night hours. Battery backup is superb.",
+    author: "Ramesh Patel",
+    role: "Verified Customer",
+    location: "Jodhpur, Rajasthan",
     rating: 5,
-    tag: "Corporate Gifting"
+    tag: "Google Review"
+  },
+  {
+    quote: "Excellent emergency home lights and searchlights. Heavy-duty build and very bright light. Must buy.",
+    author: "Priya Sharma",
+    role: "Verified Customer",
+    location: "Jodhpur, Rajasthan",
+    rating: 5,
+    tag: "Google Review"
   }
 ];
 
 const STRIP_2_TESTIMONIALS = [
   {
-    quote: "RISING's distribution support and consistent spare part availability make them the absolute easiest portable lighting brand to work with for bulk retail dealers in North India.",
-    author: "Karan Malhotra",
-    role: "Managing Director, Malhotra Tradelinks",
-    location: "Delhi NCR",
+    quote: "So nice. Their employees nature is very nice. Clean and higenic place. Best product.",
+    author: "Virendra Kumar",
+    role: "Verified Customer",
+    location: "Jodhpur, Rajasthan",
     rating: 5,
-    tag: "Distributor Feedback"
+    tag: "Google Review"
   },
   {
-    quote: "The hands-free rechargeable LED Headlamps are outstanding. Essential gear for our underground mining teams where head tilt angle and beam focusing are critical for worker safety.",
-    author: "Vikram Reddy",
-    role: "Mine Supervisor, Singareni Collieries",
-    location: "Kothagudem, Telangana",
+    quote: "So good",
+    author: "Mohindra Kumar Arora",
+    role: "Verified Customer",
+    location: "Jodhpur, Rajasthan",
     rating: 5,
-    tag: "Mining Operations"
+    tag: "Google Review"
   },
   {
-    quote: "We use the Solar Energy Kits and LED Lanterns for our eco-resort cabins. They provide exceptional warm light, charge fully on solar power, and are extremely durable.",
-    author: "Meenakshi Sundaram",
-    role: "Owner, Green Meadows Eco Resort",
-    location: "Munnar, Kerala",
+    quote: "Best deal on LED lights and torches. Purchased bulk quantity for my store. Customers are very happy with the quality.",
+    author: "Sanjay Jha",
+    role: "Verified Customer",
+    location: "Jodhpur, Rajasthan",
     rating: 5,
-    tag: "Eco Tourism"
+    tag: "Google Review"
   },
   {
-    quote: "The industrial emergency wands with magnetic bases have made machinery inspection and panel repairs extremely convenient. It sticks right to the metal cabinets.",
-    author: "Amitabh Sen",
-    role: "Warehouse Operations Head",
-    location: "Kolkata, West Bengal",
+    quote: "Using the heavy metal flashlight for last 2 years. Very robust body and waterproof as advertised.",
+    author: "Anil Dewasi",
+    role: "Verified Customer",
+    location: "Jodhpur, Rajasthan",
     rating: 5,
-    tag: "Industrial Safety"
+    tag: "Google Review"
+  },
+  {
+    quote: "Superb product quality. RISING brand torch has long battery backup. Good customer service.",
+    author: "Gopal Choudhary",
+    role: "Verified Customer",
+    location: "Jodhpur, Rajasthan",
+    rating: 5,
+    tag: "Google Review"
   }
 ];
 
@@ -244,13 +260,13 @@ function TestimonialCard({
   isMobile?: boolean;
 }) {
   return (
-    <div className={`bg-slate-50/50 border border-slate-100 rounded-[28px] p-6 sm:p-8 flex flex-col justify-between h-[340px] relative hover:shadow-[0_15px_30px_rgba(0,0,0,0.03)] hover:border-primary/10 transition-all duration-300 select-none shrink-0 ${isMobile ? "w-full" : "w-[300px] sm:w-[380px]"}`}>
+    <div className={`bg-slate-50/50 border border-slate-100 rounded-[24px] p-5 sm:p-6 flex flex-col justify-between h-[210px] relative hover:shadow-[0_15px_30px_rgba(0,0,0,0.03)] hover:border-primary/10 transition-all duration-300 select-none shrink-0 ${isMobile ? "w-full" : "w-[300px] sm:w-[360px]"}`}>
       {/* Quote decoration */}
-      <span className="text-4xl sm:text-5xl font-serif text-primary/15 absolute left-6 top-16 select-none pointer-events-none">
+      <span className="text-4xl sm:text-5xl font-serif text-primary/15 absolute left-5 top-12 select-none pointer-events-none">
         “
       </span>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         <div className="flex justify-between items-center">
           <span className="text-[9px] font-bold uppercase tracking-wider text-primary bg-primary/5 border border-primary/10 px-3 py-1 rounded-full">
             {testimonial.tag}
@@ -265,13 +281,13 @@ function TestimonialCard({
           </div>
         </div>
 
-        <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-semibold pl-4">
+        <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-semibold pl-4 line-clamp-3">
           {testimonial.quote}
         </p>
       </div>
 
       {/* Author Details */}
-      <div className="pt-4 border-t border-slate-100 flex flex-col">
+      <div className="pt-3 border-t border-slate-100 flex flex-col">
         <span className="text-sm font-bold text-dark-navy leading-tight">
           {testimonial.author}
         </span>
