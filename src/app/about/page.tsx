@@ -27,15 +27,16 @@ export default function AboutPage() {
           </nav>
 
           {/* Hero Banner Section */}
-          <div className="relative overflow-hidden rounded-[36px] bg-gradient-to-br from-slate-900 via-dark-navy to-slate-950 text-white p-8 sm:p-12 md:p-16 mb-16 shadow-premium border border-white/5 flex flex-col items-start gap-4">
+          <div className="relative overflow-hidden rounded-[36px] text-white p-8 sm:p-12 md:p-16 mb-16 shadow-premium border border-white/5 flex flex-col items-start gap-4">
             <Image
               src="/about-us-banner-1920x550-1.png"
               alt="About Us Banner"
               fill
               priority
-              className="object-cover opacity-60"
+              className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent pointer-events-none" />
+            {/* Subtle bottom scrim for text legibility */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
             
             <div className="max-w-3xl space-y-4 relative z-10">
               <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-widest text-accent bg-accent/10 border border-accent/20 px-3 py-1 rounded-full inline-block">
