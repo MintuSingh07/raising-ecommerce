@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface BannerSlide {
   id: number;
@@ -28,7 +29,7 @@ const MOBILE_FALLBACK: BannerSlide[] = [
 ];
 
 // Individual carousel for one device type
-function BannerCarousel({ slides }: { slides: BannerSlide[] }) {
+function BannerCarousel({ slides, onClick }: { slides: BannerSlide[]; onClick?: () => void }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [startX, setStartX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -90,11 +91,18 @@ function BannerCarousel({ slides }: { slides: BannerSlide[] }) {
     setDragOffset(0);
   };
 
+  // Fire onClick only when the user taps/clicks without dragging
+  const handleClick = () => {
+    if (Math.abs(dragOffset) < 5) {
+      onClick?.();
+    }
+  };
+
   if (slides.length === 0) return null;
 
   return (
     <div
-      className={`absolute inset-0 overflow-hidden select-none ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+      className={`absolute inset-0 overflow-hidden select-none ${isDragging ? "cursor-grabbing" : "cursor-pointer"}`}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -102,6 +110,7 @@ function BannerCarousel({ slides }: { slides: BannerSlide[] }) {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onClick={handleClick}
     >
       {/* Sliding track */}
       <div
@@ -133,15 +142,60 @@ function BannerCarousel({ slides }: { slides: BannerSlide[] }) {
         ))}
       </div>
 
+      {/* Left / Right arrows */}
+      {slides.length > 1 && (
+        <>
+          {/* Left arrow */}
+          <button
+            onClick={(e) => { e.stopPropagation(); goPrev(); }}
+            aria-label="Previous slide"
+            className="
+              absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-30
+              w-10 h-10 sm:w-12 sm:h-12
+              flex items-center justify-center rounded-full
+              bg-white/20 backdrop-blur-sm border border-white/30
+              text-white shadow-lg
+              opacity-60 hover:opacity-100
+              transition-all duration-200 hover:scale-110 hover:bg-white/30
+              focus:outline-none
+            "
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          {/* Right arrow */}
+          <button
+            onClick={(e) => { e.stopPropagation(); goNext(); }}
+            aria-label="Next slide"
+            className="
+              absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-30
+              w-10 h-10 sm:w-12 sm:h-12
+              flex items-center justify-center rounded-full
+              bg-white/20 backdrop-blur-sm border border-white/30
+              text-white shadow-lg
+              opacity-60 hover:opacity-100
+              transition-all duration-200 hover:scale-110 hover:bg-white/30
+              focus:outline-none
+            "
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </>
+      )}
+
       {/* Dot indicators */}
       {slides.length > 1 && (
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-3 z-20">
           {slides.map((_, index) => (
             <button
               key={index}
-              onClick={() => setCurrentIndex(index)}
+              onClick={(e) => { e.stopPropagation(); setCurrentIndex(index); }}
               className={`h-1.5 transition-all duration-300 cursor-pointer ${
-                safeIndex === index ? "w-12 bg-primary" : "w-6 bg-slate-350 hover:bg-slate-400"
+                safeIndex === index ? "w-12 bg-primary" : "w-6 bg-white/50 hover:bg-white/80"
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />
@@ -153,6 +207,7 @@ function BannerCarousel({ slides }: { slides: BannerSlide[] }) {
 }
 
 export default function Hero() {
+  const router = useRouter();
   const [desktopSlides, setDesktopSlides] = useState<BannerSlide[]>(DESKTOP_FALLBACK);
   const [mobileSlides, setMobileSlides] = useState<BannerSlide[]>(MOBILE_FALLBACK);
 
@@ -191,12 +246,18 @@ export default function Hero() {
 
       {/* Desktop carousel — hidden on mobile */}
       <div className="hidden sm:block absolute inset-0 z-10">
-        <BannerCarousel slides={desktopSlides} />
+        <BannerCarousel
+          slides={desktopSlides}
+          onClick={() => router.push("/products")}
+        />
       </div>
 
       {/* Mobile carousel — hidden on desktop */}
       <div className="block sm:hidden absolute inset-0 z-10">
-        <BannerCarousel slides={mobileSlides} />
+        <BannerCarousel
+          slides={mobileSlides}
+          onClick={() => router.push("/products")}
+        />
       </div>
 
       {/* Scroll Down indicator */}
