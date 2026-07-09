@@ -28,7 +28,14 @@ export default function AboutPage() {
 
           {/* Hero Banner Section */}
           <div className="relative overflow-hidden rounded-[36px] bg-gradient-to-br from-slate-900 via-dark-navy to-slate-950 text-white p-8 sm:p-12 md:p-16 mb-16 shadow-premium border border-white/5 flex flex-col items-start gap-4">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(10,82,214,0.18)_0%,transparent_70%)] pointer-events-none" />
+            <Image
+              src="/about-us-banner-1920x550-1.png"
+              alt="About Us Banner"
+              fill
+              priority
+              className="object-cover opacity-60"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent pointer-events-none" />
             
             <div className="max-w-3xl space-y-4 relative z-10">
               <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-widest text-accent bg-accent/10 border border-accent/20 px-3 py-1 rounded-full inline-block">
@@ -172,7 +179,7 @@ export default function AboutPage() {
                 Our Journey in Pictures
               </h2>
               <p className="text-xs sm:text-sm text-slate-body leading-relaxed font-medium">
-                Step into our vibrant world through a captivating visual journey that showcases our milestones, achievements, and the people behind our success. From groundbreaking innovations to memorable moments, our company album captures the essence of who we are and the incredible path we've traveled.
+                Step into our vibrant world through a captivating visual journey that showcases our milestones, achievements, and the people behind our success. From groundbreaking innovations to memorable moments, our company album captures the essence of who we are and the incredible path we&apos;ve traveled.
               </p>
             </div>
 

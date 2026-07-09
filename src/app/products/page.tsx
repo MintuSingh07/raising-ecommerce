@@ -11,10 +11,11 @@ import { useProducts } from "@/hooks/useProducts";
 export default function ProductsPage() {
   const { products, isLoading } = useProducts();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   // Read product ID from URL query parameters when products load to persist product detail view on reload
   useEffect(() => {
-    if (typeof window !== "undefined" && products.length > 0) {
+    if (typeof window !== "undefined" && products.length > 0 && !hasInitialized) {
       const params = new URLSearchParams(window.location.search);
       const prodIdStr = params.get("product");
       if (prodIdStr) {
@@ -23,12 +24,13 @@ export default function ProductsPage() {
           setSelectedProduct(match);
         }
       }
+      setHasInitialized(true);
     }
-  }, [products]);
+  }, [products, hasInitialized]);
 
   // Update URL search parameters when selectedProduct changes
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && hasInitialized) {
       const url = new URL(window.location.href);
       if (selectedProduct) {
         url.searchParams.set("product", selectedProduct.id.toString());
@@ -37,7 +39,7 @@ export default function ProductsPage() {
       }
       window.history.pushState({}, "", url.toString());
     }
-  }, [selectedProduct]);
+  }, [selectedProduct, hasInitialized]);
 
   // Scroll to top when product is selected
   useEffect(() => {

@@ -148,6 +148,27 @@ function parseHtmlDescription(html: string) {
   return { features, specs };
 }
 
+function getCategorySlug(categoryName: string): string {
+  const name = categoryName.toLowerCase().trim();
+  if (name.includes("rechargeable led flash") || name.includes("flashlight")) return "rechargeable-led-flashlight";
+  if (name.includes("kisan")) return "kisan-torch";
+  if (name.includes("metal")) return "metal-flashlights";
+  if (name.includes("headlamp")) return "led-headlamp";
+  if (name.includes("table lamp")) return "led-table-lamp";
+  if (name.includes("solar lantern")) return "solar-lantern-searchlight";
+  if (name.includes("led lantern")) return "led-lantern";
+  if (name.includes("usb lamp")) return "led-usb-lamp";
+  if (name.includes("solar energy")) return "solar-energy-kit";
+  if (name.includes("extension board")) return "power-extension-board";
+  if (name.includes("village") || name.includes("remote")) return "village-remote";
+  if (name.includes("corporate")) return "corporate-gifting";
+  if (name.includes("defense") || name.includes("security")) return "defense-security";
+  if (name.includes("farming") || name.includes("fields")) return "farming-fields";
+  if (name.includes("industrial") || name.includes("yards")) return "industrial-yards";
+  
+  return name.replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
 // Helper to format highlights dynamically
 function getFormattedHighlight(feat: string) {
   const cleanFeat = feat
@@ -823,25 +844,28 @@ export default function ProductDetails({
 
         {/* Breadcrumb Navigation */}
         <nav className="flex items-center space-x-2 text-[11px] sm:text-xs font-semibold text-slate-light mb-8 select-none tracking-wide">
-          <button
-            onClick={onClose}
+          <Link
+            href="/"
             className="hover:text-primary cursor-pointer transition-colors uppercase"
           >
             Home
-          </button>
+          </Link>
           <ChevronRight className="w-3.5 h-3.5 text-slate-350" />
-          <button
-            onClick={onClose}
+          <Link
+            href="/products"
             className="hover:text-primary cursor-pointer transition-colors uppercase"
           >
             Products
-          </button>
+          </Link>
           <ChevronRight className="w-3.5 h-3.5 text-slate-350" />
-          <span className="text-primary uppercase">
+          <Link
+            href={`/collections/${getCategorySlug(product.categories[0] || "Lighting")}`}
+            className="hover:text-primary cursor-pointer transition-colors uppercase"
+          >
             {product.categories[0] || "Lighting"}
-          </span>
+          </Link>
           <ChevronRight className="w-3.5 h-3.5 text-slate-350" />
-          <span className="text-slate-400 font-medium truncate max-w-[180px] sm:max-w-none">
+          <span className="text-primary font-semibold truncate max-w-[180px] sm:max-w-none">
             {product.name}
           </span>
         </nav>
@@ -881,25 +905,14 @@ export default function ProductDetails({
                   </button>
                 </div>
               ) : allImages.length > 0 ? (
-                <>
-                  <Image
-                    src={allImages[activeImageIndex]}
-                    alt={product.name}
-                    fill
-                    className="object-cover transition-transform duration-500 hover:scale-105"
-                    sizes="(max-width: 1024px) 100vw, 600px"
-                    priority
-                  />
-                  {product.video && (
-                    <button
-                      onClick={() => setShowVideo(true)}
-                      className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-black/55 hover:bg-primary/95 text-white flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95 cursor-pointer border border-white/20 z-10"
-                      title="Play Video"
-                    >
-                      <LucideIcons.Play className="w-6 h-6 ml-1 text-white fill-white" />
-                    </button>
-                  )}
-                </>
+                <Image
+                  src={allImages[activeImageIndex]}
+                  alt={product.name}
+                  fill
+                  className="object-cover transition-transform duration-500 hover:scale-105"
+                  sizes="(max-width: 1024px) 100vw, 600px"
+                  priority
+                />
               ) : (
                 <div className="flex flex-col items-center justify-center text-slate-655">
                   <Package
@@ -1283,7 +1296,7 @@ export default function ProductDetails({
                 Trusted Quality
               </h4>
               <p className="text-[11px] sm:text-xs text-slate-body font-medium leading-relaxed">
-                20+ years of excellence in lighting solutions
+                30+ years of excellence in lighting solutions
               </p>
             </div>
           </div>

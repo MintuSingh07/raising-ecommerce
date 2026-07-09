@@ -13,6 +13,7 @@ export interface Product {
   type: string;
   name: string;
   video: string;
+  category?: string;
   sku: string | null;
   gtin_upc_ean_isbn: string | null;
   published: number;
@@ -205,12 +206,17 @@ export default function ProductCatalog({
 }: ProductCatalogProps = {}) {
   const { products, isLoading } = useProducts();
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState("rechargeable-led-flashlight");
+  const [activeCategory, setActiveCategory] = useState(
+    "rechargeable-led-flashlight",
+  );
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
-    scrollRef.current.scrollBy({ left: dir === "left" ? -400 : 400, behavior: "smooth" });
+    scrollRef.current.scrollBy({
+      left: dir === "left" ? -400 : 400,
+      behavior: "smooth",
+    });
   };
 
   // Expanded state for each category section
@@ -261,7 +267,12 @@ export default function ProductCatalog({
         groups["led-lantern"].push(p);
         matched = true;
       }
-      if (cats.includes("led table lamp") || cats.includes("led-table-lamp") || cats.includes("corporate gifting") || cats.includes("corporate-gifting")) {
+      if (
+        cats.includes("led table lamp") ||
+        cats.includes("led-table-lamp") ||
+        cats.includes("corporate gifting") ||
+        cats.includes("corporate-gifting")
+      ) {
         groups["led-table-lamp"].push(p);
         matched = true;
       }
@@ -280,7 +291,10 @@ export default function ProductCatalog({
         groups["metal-flashlights"].push(p);
         matched = true;
       }
-      if (cats.includes("rechargeable led flashlight") || cats.includes("rechargeable-led-flashlight")) {
+      if (
+        cats.includes("rechargeable led flashlight") ||
+        cats.includes("rechargeable-led-flashlight")
+      ) {
         groups["rechargeable-led-flashlight"].push(p);
         matched = true;
       }
@@ -295,15 +309,25 @@ export default function ProductCatalog({
         groups["kisan-torch"].push(p);
         matched = true;
       }
-      if (cats.includes("solar energy kit") || cats.includes("solar-energy-kit")) {
+      if (
+        cats.includes("solar energy kit") ||
+        cats.includes("solar-energy-kit")
+      ) {
         groups["solar-energy-kit"].push(p);
         matched = true;
       }
-      if (cats.includes("solar lantern & searchlight") || cats.includes("solar-lantern-searchlight") || cats.includes("solar lantern and search light")) {
+      if (
+        cats.includes("solar lantern & searchlight") ||
+        cats.includes("solar-lantern-searchlight") ||
+        cats.includes("solar lantern and search light")
+      ) {
         groups["solar-lantern-searchlight"].push(p);
         matched = true;
       }
-      if (cats.includes("power extension board") || cats.includes("power-extension-board")) {
+      if (
+        cats.includes("power extension board") ||
+        cats.includes("power-extension-board")
+      ) {
         groups["power-extension-board"].push(p);
         matched = true;
       }
@@ -368,11 +392,30 @@ export default function ProductCatalog({
 
   if (isLoading) {
     return (
-      <section id="product" className="py-24 bg-white scroll-mt-20 flex items-center justify-center min-h-[400px]">
+      <section
+        id="product"
+        className="py-24 bg-white scroll-mt-20 flex items-center justify-center min-h-[400px]"
+      >
         <div className="flex flex-col items-center justify-center text-slate-500 font-sans">
-          <svg className="animate-spin -ml-1 mr-3 h-10 w-10 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          <svg
+            className="animate-spin -ml-1 mr-3 h-10 w-10 text-primary"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
           </svg>
           <span className="text-sm font-semibold mt-4">Loading catalog...</span>
         </div>
@@ -451,8 +494,18 @@ export default function ProductCatalog({
               download
               className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-full text-xs font-semibold bg-primary text-white border border-white/20 shadow-lg shadow-primary/15 transition-all duration-300 hover:bg-primary-navy hover:shadow-primary/25 active:scale-95 whitespace-nowrap w-full sm:w-auto cursor-pointer"
             >
-              <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              <svg
+                className="w-4 h-4 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                />
               </svg>
               Download Catalog
             </a>
@@ -460,15 +513,25 @@ export default function ProductCatalog({
         </div>
 
         {/* Category Capsules Wrapper with arrows & fade effect */}
-        <div className="relative w-full max-w-5xl mx-auto mb-12 px-0 sm:px-10">
+        <div className="relative w-full max-w-5xl mx-auto mb-12 px-10">
           {/* Left Arrow Button */}
           <button
             onClick={() => scroll("left")}
             aria-label="Scroll capsules left"
-            className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm text-slate-500 hover:bg-primary hover:text-white hover:border-primary transition-all duration-200 active:scale-90 items-center justify-center cursor-pointer"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm text-slate-500 hover:bg-primary hover:text-white hover:border-primary transition-all duration-200 active:scale-90 flex items-center justify-center cursor-pointer"
           >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+            <svg
+              className="w-3.5 h-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2.5}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
 
@@ -476,21 +539,31 @@ export default function ProductCatalog({
           <button
             onClick={() => scroll("right")}
             aria-label="Scroll capsules right"
-            className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm text-slate-500 hover:bg-primary hover:text-white hover:border-primary transition-all duration-200 active:scale-90 items-center justify-center cursor-pointer"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm text-slate-500 hover:bg-primary hover:text-white hover:border-primary transition-all duration-200 active:scale-90 flex items-center justify-center cursor-pointer"
           >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+            <svg
+              className="w-3.5 h-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2.5}
+                d="M9 5l7 7-7 7"
+              />
             </svg>
           </button>
 
           {/* Left fade overlay */}
-          <div className="pointer-events-none hidden sm:block absolute left-8 top-0 bottom-0 w-8 z-10 bg-gradient-to-r from-white to-transparent" />
+          <div className="pointer-events-none absolute left-8 top-0 bottom-0 w-8 z-10 bg-gradient-to-r from-white to-transparent" />
           {/* Right fade overlay */}
-          <div className="pointer-events-none hidden sm:block absolute right-8 top-0 bottom-0 w-8 z-10 bg-gradient-to-l from-white to-transparent" />
+          <div className="pointer-events-none absolute right-8 top-0 bottom-0 w-8 z-10 bg-gradient-to-l from-white to-transparent" />
 
           <div
             ref={scrollRef}
-            className="flex flex-row flex-nowrap overflow-x-auto justify-start gap-2.5 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-2 px-4 sm:px-0"
+            className="flex flex-row flex-nowrap overflow-x-auto justify-start gap-2.5 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-2"
           >
             {WEBSITE_CATEGORIES.map((webCat) => {
               const isActive = activeCategory === webCat.id;

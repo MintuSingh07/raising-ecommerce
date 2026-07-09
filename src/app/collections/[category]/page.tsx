@@ -178,7 +178,14 @@ export default function CategoryPage({ params }: PageProps) {
   // Group all products to filter the ones belonging to the active category
   const products = useMemo(() => {
     const filtered = allProducts.filter(p => {
+      // Direct slug match or array match (case-insensitive)
+      if (p.category && p.category.toLowerCase() === categoryId.toLowerCase()) {
+        return true;
+      }
       const cats = p.categories.map(c => c.toLowerCase());
+      if (cats.includes(categoryId.toLowerCase())) {
+        return true;
+      }
       
       if (categoryId === "led-headlamp") {
         return cats.includes("led headlamp") || cats.includes("led-headlamp");
@@ -295,20 +302,7 @@ export default function CategoryPage({ params }: PageProps) {
 
             {/* Category Header Card */}
             <div className="relative overflow-hidden rounded-[36px] bg-gradient-to-br from-slate-900 via-dark-navy to-slate-950 text-white p-8 sm:p-12 mb-12 shadow-premium border border-white/5">
-              {(categoryInfo as any).image ? (
-                <>
-                  <Image
-                    src={(categoryInfo as any).image}
-                    alt={categoryInfo.label}
-                    fill
-                    priority
-                    className="object-cover opacity-25"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent pointer-events-none" />
-                </>
-              ) : (
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(10,82,214,0.18)_0%,transparent_70%)] pointer-events-none" />
-              )}
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(10,82,214,0.18)_0%,transparent_70%)] pointer-events-none" />
               
               <div className="max-w-3xl space-y-4 relative z-10">
                 <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-widest text-accent bg-accent/10 border border-accent/20 px-3 py-1 rounded-full inline-block">

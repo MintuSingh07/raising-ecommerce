@@ -1,81 +1,125 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import BlurText from "./BlurText";
 import { motion } from "motion/react";
 
+const STATIC_CATEGORIES = [
+  {
+    id: "rechargeable-led-flashlight",
+    title: "Rechargeable LED Flash Light",
+    subtitle: "High-efficiency beam flashlights",
+    image: "/product_torch.png",
+    href: "/collections/rechargeable-led-flashlight",
+  },
+  {
+    id: "kisan-torch",
+    title: "Kisan Torch",
+    subtitle: "Heavy-duty torch for farming & outdoors",
+    image: "/product_torch.png",
+    href: "/collections/kisan-torch",
+  },
+  {
+    id: "metal-flashlights",
+    title: "Metal Flash Lights",
+    subtitle: "Rugged metal-body searchlights",
+    image: "/product_torch.png",
+    href: "/collections/metal-flashlights",
+  },
+  {
+    id: "led-headlamp",
+    title: "LED Headlamp",
+    subtitle: "Hands-free adjustable headlamps",
+    image: "/product_headlamp.png",
+    href: "/collections/led-headlamp",
+  },
+  {
+    id: "led-table-lamp",
+    title: "LED Table Lamp",
+    subtitle: "Flexible desk and reading lamps",
+    image: "/product_lantern.png",
+    href: "/collections/led-table-lamp",
+  },
+  {
+    id: "solar-lantern-searchlight",
+    title: "Solar Lantern and Search Light",
+    subtitle: "Dual-purpose solar rechargeable lights",
+    image: "/product_spotlight.png",
+    href: "/collections/solar-lantern-searchlight",
+  },
+  {
+    id: "led-lantern",
+    title: "LED Lantern",
+    subtitle: "Premium emergency backup lanterns",
+    image: "/product_lantern.png",
+    href: "/collections/led-lantern",
+  },
+  {
+    id: "led-usb-lamp",
+    title: "LED USB Lamp",
+    subtitle: "Portable USB plug-and-play bulbs",
+    image: "/product_lantern.png",
+    href: "/collections/led-usb-lamp",
+  },
+  {
+    id: "solar-energy-kit",
+    title: "Solar Energy Kit",
+    subtitle: "Complete solar home lighting solution",
+    image: "/product_emergency.png",
+    href: "/collections/solar-energy-kit",
+  },
+  {
+    id: "power-extension-board",
+    title: "Power Extension Board",
+    subtitle: "Multi-socket surge-protected boards",
+    image: "/product_emergency.png",
+    href: "/collections/power-extension-board",
+  },
+];
+
+interface DbCategory {
+  id: string;
+  label: string;
+  desc?: string;
+  image?: string;
+  section?: string;
+}
+
 export default function Categories() {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [categories, setCategories] = useState(STATIC_CATEGORIES);
+
+  useEffect(() => {
+    fetch("/api/public/categories")
+      .then((res) => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const filtered = data.filter((c: DbCategory) => c.section === "product-types");
+          const mapped = filtered.map((c: DbCategory) => {
+            const fallback = STATIC_CATEGORIES.find((sc) => sc.id === c.id);
+            return {
+              id: c.id,
+              title: c.label,
+              subtitle: c.desc || fallback?.subtitle || "",
+              image: c.image || fallback?.image || "/product_torch.png",
+              href: `/collections/${c.id}`,
+            };
+          });
+          setCategories(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const scroll = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollBy({ left: dir === "left" ? -700 : 700, behavior: "smooth" });
   };
-
-  const categories = [
-    {
-      title: "Rechargeable LED Flash Light",
-      subtitle: "High-efficiency beam flashlights",
-      image: "/product_torch.png",
-      href: "/collections/rechargeable-led-flashlight",
-    },
-    {
-      title: "Kisan Torch",
-      subtitle: "Heavy-duty torch for farming & outdoors",
-      image: "/product_torch.png",
-      href: "/collections/kisan-torch",
-    },
-    {
-      title: "Metal Flash Lights",
-      subtitle: "Rugged metal-body searchlights",
-      image: "/product_torch.png",
-      href: "/collections/metal-flashlights",
-    },
-    {
-      title: "LED Headlamp",
-      subtitle: "Hands-free adjustable headlamps",
-      image: "/product_headlamp.png",
-      href: "/collections/led-headlamp",
-    },
-    {
-      title: "LED Table Lamp",
-      subtitle: "Flexible desk and reading lamps",
-      image: "/product_lantern.png",
-      href: "/collections/led-table-lamp",
-    },
-    {
-      title: "Solar Lantern and Search Light",
-      subtitle: "Dual-purpose solar rechargeable lights",
-      image: "/product_spotlight.png",
-      href: "/collections/solar-lantern-searchlight",
-    },
-    {
-      title: "LED Lantern",
-      subtitle: "Premium emergency backup lanterns",
-      image: "/product_lantern.png",
-      href: "/collections/led-lantern",
-    },
-    {
-      title: "LED USB Lamp",
-      subtitle: "Portable USB plug-and-play bulbs",
-      image: "/product_lantern.png",
-      href: "/collections/led-usb-lamp",
-    },
-    {
-      title: "Solar Energy Kit",
-      subtitle: "Complete solar home lighting solution",
-      image: "/product_emergency.png",
-      href: "/collections/solar-energy-kit",
-    },
-    {
-      title: "Power Extension Board",
-      subtitle: "Multi-socket surge-protected boards",
-      image: "/product_emergency.png",
-      href: "/collections/power-extension-board",
-    },
-  ];
 
   return (
     <section id="collections" className="py-20 bg-slate-50/40 border-y border-slate-100/50 scroll-mt-20 overflow-hidden w-full">
@@ -91,9 +135,12 @@ export default function Categories() {
               </span>
               <BlurText text="Our Product Collections" delay={30} animateBy="words" direction="bottom" />
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-dark-navy tracking-tight leading-tight">
-              <BlurText text="Solutions That Light Every Need" highlightWords={["Light"]} delay={20} animateBy="words" direction="bottom" />
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-dark-navy tracking-tight leading-tight">
+              <BlurText text="Browse Smart Portable Lighting Collection" highlightWords={["Light"]} delay={20} animateBy="words" direction="bottom" />
             </h2>
+            <p className="text-slate-500 font-medium text-sm sm:text-base max-w-xl mt-1">
+              <BlurText text="Explore premium rechargeable torches, emergency lights, lanterns, headlamps, and LED lighting solutions for every need." delay={10} animateBy="words" direction="bottom" />
+            </p>
           </div>
 
           {/* Arrow buttons + View Collection link */}

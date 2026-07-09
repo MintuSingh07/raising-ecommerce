@@ -8,7 +8,7 @@ export default function StatsBanner() {
     {
       value: (
         <span>
-          <CountUp from={0} to={20} duration={2} />+
+          <CountUp from={0} to={30} duration={2} />+
         </span>
       ),
       label: "Years of Experience",

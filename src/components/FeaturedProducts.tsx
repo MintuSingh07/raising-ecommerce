@@ -2,6 +2,7 @@
 
 import { useRef, useMemo } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import BlurText from "./BlurText";
 import { motion } from "motion/react";
 import { useProducts } from "@/hooks/useProducts";
@@ -156,41 +157,41 @@ export default function FeaturedProducts({ setSelectedProduct }: FeaturedProduct
               whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: idx * 0.1, ease: "easeOut" }}
-              onClick={() => {
-                if (prod.rawProduct) {
-                  setSelectedProduct?.(prod.rawProduct);
-                }
-              }}
-              className="group shrink-0 snap-start w-[300px] sm:w-[340px] bg-white rounded-[32px] p-6 border border-[#F0F0F0] shadow-[0_12px_40px_rgba(0,0,0,0.02)] hover:-translate-y-1.5 hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] transition-all duration-300 flex flex-col justify-between cursor-pointer"
+              className="group shrink-0 snap-start w-[300px] sm:w-[340px] flex"
             >
-              {/* Top Section: Title & Short Description */}
-              <div className="flex flex-col items-start mb-6">
-                <h3 className="text-xl sm:text-2xl font-semibold text-[#111111] tracking-tight leading-tight group-hover:text-primary transition-colors duration-300">
-                  {prod.title}
-                </h3>
-                <span className="text-xs sm:text-sm text-[#767676] font-medium mt-1">
-                  {prod.category}
-                </span>
-              </div>
-
-              {/* Bottom Section: Grey Image Placeholder */}
-              <div className="relative w-full aspect-square rounded-[24px] bg-[#EBEBEB] overflow-hidden transition-colors duration-300">
-                <Image
-                  src={prod.image}
-                  alt={prod.title}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  sizes="(max-width: 640px) 290px, 320px"
-                  priority={idx < 3}
-                />
-
-                {/* Circular Action Button with Arrow ↗ */}
-                <div className="absolute bottom-5 right-5 w-12 h-12 rounded-full bg-white flex items-center justify-center text-black shadow-md transition-all duration-300 group-hover:scale-105 z-10">
-                  <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 17L17 7M17 7H9M17 7V15" />
-                  </svg>
+              <Link
+                href={`/products?product=${prod.id}`}
+                className="w-full bg-white rounded-[32px] p-6 border border-[#F0F0F0] shadow-[0_12px_40px_rgba(0,0,0,0.02)] hover:-translate-y-1.5 hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] transition-all duration-300 flex flex-col justify-between cursor-pointer"
+              >
+                {/* Top Section: Title & Short Description */}
+                <div className="flex flex-col items-start mb-6">
+                  <h3 className="text-xl sm:text-2xl font-semibold text-[#111111] tracking-tight leading-tight group-hover:text-primary transition-colors duration-300">
+                    {prod.title}
+                  </h3>
+                  <span className="text-xs sm:text-sm text-[#767676] font-medium mt-1">
+                    {prod.category}
+                  </span>
                 </div>
-              </div>
+
+                {/* Bottom Section: Grey Image Placeholder */}
+                <div className="relative w-full aspect-square rounded-[24px] bg-[#EBEBEB] overflow-hidden transition-colors duration-300">
+                  <Image
+                    src={prod.image}
+                    alt={prod.title}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 640px) 290px, 320px"
+                    priority={idx < 3}
+                  />
+
+                  {/* Circular Action Button with Arrow ↗ */}
+                  <div className="absolute bottom-5 right-5 w-12 h-12 rounded-full bg-white flex items-center justify-center text-black shadow-md transition-all duration-300 group-hover:scale-105 z-10">
+                    <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 17L17 7M17 7H9M17 7V15" />
+                    </svg>
+                  </div>
+                </div>
+              </Link>
             </motion.div>
           ))}
         </div>

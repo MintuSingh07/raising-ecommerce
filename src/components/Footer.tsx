@@ -1,7 +1,49 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
+interface FooterCategory {
+  id: string;
+  label: string;
+  section?: string;
+}
+
+const STATIC_CATEGORIES: FooterCategory[] = [
+  { id: "rechargeable-led-flashlight", label: "Rechargeable LED Flash Light" },
+  { id: "kisan-torch", label: "Kisan Torch" },
+  { id: "metal-flashlights", label: "Metal Flash Lights" },
+  { id: "led-headlamp", label: "LED Headlamp" },
+  { id: "led-table-lamp", label: "LED Table Lamp" },
+  { id: "solar-lantern-searchlight", label: "Solar Lantern and Search Light" },
+  { id: "led-lantern", label: "LED Lantern" },
+  { id: "led-usb-lamp", label: "LED USB Lamp" },
+  { id: "solar-energy-kit", label: "Solar Energy Kit" },
+  { id: "power-extension-board", label: "Power Extension Board" },
+];
+
 export default function Footer() {
+  const [categories, setCategories] = useState<FooterCategory[]>(STATIC_CATEGORIES);
+
+  useEffect(() => {
+    fetch("/api/public/categories")
+      .then((res) => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const filtered = data.filter((c: FooterCategory) => c.section === "product-types");
+          const mapped = filtered.map((c: FooterCategory) => ({
+            id: c.id,
+            label: c.label,
+          }));
+          setCategories(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
   return (
     <footer id="contact" className="bg-white border-t border-slate-100 pt-20 pb-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -97,16 +139,13 @@ export default function Footer() {
           <div className="lg:col-span-2 flex flex-col space-y-4">
             <h4 className="text-sm font-semibold text-dark-navy tracking-wider uppercase">Products</h4>
             <ul className="space-y-2 text-xs font-medium text-slate-light">
-              <li><Link href="/collections/rechargeable-led-flashlight" className="hover:text-primary transition-colors">Rechargeable LED Flash Light</Link></li>
-              <li><Link href="/collections/kisan-torch" className="hover:text-primary transition-colors">Kisan Torch</Link></li>
-              <li><Link href="/collections/metal-flashlights" className="hover:text-primary transition-colors">Metal Flash Lights</Link></li>
-              <li><Link href="/collections/led-headlamp" className="hover:text-primary transition-colors">LED Headlamp</Link></li>
-              <li><Link href="/collections/led-table-lamp" className="hover:text-primary transition-colors">LED Table Lamp</Link></li>
-              <li><Link href="/collections/solar-lantern-searchlight" className="hover:text-primary transition-colors">Solar Lantern and Search Light</Link></li>
-              <li><Link href="/collections/led-lantern" className="hover:text-primary transition-colors">LED Lantern</Link></li>
-              <li><Link href="/collections/led-usb-lamp" className="hover:text-primary transition-colors">LED USB Lamp</Link></li>
-              <li><Link href="/collections/solar-energy-kit" className="hover:text-primary transition-colors">Solar Energy Kit</Link></li>
-              <li><Link href="/collections/power-extension-board" className="hover:text-primary transition-colors">Power Extension Board</Link></li>
+              {categories.map((cat) => (
+                <li key={cat.id}>
+                  <Link href={`/collections/${cat.id}`} className="hover:text-primary transition-colors">
+                    {cat.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
