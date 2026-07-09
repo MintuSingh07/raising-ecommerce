@@ -1477,7 +1477,7 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                         </div>
                         <div>
                           <h4 className="text-sm font-bold text-slate-800">Desktop Banners</h4>
-                          <p className="text-[11px] text-slate-400">Shown on screens ≥ 640px · Recommended: 1920×550</p>
+                          <p className="text-[11px] text-slate-400">Shown on screens ≥ 640px · Recommended: 1920×1080</p>
                         </div>
                         <span className="ml-auto text-xs font-semibold text-slate-500 bg-slate-100 rounded-full px-2.5 py-0.5">
                           {banners.desktop.length} slide{banners.desktop.length !== 1 ? "s" : ""}
@@ -1493,13 +1493,13 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                             <PlusCircle className="w-5 h-5 text-slate-400 group-hover:text-[#0A52D6] transition-colors" />
                           </div>
                           <p className="text-sm font-semibold text-slate-500 group-hover:text-[#0A52D6] transition-colors">Add Desktop Banner</p>
-                          <p className="text-xs text-slate-400 mt-1">1920×550px recommended</p>
+                          <p className="text-xs text-slate-400 mt-1">1920×1080px recommended</p>
                         </div>
                       ) : (
                         <div className="space-y-3">
                           {banners.desktop.map((ban: any) => (
                             <div key={ban._id || ban.id} className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-xs">
-                              <div className="relative w-full aspect-[1920/550] bg-slate-100">
+                              <div className="relative w-full aspect-[1920/1080] bg-slate-100">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={ban.image} alt={`Desktop Banner ${ban.id}`} className="w-full h-full object-cover" />
                               </div>
@@ -1858,7 +1858,7 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                     Add {bannerUploadType === "desktop" ? "Desktop" : "Mobile"} Banner
                   </h3>
                   <p className="text-[11px] text-slate-400 mt-0.5">
-                    {bannerUploadType === "desktop" ? "Recommended: 1920×550px" : "Recommended: 750×1000px (portrait)"}
+                    {bannerUploadType === "desktop" ? "Recommended: 1920×1080px" : "Recommended: 750×1000px (portrait)"}
                   </p>
                 </div>
               </div>
@@ -1921,7 +1921,7 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                       }}
                     />
                     {bannerPreviewUrl ? (
-                      <div className={`relative w-full rounded overflow-hidden border border-slate-100 bg-slate-50 ${bannerUploadType === "desktop" ? "aspect-[1920/550] max-h-[120px]" : "aspect-[750/1000] max-h-[220px]"}`}>
+                      <div className={`relative w-full rounded overflow-hidden border border-slate-100 bg-slate-50 ${bannerUploadType === "desktop" ? "aspect-[1920/1080] max-h-[120px]" : "aspect-[750/1000] max-h-[220px]"}`}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={bannerPreviewUrl} alt="Preview" className="w-full h-full object-cover" />
                         <button
