@@ -102,7 +102,7 @@ export default function ContactPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="space-y-2">
                     <label htmlFor="name" className="text-xs font-bold text-dark-navy uppercase tracking-wider block">
-                      Full Name
+                      Full Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -118,7 +118,7 @@ export default function ContactPage() {
 
                   <div className="space-y-2">
                     <label htmlFor="email" className="text-xs font-bold text-dark-navy uppercase tracking-wider block">
-                      Email Address
+                      Email Address <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="email"
@@ -151,7 +151,7 @@ export default function ContactPage() {
 
                   <div className="space-y-2">
                     <label htmlFor="subject" className="text-xs font-bold text-dark-navy uppercase tracking-wider block">
-                      Subject
+                      Subject <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -168,7 +168,7 @@ export default function ContactPage() {
 
                 <div className="space-y-2">
                   <label htmlFor="message" className="text-xs font-bold text-dark-navy uppercase tracking-wider block">
-                    Message
+                    Message <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     id="message"
