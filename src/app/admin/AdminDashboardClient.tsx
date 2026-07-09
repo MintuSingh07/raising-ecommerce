@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect */
+
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -48,7 +50,6 @@ interface AdminDashboardClientProps {
 
 type TabType = "dashboard" | "products" | "categories" | "settings" | "blogs" | "media" | "banners";
 
-import { useRef } from "react";
 
 function RichTextEditor({ value, onChange }: { value: string; onChange: (html: string) => void }) {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -313,7 +314,8 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
   const [categories, setCategories] = useState<any[]>([]);
   const [blogs, setBlogs] = useState<any[]>([]);
   const [media, setMedia] = useState<any[]>([]);
-  const [banners, setBanners] = useState<any[]>([]);
+  // banners split by device type
+  const [banners, setBanners] = useState<{ desktop: any[]; mobile: any[] }>({ desktop: [], mobile: [] });
 
   // Statistics
   const [stats, setStats] = useState(initialStats);
@@ -381,9 +383,16 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
     category: "Product",
   });
 
-  const [bannerForm, setBannerForm] = useState({
-    image: "",
-  });
+  // Banner upload state — one simple modal for a single type at a time
+  const [bannerUploadType, setBannerUploadType] = useState<"desktop" | "mobile">("desktop");
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const bannerFileRef = useRef<File | null>(null); // avoids stale-closure in async handler
+  const bannerInputRef = useRef<HTMLInputElement>(null);
+  const [bannerPreviewUrl, setBannerPreviewUrl] = useState<string>("");
+  const [bannerUrlInput, setBannerUrlInput] = useState<string>("");
+  const [bannerUploadOption, setBannerUploadOption] = useState<"file" | "url">("file");
+  const [isUploadingBanner, setIsUploadingBanner] = useState<boolean>(false);
+
 
   // Fetch lists based on active tab
   useEffect(() => {
@@ -416,7 +425,10 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
         }
         if (activeTab === "banners") {
           const res = await fetch("/api/public/banners");
-          if (res.ok) setBanners(await res.json());
+          if (res.ok) {
+            const data = await res.json();
+            setBanners({ desktop: data.desktop || [], mobile: data.mobile || [] });
+          }
         }
       } catch (err) {
         console.error("Error loading tab data", err);
@@ -636,45 +648,90 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
     }
   };
 
+  const resetBannerModal = () => {
+    bannerFileRef.current = null;
+    setBannerFile(null);
+    setBannerPreviewUrl("");
+    setBannerUrlInput("");
+    setBannerUploadOption("file");
+    setActiveModal(null);
+  };
+
+  const refreshBanners = async () => {
+    const res = await fetch("/api/public/banners");
+    if (res.ok) {
+      const data = await res.json();
+      setBanners({ desktop: data.desktop || [], mobile: data.mobile || [] });
+    }
+  };
+
   const handleBannerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setApiMessage(null);
+    setIsUploadingBanner(true);
     try {
+      let imageUrl = bannerUrlInput;
+
+      if (bannerUploadOption === "file") {
+        const file = bannerFileRef.current;
+        if (!file) throw new Error("Please select an image to upload");
+        const fd = new FormData();
+        fd.append("file", file);
+        const uploadRes = await fetch("/api/admin/upload", { method: "POST", body: fd });
+        if (!uploadRes.ok) {
+          const e = await uploadRes.json();
+          throw new Error(e.error || "Upload failed");
+        }
+        const uploadData = await uploadRes.json();
+        imageUrl = uploadData.url;
+      }
+
+      if (!imageUrl) throw new Error("Please provide an image file or URL");
+
       const res = await fetch("/api/admin/banners", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(bannerForm),
+        body: JSON.stringify({ image: imageUrl, type: bannerUploadType }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Operation failed");
-      setApiMessage({ type: "success", text: "Banner slide added successfully!" });
-      setActiveModal(null);
-      const newRes = await fetch("/api/public/banners");
-      if (newRes.ok) setBanners(await newRes.json());
-    } catch (err: any) {
-      setApiMessage({ type: "error", text: err.message });
+      if (!res.ok) throw new Error(data.error || "Failed to add banner");
+
+      setApiMessage({ type: "success", text: `${bannerUploadType === "desktop" ? "Desktop" : "Mobile"} banner added successfully!` });
+      resetBannerModal();
+      await refreshBanners();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setApiMessage({ type: "error", text: msg });
+    } finally {
+      setIsUploadingBanner(false);
     }
   };
 
-  const handleDeleteBanner = async (id: number) => {
+  const handleDeleteBanner = async (id: number, type: "desktop" | "mobile") => {
     if (!confirm("Are you sure you want to delete this banner?")) return;
     setApiMessage(null);
     try {
-      const res = await fetch(`/api/admin/banners?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/banners?id=${id}&type=${type}`, { method: "DELETE" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Deletion failed");
       setApiMessage({ type: "success", text: "Banner deleted successfully!" });
-      setBanners(prev => prev.filter(b => b.id !== id));
-    } catch (err: any) {
-      setApiMessage({ type: "error", text: err.message });
+      setBanners(prev => ({
+        ...prev,
+        [type]: prev[type].filter((b: any) => b.id !== id),
+      }));
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setApiMessage({ type: "error", text: msg });
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const openBlogModal = (item?: any) => {
     setEditItem(item || null);
     if (item) {
       const legacyHtml = item.htmlContent || (
         (item.intro ? `<p><strong>${item.intro}</strong></p>` : "") +
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (item.sections || []).map((s: any) => `<h2>${s.heading}</h2>${(s.paragraphs || []).map((p: string) => `<p>${p}</p>`).join("")}`).join("")
       );
       setBlogForm({
@@ -871,16 +928,30 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                 </button>
               )}
               {activeTab === "banners" && (
-                <button
-                  onClick={() => {
-                    setBannerForm({ image: "" });
-                    setActiveModal("banner");
-                  }}
-                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#0A52D6] hover:bg-[#0B4294] text-white font-semibold rounded-lg text-sm shadow-xs cursor-pointer"
-                >
-                  <PlusCircle className="w-4 h-4" />
-                  Add Slide
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      resetBannerModal();
+                      setBannerUploadType("desktop");
+                      setActiveModal("banner");
+                    }}
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#0A52D6] hover:bg-[#0B4294] text-white font-semibold rounded-lg text-sm shadow-xs cursor-pointer"
+                  >
+                    <PlusCircle className="w-4 h-4" />
+                    Add Desktop Banner
+                  </button>
+                  <button
+                    onClick={() => {
+                      resetBannerModal();
+                      setBannerUploadType("mobile");
+                      setActiveModal("banner");
+                    }}
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-slate-700 hover:bg-slate-900 text-white font-semibold rounded-lg text-sm shadow-xs cursor-pointer"
+                  >
+                    <PlusCircle className="w-4 h-4" />
+                    Add Mobile Banner
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -921,7 +992,7 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                   <div className="border border-amber-200 bg-amber-50/50 rounded-xl p-5">
                     <h3 className="font-bold text-amber-800 text-sm uppercase tracking-wider">Database Seeding Needed</h3>
                     <p className="text-slate-600 text-sm mt-1">
-                      Your database is currently empty. Seed MongoDB with the existing categories and products from the website's structured data file (`products_structured.json`).
+                      Your database is currently empty. Seed MongoDB with the existing categories and products from the website&apos;s structured data file (`products_structured.json`).
                     </p>
                     
                     {seedSuccess && <p className="mt-2 text-emerald-600 text-sm font-semibold">{seedSuccess}</p>}
@@ -1089,8 +1160,9 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                                 const data = await res.json();
                                 if (!res.ok) throw new Error(data.error || "Upload failed");
                                 setCategoryForm({ ...categoryForm, image: data.url });
-                              } catch (err: any) {
-                                alert(`Upload failed: ${err.message}`);
+                              } catch (err: unknown) {
+                                const msg = err instanceof Error ? err.message : String(err);
+                                alert(`Upload failed: ${msg}`);
                               } finally {
                                 setIsUploadingCategoryCover(false);
                               }
@@ -1384,28 +1456,130 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
             )}
 
             {activeTab === "banners" && (
-              <div className="space-y-4 flex-1">
+              <div className="space-y-8 flex-1">
+                <div className="border-b border-slate-100 pb-4">
+                  <h3 className="text-lg font-bold text-slate-900">Home Banners</h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Desktop banners display on screens ≥ 640px. Mobile banners display on screens &lt; 640px. If no mobile banners are uploaded, the desktop banners will be shown on mobile too.
+                  </p>
+                </div>
+
                 {isLoading ? (
-                  <div className="text-center py-12 text-slate-400">Loading home banners...</div>
-                ) : banners.length === 0 ? (
-                  <div className="text-center py-12 text-slate-400 border border-dashed border-slate-200 rounded-xl">
-                    No banners found. Add banner slides to homepage slider.
-                  </div>
+                  <div className="text-center py-12 text-slate-400">Loading banners...</div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {banners.map((ban) => (
-                      <div key={ban.id} className="border border-slate-200 rounded-xl p-3 bg-slate-50/20 flex flex-col justify-between">
-                        <div className="relative w-full aspect-video rounded overflow-hidden border border-slate-100 bg-slate-100">
-                          <img src={ban.image} alt={`Slide ${ban.id}`} className="w-full h-full object-cover" />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+
+                    {/* Desktop Banners Section */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
+                        <div className="w-7 h-7 rounded-lg bg-[#0A52D6]/10 flex items-center justify-center">
+                          <ImageIcon className="w-3.5 h-3.5 text-[#0A52D6]" />
                         </div>
-                        <div className="flex justify-between items-center mt-3">
-                          <span className="text-xs font-bold text-slate-500 font-mono">Slide #{ban.id}</span>
-                          <button onClick={() => handleDeleteBanner(ban.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded" title="Delete">
-                            <Trash2 className="w-4 h-4" />
+                        <div>
+                          <h4 className="text-sm font-bold text-slate-800">Desktop Banners</h4>
+                          <p className="text-[11px] text-slate-400">Shown on screens ≥ 640px · Recommended: 1920×550</p>
+                        </div>
+                        <span className="ml-auto text-xs font-semibold text-slate-500 bg-slate-100 rounded-full px-2.5 py-0.5">
+                          {banners.desktop.length} slide{banners.desktop.length !== 1 ? "s" : ""}
+                        </span>
+                      </div>
+
+                      {banners.desktop.length === 0 ? (
+                        <div
+                          onClick={() => { resetBannerModal(); setBannerUploadType("desktop"); setActiveModal("banner"); }}
+                          className="border-2 border-dashed border-slate-200 rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-[#0A52D6]/40 hover:bg-blue-50/30 transition-colors group"
+                        >
+                          <div className="w-10 h-10 rounded-full bg-slate-100 group-hover:bg-[#0A52D6]/10 flex items-center justify-center mb-3 transition-colors">
+                            <PlusCircle className="w-5 h-5 text-slate-400 group-hover:text-[#0A52D6] transition-colors" />
+                          </div>
+                          <p className="text-sm font-semibold text-slate-500 group-hover:text-[#0A52D6] transition-colors">Add Desktop Banner</p>
+                          <p className="text-xs text-slate-400 mt-1">1920×550px recommended</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {banners.desktop.map((ban: any) => (
+                            <div key={ban._id || ban.id} className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-xs">
+                              <div className="relative w-full aspect-[1920/550] bg-slate-100">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={ban.image} alt={`Desktop Banner ${ban.id}`} className="w-full h-full object-cover" />
+                              </div>
+                              <div className="flex items-center justify-between px-3 py-2 border-t border-slate-100">
+                                <span className="text-xs font-semibold text-slate-500 font-mono">Slide #{ban.id}</span>
+                                <button
+                                  onClick={() => handleDeleteBanner(ban.id, "desktop")}
+                                  className="flex items-center gap-1 text-xs font-semibold text-red-600 hover:bg-red-50 px-2 py-1 rounded-lg transition-colors"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" /> Delete
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                          <button
+                            onClick={() => { resetBannerModal(); setBannerUploadType("desktop"); setActiveModal("banner"); }}
+                            className="w-full border border-dashed border-slate-200 rounded-xl py-3 text-xs font-semibold text-slate-400 hover:border-[#0A52D6]/40 hover:text-[#0A52D6] hover:bg-blue-50/20 transition-colors flex items-center justify-center gap-1.5"
+                          >
+                            <PlusCircle className="w-4 h-4" /> Add another desktop banner
                           </button>
                         </div>
+                      )}
+                    </div>
+
+                    {/* Mobile Banners Section */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
+                        <div className="w-7 h-7 rounded-lg bg-slate-700/10 flex items-center justify-center">
+                          <ImageIcon className="w-3.5 h-3.5 text-slate-700" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-slate-800">Mobile Banners</h4>
+                          <p className="text-[11px] text-slate-400">Shown on screens &lt; 640px · Recommended: 750×950</p>
+                        </div>
+                        <span className="ml-auto text-xs font-semibold text-slate-500 bg-slate-100 rounded-full px-2.5 py-0.5">
+                          {banners.mobile.length} slide{banners.mobile.length !== 1 ? "s" : ""}
+                        </span>
                       </div>
-                    ))}
+
+                      {banners.mobile.length === 0 ? (
+                        <div
+                          onClick={() => { resetBannerModal(); setBannerUploadType("mobile"); setActiveModal("banner"); }}
+                          className="border-2 border-dashed border-slate-200 rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-slate-500/40 hover:bg-slate-50 transition-colors group"
+                        >
+                          <div className="w-10 h-10 rounded-full bg-slate-100 group-hover:bg-slate-200 flex items-center justify-center mb-3 transition-colors">
+                            <PlusCircle className="w-5 h-5 text-slate-400 group-hover:text-slate-600 transition-colors" />
+                          </div>
+                          <p className="text-sm font-semibold text-slate-500 group-hover:text-slate-700 transition-colors">Add Mobile Banner</p>
+                          <p className="text-xs text-slate-400 mt-1">750×950px recommended (portrait)</p>
+                          <p className="text-[11px] text-amber-600 mt-2 font-medium">⚠ Without mobile banners, desktop banners will be shown on mobile</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {banners.mobile.map((ban: any) => (
+                            <div key={ban._id || ban.id} className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-xs">
+                              <div className="relative w-full aspect-[750/950] max-h-[200px] bg-slate-100">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={ban.image} alt={`Mobile Banner ${ban.id}`} className="w-full h-full object-cover" />
+                              </div>
+                              <div className="flex items-center justify-between px-3 py-2 border-t border-slate-100">
+                                <span className="text-xs font-semibold text-slate-500 font-mono">Slide #{ban.id}</span>
+                                <button
+                                  onClick={() => handleDeleteBanner(ban.id, "mobile")}
+                                  className="flex items-center gap-1 text-xs font-semibold text-red-600 hover:bg-red-50 px-2 py-1 rounded-lg transition-colors"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" /> Delete
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                          <button
+                            onClick={() => { resetBannerModal(); setBannerUploadType("mobile"); setActiveModal("banner"); }}
+                            className="w-full border border-dashed border-slate-200 rounded-xl py-3 text-xs font-semibold text-slate-400 hover:border-slate-500/40 hover:text-slate-600 hover:bg-slate-50 transition-colors flex items-center justify-center gap-1.5"
+                          >
+                            <PlusCircle className="w-4 h-4" /> Add another mobile banner
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
                   </div>
                 )}
               </div>
@@ -1551,8 +1725,9 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                             const data = await res.json();
                             if (!res.ok) throw new Error(data.error || "Upload failed");
                             setBlogForm({ ...blogForm, image: data.url });
-                          } catch (err: any) {
-                            alert(`Upload failed: ${err.message}`);
+                          } catch (err: unknown) {
+                            const msg = err instanceof Error ? err.message : String(err);
+                            alert(`Upload failed: ${msg}`);
                           }
                         }}
                         className="hidden"
@@ -1671,39 +1846,140 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
       {/* Banner Add Modal */}
       {activeModal === "banner" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 max-w-md w-full shadow-2xl animate-scale-in">
-            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 rounded-t-2xl">
-              <h3 className="font-extrabold text-slate-900 text-base">Add Banner Slide</h3>
-              <button onClick={() => setActiveModal(null)} className="p-1 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700">
+          <div className="bg-white rounded-2xl border border-slate-200 max-w-lg w-full shadow-2xl animate-scale-in">
+            {/* Header */}
+            <div className={`p-5 border-b border-slate-100 flex justify-between items-center rounded-t-2xl ${bannerUploadType === "desktop" ? "bg-blue-50/60" : "bg-slate-50"}`}>
+              <div className="flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${bannerUploadType === "desktop" ? "bg-[#0A52D6]/10" : "bg-slate-200"}`}>
+                  <ImageIcon className={`w-4 h-4 ${bannerUploadType === "desktop" ? "text-[#0A52D6]" : "text-slate-600"}`} />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-sm">
+                    Add {bannerUploadType === "desktop" ? "Desktop" : "Mobile"} Banner
+                  </h3>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    {bannerUploadType === "desktop" ? "Recommended: 1920×550px" : "Recommended: 750×950px (portrait)"}
+                  </p>
+                </div>
+              </div>
+              <button onClick={resetBannerModal} className="p-1 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <form onSubmit={handleBannerSubmit} className="p-6 space-y-4 text-sm">
+
+            <form onSubmit={handleBannerSubmit} className="p-5 space-y-4 text-sm">
+              {/* Upload Option Toggle */}
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Image Path/URL *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. /banner-1.png"
-                  value={bannerForm.image}
-                  onChange={(e) => setBannerForm({ ...bannerForm, image: e.target.value })}
-                  className="w-full text-base px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6]"
-                />
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Upload Method</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setBannerUploadOption("file")}
+                    className={`py-2 px-3 text-xs font-semibold rounded-lg border text-center transition-all ${bannerUploadOption === "file" ? "bg-slate-800 border-slate-800 text-white" : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"}`}
+                  >
+                    File Upload
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBannerUploadOption("url")}
+                    className={`py-2 px-3 text-xs font-semibold rounded-lg border text-center transition-all ${bannerUploadOption === "url" ? "bg-slate-800 border-slate-800 text-white" : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"}`}
+                  >
+                    Manual URL
+                  </button>
+                </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex justify-end gap-2">
+              {bannerUploadOption === "file" ? (
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Select or Drag Image *</label>
+                  <div
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const file = e.dataTransfer.files?.[0];
+                      if (file && file.type.startsWith("image/")) {
+                        bannerFileRef.current = file;
+                        setBannerFile(file);
+                        setBannerPreviewUrl(URL.createObjectURL(file));
+                      }
+                    }}
+                    className="border-2 border-dashed border-slate-200 hover:border-[#0A52D6] rounded-xl p-6 text-center cursor-pointer transition-colors relative"
+                    onClick={() => bannerInputRef.current?.click()}
+                  >
+                    <input
+                      type="file"
+                      ref={bannerInputRef}
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          bannerFileRef.current = file;
+                          setBannerFile(file);
+                          setBannerPreviewUrl(URL.createObjectURL(file));
+                        }
+                      }}
+                    />
+                    {bannerPreviewUrl ? (
+                      <div className={`relative w-full rounded overflow-hidden border border-slate-100 bg-slate-50 ${bannerUploadType === "desktop" ? "aspect-[1920/550] max-h-[120px]" : "aspect-[750/950] max-h-[220px]"}`}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={bannerPreviewUrl} alt="Preview" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            bannerFileRef.current = null;
+                            setBannerFile(null);
+                            setBannerPreviewUrl("");
+                          }}
+                          className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2 py-4">
+                        <div className="flex justify-center text-slate-300">
+                          <ImageIcon className="w-10 h-10 stroke-1" />
+                        </div>
+                        <p className="text-xs font-semibold text-slate-600">
+                          Drag &amp; drop, or <span className="text-[#0A52D6] hover:underline">browse files</span>
+                        </p>
+                        <p className="text-[10px] text-slate-400">PNG, JPG, JPEG, WEBP supported</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Image URL or Path *</label>
+                  <input
+                    type="text"
+                    required={bannerUploadOption === "url"}
+                    placeholder={bannerUploadType === "desktop" ? "e.g. /banner-desktop.png or Cloudinary URL" : "e.g. /banner-mobile.png or Cloudinary URL"}
+                    value={bannerUrlInput}
+                    onChange={(e) => setBannerUrlInput(e.target.value)}
+                    className="w-full text-sm px-3 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6]"
+                  />
+                </div>
+              )}
+
+              <div className="pt-2 border-t border-slate-100 flex justify-end gap-2">
                 <button
                   type="button"
-                  onClick={() => setActiveModal(null)}
-                  className="px-4 py-2 border border-slate-200 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 cursor-pointer"
+                  onClick={resetBannerModal}
+                  className="px-4 py-2 border border-slate-200 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 cursor-pointer text-sm"
+                  disabled={isUploadingBanner}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#0A52D6] hover:bg-[#0B4294] text-white font-semibold rounded-lg cursor-pointer"
+                  disabled={isUploadingBanner}
+                  className={`px-5 py-2 text-white font-semibold rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 text-sm ${bannerUploadType === "desktop" ? "bg-[#0A52D6] hover:bg-[#0B4294]" : "bg-slate-700 hover:bg-slate-900"}`}
                 >
-                  Add Banner
+                  {isUploadingBanner && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {isUploadingBanner ? "Uploading..." : `Add ${bannerUploadType === "desktop" ? "Desktop" : "Mobile"} Banner`}
                 </button>
               </div>
             </form>

@@ -103,7 +103,7 @@ export default function Footer() {
               <div className="flex items-center gap-5 mt-1.5">
                 {/* Amazon */}
                 <a
-                  href="https://www.amazon.in"
+                  href="https://www.amazon.in/stores/page/74A84DE2-35D8-4F5B-8387-0B75E1A4CDE9?ingress=0&visitId=5c873a4d-732c-4151-9cb1-86399dd31b8c"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Available on Amazon"

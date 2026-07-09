@@ -1,28 +1,177 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 
-export default function Hero() {
-  const [slides, setSlides] = useState<any[]>([
-    { id: 1, image: "/banner-1.png" },
-    { id: 2, image: "/banner-2.png" },
-    { id: 3, image: "/banner-3.png" },
-  ]);
+interface BannerSlide {
+  id: number;
+  type: "desktop" | "mobile";
+  image: string;
+}
+
+interface BannerData {
+  desktop: BannerSlide[];
+  mobile: BannerSlide[];
+}
+
+// Static fallbacks shown before DB banners load
+const DESKTOP_FALLBACK: BannerSlide[] = [
+  { id: 1, type: "desktop", image: "/banner-1.png" },
+  { id: 2, type: "desktop", image: "/banner-2.png" },
+  { id: 3, type: "desktop", image: "/banner-3.png" },
+];
+
+const MOBILE_FALLBACK: BannerSlide[] = [
+  { id: 1, type: "mobile", image: "/banner-1.png" },
+  { id: 2, type: "mobile", image: "/banner-2.png" },
+  { id: 3, type: "mobile", image: "/banner-3.png" },
+];
+
+// Individual carousel for one device type
+function BannerCarousel({ slides }: { slides: BannerSlide[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [startX, setStartX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
 
+  const safeIndex = slides.length === 0 ? 0 : currentIndex % slides.length;
+
+  const goNext = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % slides.length);
+  }, [slides.length]);
+
+  const goPrev = useCallback(() => {
+    setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
+  }, [slides.length]);
+
+  // Auto-play
+  useEffect(() => {
+    if (isDragging || slides.length <= 1) return;
+    const timer = setInterval(goNext, 6000);
+    return () => clearInterval(timer);
+  }, [isDragging, slides.length, goNext]);
+
+  // Touch
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (slides.length <= 1) return;
+    setIsDragging(true);
+    setStartX(e.touches[0].clientX);
+    setDragOffset(0);
+  };
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    setDragOffset(e.touches[0].clientX - startX);
+  };
+  const handleTouchEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    if (dragOffset < -70) goNext();
+    else if (dragOffset > 70) goPrev();
+    setDragOffset(0);
+  };
+
+  // Mouse drag
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (slides.length <= 1) return;
+    setIsDragging(true);
+    setStartX(e.clientX);
+    setDragOffset(0);
+  };
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    setDragOffset(e.clientX - startX);
+  };
+  const handleMouseUp = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    if (dragOffset < -70) goNext();
+    else if (dragOffset > 70) goPrev();
+    setDragOffset(0);
+  };
+
+  if (slides.length === 0) return null;
+
+  return (
+    <div
+      className={`absolute inset-0 overflow-hidden select-none ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+    >
+      {/* Sliding track */}
+      <div
+        className="flex h-full"
+        style={{
+          width: `${slides.length * 100}%`,
+          transform: isDragging
+            ? `translateX(calc(-${safeIndex * (100 / slides.length)}% + ${dragOffset / slides.length}px))`
+            : `translateX(-${safeIndex * (100 / slides.length)}%)`,
+          transition: isDragging ? "none" : "transform 700ms cubic-bezier(0.16, 1, 0.3, 1)",
+        }}
+      >
+        {slides.map((slide, index) => (
+          <div
+            key={`${slide.type}-${slide.id}`}
+            className="relative h-full"
+            style={{ width: `${100 / slides.length}%` }}
+          >
+            <Image
+              src={slide.image}
+              alt={`RISING Banner ${index + 1}`}
+              fill
+              className="object-cover pointer-events-none select-none"
+              sizes="100vw"
+              priority={index === 0}
+              draggable={false}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Dot indicators */}
+      {slides.length > 1 && (
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-3 z-20">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              className={`h-1.5 transition-all duration-300 cursor-pointer ${
+                safeIndex === index ? "w-12 bg-primary" : "w-6 bg-slate-350 hover:bg-slate-400"
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function Hero() {
+  const [desktopSlides, setDesktopSlides] = useState<BannerSlide[]>(DESKTOP_FALLBACK);
+  const [mobileSlides, setMobileSlides] = useState<BannerSlide[]>(MOBILE_FALLBACK);
+
   useEffect(() => {
     async function loadBanners() {
       try {
         const res = await fetch("/api/public/banners");
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.length > 0) {
-            setSlides(data);
-          }
+        if (!res.ok) return;
+        const data: BannerData = await res.json();
+
+        if (data.desktop && data.desktop.length > 0) {
+          setDesktopSlides(data.desktop);
+        }
+        // If no mobile banners uploaded, fall back to the desktop banners
+        if (data.mobile && data.mobile.length > 0) {
+          setMobileSlides(data.mobile);
+        } else if (data.desktop && data.desktop.length > 0) {
+          // Coerce desktop slides as mobile fallback
+          setMobileSlides(data.desktop.map(s => ({ ...s, type: "mobile" as const })));
         }
       } catch (err) {
         console.error("Error loading banners:", err);
@@ -31,175 +180,33 @@ export default function Hero() {
     loadBanners();
   }, []);
 
-  // Auto-play slides (paused when dragging)
-  useEffect(() => {
-    if (isDragging) return;
-
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, [isDragging, currentIndex]);
-
-  // Touch handlers for mobile swipe
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsDragging(true);
-    setStartX(e.touches[0].clientX);
-    setDragOffset(0);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
-    const currentX = e.touches[0].clientX;
-    const diff = currentX - startX;
-    setDragOffset(diff);
-  };
-
-  const handleTouchEnd = () => {
-    if (!isDragging) return;
-    setIsDragging(false);
-
-    const threshold = 70;
-    if (dragOffset < -threshold) {
-      // Swipe Left -> Next Slide
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
-    } else if (dragOffset > threshold) {
-      // Swipe Right -> Prev Slide
-      setCurrentIndex(
-        (prevIndex) => (prevIndex - 1 + slides.length) % slides.length,
-      );
-    }
-    setDragOffset(0);
-  };
-
-  // Mouse handlers for desktop drag
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setStartX(e.clientX);
-    setDragOffset(0);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    e.preventDefault(); // Prevent text/image selection dragging
-    const currentX = e.clientX;
-    const diff = currentX - startX;
-    setDragOffset(diff);
-  };
-
-  const handleMouseUp = () => {
-    if (!isDragging) return;
-    setIsDragging(false);
-
-    const threshold = 70;
-    if (dragOffset < -threshold) {
-      // Drag Left -> Next Slide
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
-    } else if (dragOffset > threshold) {
-      // Drag Right -> Prev Slide
-      setCurrentIndex(
-        (prevIndex) => (prevIndex - 1 + slides.length) % slides.length,
-      );
-    }
-    setDragOffset(0);
-  };
-
-  const handleMouseLeave = () => {
-    if (isDragging) {
-      handleMouseUp();
-    }
-  };
-
   return (
     <section
       id="home"
-      className={`scroll-mt-20 relative overflow-hidden w-full h-[60dvh] sm:h-screen sm:h-[100dvh] min-h-[400px] sm:min-h-[500px] bg-white select-none ${
-        isDragging ? "cursor-grabbing" : "cursor-grab"
-      }`}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
+      className="scroll-mt-20 relative overflow-hidden w-full h-[60dvh] sm:h-[100dvh] min-h-[400px] sm:min-h-[500px] bg-white"
     >
-      {/* Fixed Subtle Ambient Lights (Blue & Yellow) */}
+      {/* Ambient lights */}
       <div className="absolute top-0 right-0 w-[70vw] h-[70vh] bg-[radial-gradient(circle_at_80%_20%,rgba(10,82,214,0.05),transparent_70%)] pointer-events-none z-0" />
       <div className="absolute bottom-0 left-0 w-[70vw] h-[70vh] bg-[radial-gradient(circle_at_20%_80%,rgba(255,184,0,0.04),transparent_70%)] pointer-events-none z-0" />
 
-      {/* Sliding Track Container */}
-      <div
-        className="flex h-full w-full relative z-10"
-        style={{
-          transform: isDragging
-            ? `translateX(calc(-${currentIndex * 100}% + ${dragOffset}px))`
-            : `translateX(-${currentIndex * 100}%)`,
-          transition: isDragging
-            ? "none"
-            : "transform 700ms cubic-bezier(0.16, 1, 0.3, 1)",
-        }}
-      >
-        {slides.map((slide, index) => {
-          return (
-            <div
-              key={slide.id}
-              className="relative w-full h-full shrink-0 bg-transparent overflow-hidden"
-            >
-              {slide.image && (
-                <Image
-                  src={slide.image}
-                  alt={`RISING Banner ${index + 1}`}
-                  fill
-                  className={`object-cover ${
-                    index === 1 
-                      ? "object-[center_60%]" 
-                      : "object-[20%_center] sm:object-center"
-                  } pointer-events-none select-none`}
-                  sizes="100vw"
-                  priority={index === 0}
-                  draggable={false}
-                />
-              )}
-            </div>
-          );
-        })}
+      {/* Desktop carousel — hidden on mobile */}
+      <div className="hidden sm:block absolute inset-0 z-10">
+        <BannerCarousel slides={desktopSlides} />
       </div>
 
-      {/* Vertical Scroll Down Indicator (Left Side, from reference image) */}
+      {/* Mobile carousel — hidden on desktop */}
+      <div className="block sm:hidden absolute inset-0 z-10">
+        <BannerCarousel slides={mobileSlides} />
+      </div>
+
+      {/* Scroll Down indicator */}
       <div className="absolute left-10 top-1/2 -translate-y-1/2 z-20 hidden md:flex flex-col items-center pointer-events-none select-none">
         <span className="text-[9px] tracking-[0.5em] text-slate-400 font-semibold uppercase rotate-90 origin-center whitespace-nowrap mb-14 translate-x-0.5">
           SCROLL DOWN
         </span>
-        <svg
-          className="w-3.5 h-3.5 text-slate-400 animate-bounce"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2.5}
-            d="M19 14l-7 7m0 0l-7-7"
-          />
+        <svg className="w-3.5 h-3.5 text-slate-400 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 14l-7 7m0 0l-7-7" />
         </svg>
-      </div>
-
-      {/* Bottom Slider Indicators - Flat bars, not circles */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-3 z-20">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`h-1.5 transition-all duration-300 cursor-pointer ${
-              currentIndex === index
-                ? "w-12 bg-primary"
-                : "w-6 bg-slate-350 hover:bg-slate-400"
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
       </div>
     </section>
   );

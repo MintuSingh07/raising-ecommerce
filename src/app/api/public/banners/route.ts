@@ -7,12 +7,13 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     await dbConnect();
-    const banners = await Banner.find({}).sort({ id: 1 });
-    return NextResponse.json(banners);
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: "Failed to fetch banners: " + error.message },
-      { status: 500 }
-    );
+    const [desktop, mobile] = await Promise.all([
+      Banner.find({ type: "desktop" }).sort({ id: 1 }).lean(),
+      Banner.find({ type: "mobile" }).sort({ id: 1 }).lean(),
+    ]);
+    return NextResponse.json({ desktop, mobile });
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
