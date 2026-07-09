@@ -20,16 +20,17 @@ export async function GET(request: NextRequest) {
 
     let fetchUrl = url;
     if (url.includes("res.cloudinary.com")) {
-      const matches = url.match(/res\.cloudinary\.com\/[^/]+\/(image|raw)\/upload\/(?:v\d+\/)?(.+?)(?:\.[a-z0-9]+)?$/i);
+      const matches = url.match(/res\.cloudinary\.com\/[^/]+\/(image|raw)\/upload\/(?:v\d+\/)?(.+?)(?:\.([a-z0-9]+))?$/i);
       if (matches) {
         const resourceType = matches[1];
         const publicId = matches[2];
+        const format = matches[3] || "";
         
-        // Generate a signed URL using Cloudinary SDK to authorize access
-        fetchUrl = cloudinary.url(publicId, {
+        // Generate a private signed download URL to access the restricted asset
+        fetchUrl = cloudinary.utils.private_download_url(publicId, format, {
           resource_type: resourceType,
-          sign_url: true,
-          secure: true,
+          type: "upload",
+          expires_at: Math.floor(Date.now() / 1000) + 3600, // 1 hour expiration
         });
       }
     }
