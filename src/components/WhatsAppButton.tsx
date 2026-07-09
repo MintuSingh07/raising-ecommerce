@@ -2,8 +2,8 @@
 
 export default function WhatsAppButton() {
   // Configurable WhatsApp number (using India country code by default)
-  // Feel free to replace the number '919999999999' with the correct business number.
-  const whatsappNumber = "919999999999";
+  // Feel free to replace the number '919468650719' with the correct business number.
+  const whatsappNumber = "919468650719";
   const message = encodeURIComponent("Hello! I visited your website and would like to inquire about your products.");
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
 

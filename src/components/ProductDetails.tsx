@@ -86,6 +86,7 @@ interface ProductDetailsProps {
     specs?: any[];
     applications?: any[];
     inBox?: any[];
+    datasheetUrl?: string;
   };
   onClose: () => void;
 }
@@ -1140,7 +1141,7 @@ export default function ProductDetails({
                 {rating} ({reviews} Reviews)
               </span>
               <span className="text-slate-200">|</span>
-              <span>SKU: {product.sku || `RT-${product.id}`}</span>
+              <span>SKU: {product.sku || product.id}</span>
             </div>
 
             {/* Quick Specs Bullet List with Lucide Icons */}
@@ -1232,18 +1233,20 @@ export default function ProductDetails({
                   />
                 </div>
               </a>
-              <button
-                onClick={() =>
-                  alert("Datasheet download started successfully.")
-                }
-                className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start px-6 py-3.5 rounded-lg text-xs font-bold bg-white text-slate-800 border border-slate-200 hover:border-slate-350 hover:bg-slate-50 transition-all duration-300 active:scale-[0.98]"
-              >
-                <span>Download Datasheet</span>
-                <Download
-                  className="w-4.5 h-4.5 ml-6 text-slate-650"
-                  strokeWidth={2.5}
-                />
-              </button>
+              {product.datasheetUrl && (
+                <a
+                  href={`/api/public/download-datasheet?url=${encodeURIComponent(product.datasheetUrl)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start px-6 py-3.5 rounded-lg text-xs font-bold bg-white text-slate-800 border border-slate-200 hover:border-slate-350 hover:bg-slate-50 transition-all duration-300 active:scale-[0.98]"
+                >
+                  <span>Download Datasheet</span>
+                  <Download
+                    className="w-4.5 h-4.5 ml-6 text-slate-650"
+                    strokeWidth={2.5}
+                  />
+                </a>
+              )}
             </div>
           </div>
         </div>

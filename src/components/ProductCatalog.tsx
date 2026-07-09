@@ -14,6 +14,8 @@ export interface Product {
   name: string;
   video: string;
   category?: string;
+  rawCategories?: string[];
+  datasheetUrl?: string;
   sku: string | null;
   gtin_upc_ean_isbn: string | null;
   published: number;
@@ -256,85 +258,119 @@ export default function ProductCatalog({
 
     products.forEach((p) => {
       const cats = p.categories.map((c) => c.toLowerCase());
-      let matched = false;
+      const rawCats = (p.rawCategories || []).map((c) => c.toLowerCase());
+      const primaryCat = (p.category || "").toLowerCase();
 
-      // Group precisely based on category tags
-      if (cats.includes("led headlamp") || cats.includes("led-headlamp")) {
-        groups["led-headlamp"].push(p);
-        matched = true;
-      }
-      if (cats.includes("led lantern") || cats.includes("led-lantern")) {
-        groups["led-lantern"].push(p);
-        matched = true;
-      }
-      if (
-        cats.includes("led table lamp") ||
-        cats.includes("led-table-lamp") ||
-        cats.includes("corporate gifting") ||
-        cats.includes("corporate-gifting")
-      ) {
-        groups["led-table-lamp"].push(p);
-        matched = true;
-      }
-      if (cats.includes("led usb lamp") || cats.includes("led-usb-lamp")) {
-        groups["led-usb-lamp"].push(p);
-        matched = true;
-      }
-      if (
-        cats.includes("metal flashlights") ||
-        cats.includes("metal-flashlights") ||
-        cats.includes("defence/security") ||
-        cats.includes("defense-security") ||
-        cats.includes("defense & security") ||
-        cats.includes("industrial")
-      ) {
-        groups["metal-flashlights"].push(p);
-        matched = true;
-      }
-      if (
-        cats.includes("rechargeable led flashlight") ||
-        cats.includes("rechargeable-led-flashlight")
-      ) {
-        groups["rechargeable-led-flashlight"].push(p);
-        matched = true;
-      }
-      if (
-        cats.includes("kisan torch") ||
-        cats.includes("kisan-torch") ||
-        cats.includes("farming") ||
-        cats.includes("remote areas/village") ||
-        cats.includes("village-remote") ||
-        cats.includes("village & remote")
-      ) {
-        groups["kisan-torch"].push(p);
-        matched = true;
-      }
-      if (
-        cats.includes("solar energy kit") ||
-        cats.includes("solar-energy-kit")
-      ) {
-        groups["solar-energy-kit"].push(p);
-        matched = true;
-      }
-      if (
-        cats.includes("solar lantern & searchlight") ||
-        cats.includes("solar-lantern-searchlight") ||
-        cats.includes("solar lantern and search light")
-      ) {
-        groups["solar-lantern-searchlight"].push(p);
-        matched = true;
-      }
-      if (
-        cats.includes("power extension board") ||
-        cats.includes("power-extension-board")
-      ) {
-        groups["power-extension-board"].push(p);
-        matched = true;
-      }
+      const PRODUCT_TYPE_SLUGS = [
+        "rechargeable-led-flashlight",
+        "kisan-torch",
+        "metal-flashlights",
+        "led-headlamp",
+        "led-table-lamp",
+        "solar-lantern-searchlight",
+        "led-lantern",
+        "led-usb-lamp",
+        "solar-energy-kit",
+        "power-extension-board"
+      ];
 
-      if (!matched) {
-        // Default fallback
-        groups["rechargeable-led-flashlight"].push(p);
+      // Find any explicit product type category matches
+      const explicitMatches: string[] = [];
+      PRODUCT_TYPE_SLUGS.forEach(slug => {
+        if (
+          primaryCat === slug ||
+          rawCats.includes(slug) ||
+          cats.includes(slug) ||
+          cats.includes(slug.replace(/-/g, " "))
+        ) {
+          explicitMatches.push(slug);
+        }
+      });
+
+      if (explicitMatches.length > 0) {
+        explicitMatches.forEach(slug => {
+          groups[slug].push(p);
+        });
+      } else {
+        // Fall back to legacy tags mapping
+        let matchedFallback = false;
+        if (cats.includes("led headlamp") || cats.includes("led-headlamp")) {
+          groups["led-headlamp"].push(p);
+          matchedFallback = true;
+        }
+        if (cats.includes("led lantern") || cats.includes("led-lantern")) {
+          groups["led-lantern"].push(p);
+          matchedFallback = true;
+        }
+        if (
+          cats.includes("led table lamp") ||
+          cats.includes("led-table-lamp") ||
+          cats.includes("corporate gifting") ||
+          cats.includes("corporate-gifting")
+        ) {
+          groups["led-table-lamp"].push(p);
+          matchedFallback = true;
+        }
+        if (cats.includes("led usb lamp") || cats.includes("led-usb-lamp")) {
+          groups["led-usb-lamp"].push(p);
+          matchedFallback = true;
+        }
+        if (
+          cats.includes("metal flashlights") ||
+          cats.includes("metal-flashlights") ||
+          cats.includes("defence/security") ||
+          cats.includes("defense-security") ||
+          cats.includes("defense & security") ||
+          cats.includes("industrial")
+        ) {
+          groups["metal-flashlights"].push(p);
+          matchedFallback = true;
+        }
+        if (
+          cats.includes("rechargeable led flashlight") ||
+          cats.includes("rechargeable-led-flashlight") ||
+          cats.includes("rechargeable led flash light")
+        ) {
+          groups["rechargeable-led-flashlight"].push(p);
+          matchedFallback = true;
+        }
+        if (
+          cats.includes("kisan torch") ||
+          cats.includes("kisan-torch") ||
+          cats.includes("farming") ||
+          cats.includes("remote areas/village") ||
+          cats.includes("village-remote") ||
+          cats.includes("village & remote")
+        ) {
+          groups["kisan-torch"].push(p);
+          matchedFallback = true;
+        }
+        if (
+          cats.includes("solar energy kit") ||
+          cats.includes("solar-energy-kit")
+        ) {
+          groups["solar-energy-kit"].push(p);
+          matchedFallback = true;
+        }
+        if (
+          cats.includes("solar lantern & searchlight") ||
+          cats.includes("solar-lantern-searchlight") ||
+          cats.includes("solar lantern and search light")
+        ) {
+          groups["solar-lantern-searchlight"].push(p);
+          matchedFallback = true;
+        }
+        if (
+          cats.includes("power extension board") ||
+          cats.includes("power-extension-board")
+        ) {
+          groups["power-extension-board"].push(p);
+          matchedFallback = true;
+        }
+
+        if (!matchedFallback) {
+          groups["rechargeable-led-flashlight"].push(p);
+        }
       }
     });
 

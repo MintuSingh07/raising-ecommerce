@@ -539,7 +539,7 @@ function ProductFormContent() {
                       <input
                         type="text"
                         required
-                        placeholder="e.g. RT-4002"
+                        placeholder="e.g. 4002"
                         value={productForm.id}
                         onChange={(e) => setProductForm({ ...productForm, id: e.target.value })}
                         className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-[#0A52D6] font-mono text-sm bg-white font-bold"
@@ -724,19 +724,19 @@ function ProductFormContent() {
 
 
                   <div>
-                    <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider mb-1">Product Datasheet PDF</label>
+                    <label className="block text-sm font-extrabold text-slate-550 uppercase tracking-wider mb-1">Product Datasheet (PDF / Image)</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
-                        placeholder="Or enter PDF URL here..."
+                        placeholder="Or enter file URL here..."
                         value={productForm.datasheetUrl}
                         onChange={(e) => setProductForm({ ...productForm, datasheetUrl: e.target.value })}
                         className="flex-1 w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-[#0A52D6]"
                       />
                       <input
                         type="file"
-                        accept=".pdf"
-                        id="pdf-upload"
+                        accept=".pdf,image/*"
+                        id="datasheet-upload"
                         className="hidden"
                         onChange={async (e) => {
                           const file = e.target.files?.[0];
@@ -753,7 +753,7 @@ function ProductFormContent() {
                           }}
                         />
                         <label
-                          htmlFor="pdf-upload"
+                          htmlFor="datasheet-upload"
                           className="px-3 py-2 border border-slate-200 text-slate-600 font-bold rounded-lg text-xs bg-slate-50 hover:bg-slate-100 cursor-pointer shrink-0 transition-colors flex items-center gap-1 shadow-2xs"
                         >
                           {uploadingColor === "datasheet" ? (
@@ -761,7 +761,7 @@ function ProductFormContent() {
                           ) : (
                             <Plus className="w-3.5 h-3.5" />
                           )}
-                          Upload PDF
+                          Upload File
                         </label>
                       </div>
                     </div>
