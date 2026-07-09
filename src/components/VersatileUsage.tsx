@@ -137,54 +137,55 @@ export default function VersatileUsage() {
               >
                 <Link
                   href={`/collections/${cat.id}`}
-                  className="group relative w-[290px] sm:w-[340px] md:w-[380px] group-hover/scroller:w-[275px] group-hover/scroller:sm:w-[310px] group-hover/scroller:md:w-[340px] hover:!w-[325px] hover:sm:!w-[400px] hover:md:!w-[460px] bg-white border border-[#F0F0F0] rounded-[28px] shadow-[0_8px_30px_rgba(0,0,0,0.02)] hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:border-primary/20 transition-all duration-500 ease-out cursor-pointer flex flex-col justify-between overflow-hidden h-[350px]"
+                  className="group relative w-[290px] sm:w-[340px] md:w-[380px] group-hover/scroller:w-[275px] group-hover/scroller:sm:w-[310px] group-hover/scroller:md:w-[340px] hover:!w-[325px] hover:sm:!w-[400px] hover:md:!w-[460px] bg-white border border-[#F0F0F0] rounded-[28px] shadow-[0_8px_30px_rgba(0,0,0,0.05)] hover:-translate-y-2 hover:shadow-[0_24px_48px_rgba(0,0,0,0.10)] hover:border-primary/20 transition-all duration-500 ease-out cursor-pointer flex flex-col overflow-hidden h-[380px]"
                 >
-                  {/* Background image (subtle, behind gradient) */}
-                  {cat.image ? (
-                    <div className="absolute inset-0 z-0">
-                      <Image
-                        src={cat.image}
-                        alt={cat.label}
-                        fill
-                        className="object-cover opacity-15 group-hover:opacity-25 transition-opacity duration-500"
-                        sizes="(max-width: 768px) 290px, (max-width: 1024px) 340px, 460px"
-                      />
-                      {/* Gradient keeps text legible */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-white/30" />
+                  {/* ── Image panel (top 55%) ── */}
+                  <div className="relative w-full h-[210px] flex-shrink-0 overflow-hidden bg-slate-100">
+                    {cat.image ? (
+                      <>
+                        <Image
+                          src={cat.image}
+                          alt={cat.label}
+                          fill
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
+                          sizes="(max-width: 768px) 290px, (max-width: 1024px) 340px, 460px"
+                        />
+                        {/* Soft vignette at the bottom so it blends into the white text panel */}
+                        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white/60 to-transparent pointer-events-none" />
+                      </>
+                    ) : (
+                      /* Placeholder when no image */
+                      <div className="absolute inset-0 bg-gradient-to-br from-slate-100 via-slate-50 to-blue-50 flex items-center justify-center">
+                        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+                          {TAG_ICONS[idx % TAG_ICONS.length]}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Top-right: arrow badge (appears on hover) */}
+                    <div className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm border border-white/60 flex items-center justify-center shadow-sm opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 group-hover:bg-primary group-hover:border-primary transition-all duration-400">
+                      <svg className="w-4 h-4 text-slate-600 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
                     </div>
-                  ) : (
-                    <div className="absolute inset-0 z-0 bg-gradient-to-br from-slate-50 to-slate-100/60" />
-                  )}
+                  </div>
 
-                  {/* Top hover glow accent */}
-                  <div className="absolute top-0 left-0 right-0 h-[3px] bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
-
-                  {/* Card body */}
-                  <div className="relative z-10 flex flex-col justify-between h-full p-6 sm:p-8">
-                    {/* Title + description + arrow */}
-                    <div className="flex items-start justify-between w-full">
-                      <div className="flex flex-col items-start pr-4">
-                        <h3 className="text-xl sm:text-2xl font-semibold text-dark-navy group-hover:text-primary transition-colors duration-300 tracking-tight leading-tight">
-                          {cat.label}
-                        </h3>
-                        {cat.desc && (
-                          <p className="mt-3 text-xs sm:text-sm text-slate-body leading-relaxed font-normal max-h-0 opacity-0 overflow-hidden group-hover:max-h-24 group-hover:opacity-100 transition-all duration-500 ease-in-out md:max-w-[85%]">
-                            {cat.desc}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Circular arrow button */}
-                      <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-slate-50 border border-slate-100 text-slate-500 flex items-center justify-center flex-shrink-0 shadow-sm opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all duration-500">
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                      </div>
+                  {/* ── Text panel (bottom) ── */}
+                  <div className="flex flex-col flex-1 justify-between px-6 py-5 bg-white">
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-bold text-dark-navy group-hover:text-primary transition-colors duration-300 tracking-tight leading-snug">
+                        {cat.label}
+                      </h3>
+                      {cat.desc && (
+                        <p className="mt-1.5 text-[11px] sm:text-xs text-slate-500 leading-relaxed line-clamp-2">
+                          {cat.desc}
+                        </p>
+                      )}
                     </div>
 
                     {/* Tag pill */}
-                    <div className="flex items-center mt-6 md:mt-0">
-                      <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-100/80 text-[10px] sm:text-xs text-slate-600 font-semibold tracking-wide uppercase select-none transition-colors duration-300 group-hover:bg-primary/5 group-hover:text-primary group-hover:border-primary/10">
+                    <div className="flex items-center pt-3 border-t border-slate-100 mt-3">
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-[10px] sm:text-[11px] text-slate-600 font-semibold tracking-wide uppercase select-none transition-colors duration-300 group-hover:bg-primary/5 group-hover:text-primary group-hover:border-primary/20">
                         {TAG_ICONS[idx % TAG_ICONS.length]}
                         <span>{cat.label.split(" ")[0]}</span>
                       </div>
