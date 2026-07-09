@@ -15,18 +15,7 @@ interface BannerData {
   mobile: BannerSlide[];
 }
 
-// Static fallbacks shown before DB banners load
-const DESKTOP_FALLBACK: BannerSlide[] = [
-  { id: 1, type: "desktop", image: "/banner-1.png" },
-  { id: 2, type: "desktop", image: "/banner-2.png" },
-  { id: 3, type: "desktop", image: "/banner-3.png" },
-];
 
-const MOBILE_FALLBACK: BannerSlide[] = [
-  { id: 1, type: "mobile", image: "/banner-1.png" },
-  { id: 2, type: "mobile", image: "/banner-2.png" },
-  { id: 3, type: "mobile", image: "/banner-3.png" },
-];
 
 // Individual carousel for one device type
 function BannerCarousel({ slides, onClick }: { slides: BannerSlide[]; onClick?: () => void }) {
@@ -208,8 +197,9 @@ function BannerCarousel({ slides, onClick }: { slides: BannerSlide[]; onClick?: 
 
 export default function Hero() {
   const router = useRouter();
-  const [desktopSlides, setDesktopSlides] = useState<BannerSlide[]>(DESKTOP_FALLBACK);
-  const [mobileSlides, setMobileSlides] = useState<BannerSlide[]>(MOBILE_FALLBACK);
+  const [desktopSlides, setDesktopSlides] = useState<BannerSlide[]>([]);
+  const [mobileSlides, setMobileSlides] = useState<BannerSlide[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadBanners() {
@@ -221,19 +211,35 @@ export default function Hero() {
         if (data.desktop && data.desktop.length > 0) {
           setDesktopSlides(data.desktop);
         }
-        // If no mobile banners uploaded, fall back to the desktop banners
+        // If no mobile banners uploaded, use desktop banners on mobile too
         if (data.mobile && data.mobile.length > 0) {
           setMobileSlides(data.mobile);
         } else if (data.desktop && data.desktop.length > 0) {
-          // Coerce desktop slides as mobile fallback
           setMobileSlides(data.desktop.map(s => ({ ...s, type: "mobile" as const })));
         }
       } catch (err) {
         console.error("Error loading banners:", err);
+      } finally {
+        setLoading(false);
       }
     }
     loadBanners();
   }, []);
+
+  // While fetching show a subtle skeleton
+  if (loading) {
+    return (
+      <section
+        id="home"
+        className="scroll-mt-20 relative overflow-hidden w-full h-[60dvh] sm:h-[100dvh] min-h-[400px] sm:min-h-[500px] bg-slate-100 animate-pulse"
+      />
+    );
+  }
+
+  // No banners uploaded — render nothing
+  if (desktopSlides.length === 0 && mobileSlides.length === 0) {
+    return null;
+  }
 
   return (
     <section
