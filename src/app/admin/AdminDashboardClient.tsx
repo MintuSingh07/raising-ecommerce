@@ -1532,7 +1532,7 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                         </div>
                         <div>
                           <h4 className="text-sm font-bold text-slate-800">Mobile Banners</h4>
-                          <p className="text-[11px] text-slate-400">Shown on screens &lt; 640px · Recommended: 750×950</p>
+                          <p className="text-[11px] text-slate-400">Shown on screens &lt; 640px · Recommended: 750×1000</p>
                         </div>
                         <span className="ml-auto text-xs font-semibold text-slate-500 bg-slate-100 rounded-full px-2.5 py-0.5">
                           {banners.mobile.length} slide{banners.mobile.length !== 1 ? "s" : ""}
@@ -1548,14 +1548,14 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                             <PlusCircle className="w-5 h-5 text-slate-400 group-hover:text-slate-600 transition-colors" />
                           </div>
                           <p className="text-sm font-semibold text-slate-500 group-hover:text-slate-700 transition-colors">Add Mobile Banner</p>
-                          <p className="text-xs text-slate-400 mt-1">750×950px recommended (portrait)</p>
+                          <p className="text-xs text-slate-400 mt-1">750×1000px recommended (portrait)</p>
                           <p className="text-[11px] text-amber-600 mt-2 font-medium">⚠ Without mobile banners, desktop banners will be shown on mobile</p>
                         </div>
                       ) : (
                         <div className="space-y-3">
                           {banners.mobile.map((ban: any) => (
                             <div key={ban._id || ban.id} className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-xs">
-                              <div className="relative w-full aspect-[750/950] max-h-[200px] bg-slate-100">
+                              <div className="relative w-full aspect-[750/1000] max-h-[200px] bg-slate-100">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={ban.image} alt={`Mobile Banner ${ban.id}`} className="w-full h-full object-cover" />
                               </div>
@@ -1858,7 +1858,7 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                     Add {bannerUploadType === "desktop" ? "Desktop" : "Mobile"} Banner
                   </h3>
                   <p className="text-[11px] text-slate-400 mt-0.5">
-                    {bannerUploadType === "desktop" ? "Recommended: 1920×550px" : "Recommended: 750×950px (portrait)"}
+                    {bannerUploadType === "desktop" ? "Recommended: 1920×550px" : "Recommended: 750×1000px (portrait)"}
                   </p>
                 </div>
               </div>
@@ -1921,7 +1921,7 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                       }}
                     />
                     {bannerPreviewUrl ? (
-                      <div className={`relative w-full rounded overflow-hidden border border-slate-100 bg-slate-50 ${bannerUploadType === "desktop" ? "aspect-[1920/550] max-h-[120px]" : "aspect-[750/950] max-h-[220px]"}`}>
+                      <div className={`relative w-full rounded overflow-hidden border border-slate-100 bg-slate-50 ${bannerUploadType === "desktop" ? "aspect-[1920/550] max-h-[120px]" : "aspect-[750/1000] max-h-[220px]"}`}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={bannerPreviewUrl} alt="Preview" className="w-full h-full object-cover" />
                         <button
