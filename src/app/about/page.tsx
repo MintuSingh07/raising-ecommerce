@@ -176,11 +176,11 @@ export default function AboutPage() {
               <span className="text-xs sm:text-sm font-extrabold uppercase tracking-widest text-accent block">
                 Company Album
               </span>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-dark-navy tracking-tight leading-tight italic uppercase">
-                Our Journey in Pictures
+              <h2 className="text-3xl sm:text-4xl lg:text-4xl font-bold text-dark-navy tracking-tight leading-tight italic uppercase">
+                Inside Our Manufacturing Excellence
               </h2>
               <p className="text-xs sm:text-sm text-slate-body leading-relaxed font-medium">
-                Step into our vibrant world through a captivating visual journey that showcases our milestones, achievements, and the people behind our success. From groundbreaking innovations to memorable moments, our company album captures the essence of who we are and the incredible path we&apos;ve traveled.
+                Take a glimpse inside our manufacturing facility, where innovation, precision, and quality control drive every product we make. From assembly to quality inspection, every product is crafted with precision to deliver dependable lighting solutions you can trust.
               </p>
             </div>
 
