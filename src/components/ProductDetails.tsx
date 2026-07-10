@@ -381,6 +381,44 @@ export default function ProductDetails({
     return baseImages;
   }, [product, selectedColor]);
 
+  const handlePrevSlide = () => {
+    const hasVideo = !!product.video;
+    if (showVideo) {
+      if (allImages.length > 0) {
+        setActiveImageIndex(allImages.length - 1);
+      }
+      setShowVideo(false);
+    } else {
+      if (activeImageIndex === 0) {
+        if (hasVideo) {
+          setShowVideo(true);
+        } else {
+          setActiveImageIndex(allImages.length - 1);
+        }
+      } else {
+        setActiveImageIndex((prev) => prev - 1);
+      }
+    }
+  };
+
+  const handleNextSlide = () => {
+    const hasVideo = !!product.video;
+    if (showVideo) {
+      setActiveImageIndex(0);
+      setShowVideo(false);
+    } else {
+      if (activeImageIndex === allImages.length - 1) {
+        if (hasVideo) {
+          setShowVideo(true);
+        } else {
+          setActiveImageIndex(0);
+        }
+      } else {
+        setActiveImageIndex((prev) => prev + 1);
+      }
+    }
+  };
+
   // Parse color options from attributes
   const colorsList = useMemo(() => {
     const rawColors = product.attributes.Colors || "";
@@ -935,17 +973,11 @@ export default function ProductDetails({
               )}
 
               {/* Left/Right Slider Overlay Buttons */}
-              {!showVideo && allImages.length > 1 && (
+              {(allImages.length + (product.video ? 1 : 0)) > 1 && (
                 <>
                   <button
-                    onClick={() => {
-                      setActiveImageIndex(
-                        (prev) =>
-                          (prev - 1 + allImages.length) % allImages.length,
-                      );
-                      setShowVideo(false);
-                    }}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white hover:bg-slate-50 border border-slate-200/85 flex items-center justify-center text-slate-800 shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all hover:scale-105 active:scale-95 cursor-pointer z-10"
+                    onClick={handlePrevSlide}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white hover:bg-slate-50 border border-slate-200/85 flex items-center justify-center text-slate-800 shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all hover:scale-105 active:scale-95 cursor-pointer z-30"
                     aria-label="Previous image"
                   >
                     <ChevronLeft
@@ -954,13 +986,8 @@ export default function ProductDetails({
                     />
                   </button>
                   <button
-                    onClick={() => {
-                      setActiveImageIndex(
-                        (prev) => (prev + 1) % allImages.length,
-                      );
-                      setShowVideo(false);
-                    }}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white hover:bg-slate-50 border border-slate-200/85 flex items-center justify-center text-slate-800 shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all hover:scale-105 active:scale-95 cursor-pointer z-10"
+                    onClick={handleNextSlide}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white hover:bg-slate-50 border border-slate-200/85 flex items-center justify-center text-slate-800 shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all hover:scale-105 active:scale-95 cursor-pointer z-30"
                     aria-label="Next image"
                   >
                     <ChevronRight

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 export const dynamic = "force-dynamic";
 
@@ -258,6 +259,34 @@ export async function POST(request: NextRequest) {
       emailContent = buildDistributorEmail(data);
     } else {
       return NextResponse.json({ error: `Unknown type: ${type}` }, { status: 400 });
+    }
+
+    // ── Send via Resend if API Key is configured ──────────────────────────────
+    if (process.env.RESEND_API_KEY) {
+      try {
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        const fromAddress = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+        const fromName = "RISING Web Portal";
+
+        const { data: resendData, error: resendError } = await resend.emails.send({
+          from: `"${fromName}" <${fromAddress}>`,
+          to: [RECIPIENT_EMAIL],
+          replyTo: `"${data.name || data.contactName}" <${data.email}>`,
+          subject: emailContent.subject,
+          html: emailContent.html,
+        });
+
+        if (resendError) {
+          throw new Error(resendError.message);
+        }
+
+        console.log(`[contact] Email sent via Resend → ${RECIPIENT_EMAIL} | ID: ${resendData?.id}`);
+        return NextResponse.json({ success: true, message: "Message sent successfully." });
+      } catch (resendErr) {
+        const errMsg = resendErr instanceof Error ? resendErr.message : String(resendErr);
+        console.error("[contact] Resend failed:", errMsg);
+        throw resendErr; // Throw to trigger 500 error on frontend with the specific message
+      }
     }
 
     // ── Build transporter ────────────────────────────────────────────────────
