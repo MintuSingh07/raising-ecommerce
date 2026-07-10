@@ -207,6 +207,25 @@ export default function ProductCatalog({
   setSelectedProduct,
 }: ProductCatalogProps = {}) {
   const { products, isLoading } = useProducts();
+  const [catalogUrl, setCatalogUrl] = useState("/catalog.pdf");
+
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const res = await fetch("/api/public/settings");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.catalogUrl) {
+            setCatalogUrl(data.catalogUrl);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching catalog URL setting:", err);
+      }
+    }
+    fetchSettings();
+  }, []);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState(
     "rechargeable-led-flashlight",
@@ -526,8 +545,10 @@ export default function ProductCatalog({
 
             {/* Download Catalog Button */}
             <a
-              href="/catalog.pdf"
+              href={catalogUrl}
               download
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-full text-xs font-semibold bg-primary text-white border border-white/20 shadow-lg shadow-primary/15 transition-all duration-300 hover:bg-primary-navy hover:shadow-primary/25 active:scale-95 whitespace-nowrap w-full sm:w-auto cursor-pointer"
             >
               <svg
@@ -543,7 +564,7 @@ export default function ProductCatalog({
                   d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                 />
               </svg>
-              Download Catalog
+              Download Product Catalog
             </a>
           </div>
         </div>

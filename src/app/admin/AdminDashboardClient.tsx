@@ -327,6 +327,11 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
   const [seedError, setSeedError] = useState<string | null>(null);
   const [apiMessage, setApiMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
+  // Settings tab states
+  const [settings, setSettings] = useState<Record<string, string>>({});
+  const [isUploadingCatalog, setIsUploadingCatalog] = useState(false);
+  const [settingsMessage, setSettingsMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
   // Categories Form state
   const [categoryForm, setCategoryForm] = useState({
     id: "",
@@ -430,6 +435,13 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
             setBanners({ desktop: data.desktop || [], mobile: data.mobile || [] });
           }
         }
+        if (activeTab === "settings") {
+          const res = await fetch("/api/admin/settings");
+          if (res.ok) {
+            const data = await res.json();
+            setSettings(data || {});
+          }
+        }
       } catch (err) {
         console.error("Error loading tab data", err);
       } finally {
@@ -452,6 +464,54 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
       console.error("Sign out failed", error);
     } finally {
       setIsLoggingOut(false);
+    }
+  };
+
+  const handleSaveSetting = async (key: string, value: string) => {
+    setSettingsMessage(null);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key, value }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save setting");
+      
+      setSettings(prev => ({ ...prev, [key]: value }));
+      setSettingsMessage({ type: "success", text: "Settings saved successfully!" });
+    } catch (err: any) {
+      setSettingsMessage({ type: "error", text: err.message });
+    }
+  };
+
+  const handleCatalogUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingCatalog(true);
+    setSettingsMessage(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+      
+      await handleSaveSetting("catalogUrl", data.url);
+      if (data.warning) {
+        setSettingsMessage({ 
+          type: "success", 
+          text: `Catalog uploaded successfully! Note: ${data.warning}` 
+        });
+      }
+    } catch (err: any) {
+      setSettingsMessage({ type: "error", text: `Catalog upload failed: ${err.message}` });
+    } finally {
+      setIsUploadingCatalog(false);
+      e.target.value = ""; // Reset
     }
   };
 
@@ -1601,6 +1661,79 @@ export default function AdminDashboardClient({ user, stats: initialStats }: Admi
                     <div className="col-span-2">
                       <p className="text-slate-400 text-xs uppercase font-semibold">Email Address</p>
                       <p className="text-slate-900 font-medium mt-0.5">{user.email}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Product Catalog Settings Section */}
+                <div className="border border-slate-200 rounded-xl p-5 space-y-4">
+                  <h3 className="font-bold text-slate-900">Product Catalog Settings</h3>
+                  <p className="text-slate-500 text-sm">
+                    Upload a PDF or image file to dynamically update the catalog downloaded via the **"Download Product Catalog"** button on the website.
+                  </p>
+                  
+                  {settingsMessage && (
+                    <div className={`p-3 rounded-lg text-sm font-semibold ${
+                      settingsMessage.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"
+                    }`}>
+                      {settingsMessage.text}
+                    </div>
+                  )}
+
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-slate-400 text-xs uppercase font-semibold">Current Catalog Link</p>
+                      {settings.catalogUrl ? (
+                        <a 
+                          href={settings.catalogUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 font-medium text-sm break-all underline mt-1 inline-block"
+                        >
+                          {settings.catalogUrl}
+                        </a>
+                      ) : (
+                        <p className="text-slate-450 text-sm italic mt-1">Not set (using default "/catalog.pdf")</p>
+                      )}
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-100">
+                      <label className="block text-xs font-semibold text-slate-500 uppercase mb-2">
+                        Upload New Catalog (PDF or Image)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="file"
+                          accept=".pdf,image/*"
+                          onChange={handleCatalogUpload}
+                          disabled={isUploadingCatalog}
+                          className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer disabled:opacity-50"
+                        />
+                        {isUploadingCatalog && (
+                          <span className="text-xs text-slate-400 animate-pulse">Uploading...</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-100">
+                      <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">
+                        Or set direct URL manually
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={settings.catalogUrl || ""}
+                          onChange={(e) => setSettings(prev => ({ ...prev, catalogUrl: e.target.value }))}
+                          placeholder="e.g. /catalog.pdf or external URL"
+                          className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                        />
+                        <button
+                          onClick={() => handleSaveSetting("catalogUrl", settings.catalogUrl || "")}
+                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-sm transition-all animate-none"
+                        >
+                          Save
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

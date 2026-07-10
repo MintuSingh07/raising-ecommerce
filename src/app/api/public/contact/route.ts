@@ -4,7 +4,7 @@ import { Resend } from "resend";
 
 export const dynamic = "force-dynamic";
 
-const RECIPIENT_EMAIL = "info@wonderappliances.com";
+const RECIPIENT_EMAIL = process.env.RECIPIENT_EMAIL || "info@wonderappliances.com";
 const BRAND_BLUE = "#0A52D6";
 const BRAND_GOLD = "#FFB800";
 
