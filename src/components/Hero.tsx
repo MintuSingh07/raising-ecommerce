@@ -236,11 +236,6 @@ export default function Hero() {
     );
   }
 
-  // No banners uploaded — render nothing
-  if (desktopSlides.length === 0 && mobileSlides.length === 0) {
-    return null;
-  }
-
   return (
     <section
       id="home"
